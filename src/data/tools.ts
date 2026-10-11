@@ -16,6 +16,19 @@ import { publicUrl } from '@/lib/paths';
 /** 全部工具（按 order 升序的原始声明）。 */
 export const TOOLS: Tool[] = [
   {
+    id: 'shuangpin-practice',
+    name: '双拼练习',
+    description: '搜狗双拼键位练习：实时提示按键与拼音，统计速度与正确率，纯浏览器本地运行。',
+    tags: ['输入法', '双拼', '练习'],
+    status: 'online',
+    runtime: 'client-only',
+    entry: 'tools/shuangpin-practice.html',
+    cover: '⌨️',
+    version: '0.1.0',
+    createdAt: '2026-10-11',
+    order: 1,
+  },
+  {
     id: 'md-to-html-reader',
     name: 'Markdown 阅读器',
     description: '把 Markdown 文件夹构建成自包含单文件 HTML 阅读器，双击即用、离线可读。',
@@ -26,7 +39,7 @@ export const TOOLS: Tool[] = [
     cover: '📖',
     version: '0.1.0',
     createdAt: '2025-01-10',
-    order: 1,
+    order: 2,
   },
   {
     id: 'english-dict-reader',
@@ -39,7 +52,7 @@ export const TOOLS: Tool[] = [
     cover: '🔤',
     version: '0.1.0',
     createdAt: '2025-01-18',
-    order: 2,
+    order: 3,
   },
   {
     id: 'logic-fallacy-cards',
@@ -52,7 +65,7 @@ export const TOOLS: Tool[] = [
     cover: '🧩',
     version: '0.1.0',
     createdAt: '2025-02-01',
-    order: 3,
+    order: 4,
   },
   {
     id: 'set-theory-cards',
