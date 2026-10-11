@@ -1,0 +1,131 @@
+import type { Tool } from '@/types';
+
+/**
+ * 工具注册表（本地静态，唯一真相源）。
+ *
+ * P0 不走 Supabase；后续如需在线维护再迁移到 tools 表。
+ * 分类规则：
+ * - 「已上线」 = status === 'online'
+ * - 「研发中」 = status in ('planned' | 'developing' | 'paused')
+ */
+
+/** 全部工具（按 order 升序的原始声明）。 */
+export const TOOLS: Tool[] = [
+  {
+    id: 'md-to-html-reader',
+    name: 'Markdown 阅读器',
+    description: '把 Markdown 文件夹构建成自包含单文件 HTML 阅读器，双击即用、离线可读。',
+    tags: ['阅读器', '离线', 'Markdown'],
+    status: 'online',
+    runtime: 'client-only',
+    entry: '/tools/md-to-html-reader.html',
+    cover: '📖',
+    version: '0.1.0',
+    createdAt: '2025-01-10',
+    order: 1,
+  },
+  {
+    id: 'english-dict-reader',
+    name: '英语句读器',
+    description: '把英文句子清单做成可点词查音标/释义的自包含阅读器，悬停即查、无需联网。',
+    tags: ['英语', '离线', '词典'],
+    status: 'online',
+    runtime: 'client-only',
+    entry: '/tools/english-dict-reader.html',
+    cover: '🔤',
+    version: '0.1.0',
+    createdAt: '2025-01-18',
+    order: 2,
+  },
+  {
+    id: 'logic-fallacy-cards',
+    name: '逻辑谬误卡片',
+    description: '公众号长文渲染为深色信息图卡（PNG），用于收藏与速查。',
+    tags: ['信息图', '卡片', '认知'],
+    status: 'online',
+    runtime: 'light-backend',
+    entry: '/tools/logic-fallacy-cards.html',
+    cover: '🧩',
+    version: '0.1.0',
+    createdAt: '2025-02-01',
+    order: 3,
+  },
+  {
+    id: 'set-theory-cards',
+    name: '集合论学习卡片',
+    description: '数理基础学习卡片：集合、映射、可数性等核心概念图解。',
+    tags: ['数学', '学习', '卡片'],
+    status: 'planned',
+    runtime: 'client-only',
+    cover: '📐',
+    eta: '2025-Q4',
+    order: 4,
+  },
+  {
+    id: 'intuition-zhika',
+    name: '直觉之卡',
+    description: '把抽象直觉训练拆成可翻阅的小卡片，建立长期记忆回路。',
+    tags: ['认知', '学习', '卡片'],
+    status: 'developing',
+    runtime: 'client-only',
+    cover: '💡',
+    eta: '2026-Q1',
+    order: 5,
+  },
+  {
+    id: 'markdown-slide',
+    name: 'Markdown 幻灯',
+    description: '一份 Markdown 直接生成可演示的单文件幻灯片，离线分享。',
+    tags: ['演示', '离线', 'Markdown'],
+    status: 'planned',
+    runtime: 'client-only',
+    cover: '📊',
+    eta: '2026-Q2',
+    order: 6,
+  },
+];
+
+/** 合法的在线状态集合（用于筛选）。 */
+const ONLINE_STATUS = 'online' as const;
+
+/**
+ * 按 id 查找工具。
+ * @param id 工具 id
+ * @returns 匹配的 Tool，未找到返回 undefined
+ */
+export function getToolById(id: string): Tool | undefined {
+  return TOOLS.find((tool) => tool.id === id);
+}
+
+/**
+ * 获取全部已上线工具（status === 'online'），按 order 升序。
+ */
+export function getOnlineTools(): Tool[] {
+  return TOOLS.filter((tool) => tool.status === ONLINE_STATUS).sort(sortByOrder);
+}
+
+/**
+ * 获取全部研发中工具（planned | developing | paused），按 order 升序。
+ */
+export function getUpcomingTools(): Tool[] {
+  return TOOLS.filter((tool) => tool.status !== ONLINE_STATUS).sort(sortByOrder);
+}
+
+/** 按 order 升序排序（order 缺失时排到最后）。 */
+function sortByOrder(a: Tool, b: Tool): number {
+  return (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER);
+}
+
+/** 工具状态的中文展示文案。 */
+export const TOOL_STATUS_LABEL: Record<Tool['status'], string> = {
+  online: '已上线',
+  planned: '规划中',
+  developing: '开发中',
+  paused: '已暂停',
+};
+
+/** 工具运行形态的中文展示文案。 */
+export const TOOL_RUNTIME_LABEL: Record<Tool['runtime'], string> = {
+  'client-only': '浏览器本地',
+  'light-backend': '轻后端交互',
+};

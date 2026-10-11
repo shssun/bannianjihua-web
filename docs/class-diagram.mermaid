@@ -1,0 +1,125 @@
+classDiagram
+    class Tool {
+        +string id
+        +string name
+        +string description
+        +string[] tags
+        +ToolStatus status
+        +ToolRuntime runtime
+        +string entry
+        +string externalUrl
+        +string cover
+        +string version
+        +string createdAt
+        +string eta
+        +number order
+    }
+
+    class Post {
+        +string id
+        +string slug
+        +string title
+        +string excerpt
+        +string contentMd
+        +string[] tags
+        +string cover
+        +boolean published
+        +string publishedAt
+        +string createdAt
+    }
+
+    class Message {
+        +string id
+        +string nickname
+        +string content
+        +string createdAt
+        +string status
+    }
+
+    class MessageInput {
+        +string nickname
+        +string content
+        +string honeypot
+        +string turnstileToken
+    }
+
+    class APIResult~T~ {
+        +T data
+        +string error
+        +boolean fallback
+    }
+
+    class SupabaseClient {
+        +from(table) QueryBuilder
+        +auth
+    }
+
+    class PostsService {
+        +list(opts) APIResult~PostSummary[]~
+        +getBySlug(slug) APIResult~Post~
+    }
+
+    class MessagesService {
+        +list(limit) APIResult~Message[]~
+        +create(input) APIResult~Message~
+    }
+
+    class ToolRegistry {
+        +Tool[] TOOLS
+        +getToolById(id) Tool
+        +getOnlineTools() Tool[]
+        +getUpcomingTools() Tool[]
+    }
+
+    class ThemeContextValue {
+        +ThemeMode mode
+        +toggleMode() void
+        +setMode(mode) void
+    }
+
+    class MainLayout {
+        +Navbar navbar
+        +Outlet outlet
+        +Footer footer
+    }
+
+    class Navbar {
+        +ThemeToggle themeToggle
+    }
+
+    class ToolFrame {
+        +string src
+        +Tool tool
+        +void onThemeChange()
+        +void onResize()
+        +boolean fullscreen
+    }
+
+    class ToolCard {
+        +Tool tool
+        +void onOpen()
+    }
+
+    class ThemeToggle {
+        +void toggle()
+    }
+
+    class MessageBoardPage {
+        +Message[] messages
+        +submit(MessageInput)
+    }
+
+    PostsService ..> APIResult : returns
+    PostsService --> SupabaseClient : uses (nullable)
+    MessagesService ..> APIResult : returns
+    MessagesService --> SupabaseClient : uses (nullable)
+    MessagesService ..> MessageInput : accepts
+    PostsService ..> Post : produces
+    MessagesService ..> Message : produces
+    ToolRegistry ..> Tool : manages
+    MainLayout --> Navbar
+    MainLayout --> ToolFrame : page outlet
+    Navbar --> ThemeToggle
+    ToolCard --> Tool
+    ToolFrame --> Tool
+    MessageBoardPage --> MessagesService
