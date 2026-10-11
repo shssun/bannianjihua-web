@@ -17,7 +17,7 @@ export default function AboutPage(): JSX.Element {
   return (
     <Section title="关于本站" subtitle="一句话：一个浏览器优先的个人工具站与博客底座。">
       <Typography variant="body1" sx={{ lineHeight: 1.9, maxWidth: 760, mb: 4 }}>
-        本站是「百年计划」的个人站点：以纯静态方式部署，没有任何服务器端常驻进程；
+        本站是「半年计划」的个人站点：以纯静态方式部署，没有任何服务器端常驻进程；
         所有动态能力由在线数据库（Supabase）承担，工具默认 100% 在浏览器本地执行。
         目标是建立一个可长期演进的内容与工具底座 —— 加工具、加文章都不需要改动框架。
       </Typography>

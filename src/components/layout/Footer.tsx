@@ -14,7 +14,7 @@ const FOOTER_LINKS: FooterLink[] = [
   { label: '工具箱', to: '/tools' },
   { label: '研发计划', to: '/roadmap' },
   { label: 'RSS', href: '/rss.xml' },
-  { label: 'GitHub', href: 'https://github.com/' },
+  { label: 'GitHub', href: 'https://github.com/shssun/bannianjihua-web' },
 ];
 
 /**
@@ -37,7 +37,7 @@ export default function Footer(): JSX.Element {
           sx={{ py: 3 }}
         >
           <Typography variant="body2" fontWeight={700} color="var(--fg)">
-            ✦ 百年计划 · 个人站点
+            ✦ 半年计划 · 个人站点
           </Typography>
 
           <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
@@ -73,7 +73,7 @@ export default function Footer(): JSX.Element {
 
         <Box sx={{ py: 2 }}>
           <Typography variant="caption" color="var(--muted)">
-            © {year} 百年计划 · 纯静态部署，工具默认在浏览器本地运行。保留所有权利。
+            © {year} 半年计划 · 纯静态部署，工具默认在浏览器本地运行。保留所有权利。
           </Typography>
         </Box>
       </Container>

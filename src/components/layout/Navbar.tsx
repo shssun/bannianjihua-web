@@ -74,7 +74,7 @@ export default function Navbar(): JSX.Element {
             <Box component="span" sx={{ mr: 0.75 }}>
               ✦
             </Box>
-            百年计划
+            半年计划
           </Button>
 
           <Box sx={{ flexGrow: 1 }} />

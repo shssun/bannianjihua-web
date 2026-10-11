@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "百年计划 · 个人站点：blog 打底 + 浏览器端工具站（纯静态部署）",
+  "description": "半年计划 · 个人站点：blog 打底 + 浏览器端工具站（纯静态部署）",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
