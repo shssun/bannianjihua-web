@@ -26,7 +26,7 @@ export interface Tool {
   status: ToolStatus;
   /** 运行形态 */
   runtime: ToolRuntime;
-  /** iframe 指向的静态 HTML 路径，如 '/tools/md-to-html-reader.html' */
+  /** iframe 指向的静态 HTML 相对 public 的裸路径，如 'tools/md-to-html-reader.html'（消费方用 getToolEntryUrl 加 base 前缀） */
   entry?: string;
   /** 外部兜底跳转（新标签打开） */
   externalUrl?: string;

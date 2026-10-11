@@ -33,3 +33,6 @@ pnpm-debug.log*
 
 # misc
 *.tsbuildinfo
+
+# workspace tooling (local memory / cache)
+.workbuddy/

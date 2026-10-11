@@ -1,0 +1,67 @@
+# 将站点构建并发布到 GitHub Pages（项目站点：https://shssun.github.io/bannianjihua-web/）
+#
+# 触发方式：
+#   - push 到 main 分支自动部署
+#   - 支持在 Actions 页面手动触发（workflow_dispatch）
+#
+# 前置（仅需手动做一次）：仓库 Settings → Pages → Build and deployment → Source 选择 "GitHub Actions"
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 仅授予部署 Pages 所需的最小权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只保留一个 Pages 部署；新的 push 可取消进行中的旧部署
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 关键坑：npm ci 在部分环境/配置下会跳过 optionalDependencies，
+      # 导致 rollup / esbuild 的平台原生二进制缺失而构建失败。
+      # 显式 --include=optional 强制安装可选依赖，规避该问题。
+      - name: Install dependencies
+        run: npm ci --include=optional
+
+      # 构建。base 无需传入：vite.config.ts 默认即为 '/bannianjihua-web/'。
+      # 若日后换成自定义域名/根路径部署，可改为：BASE_PATH=/ npm run build
+      - name: Build
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

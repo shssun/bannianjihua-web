@@ -1,4 +1,5 @@
 import type { Tool } from '@/types';
+import { publicUrl } from '@/lib/paths';
 
 /**
  * 工具注册表（本地静态，唯一真相源）。
@@ -7,6 +8,9 @@ import type { Tool } from '@/types';
  * 分类规则：
  * - 「已上线」 = status === 'online'
  * - 「研发中」 = status in ('planned' | 'developing' | 'paused')
+ *
+ * 注意：`entry` 这里只写相对 `public/tools/` 的**裸路径**（如 'tools/x.html'），
+ * 消费方请通过下面的 `getToolEntryUrl()` 取得带部署 base 前缀的完整 URL。
  */
 
 /** 全部工具（按 order 升序的原始声明）。 */
@@ -18,7 +22,7 @@ export const TOOLS: Tool[] = [
     tags: ['阅读器', '离线', 'Markdown'],
     status: 'online',
     runtime: 'client-only',
-    entry: '/tools/md-to-html-reader.html',
+    entry: 'tools/md-to-html-reader.html',
     cover: '📖',
     version: '0.1.0',
     createdAt: '2025-01-10',
@@ -31,7 +35,7 @@ export const TOOLS: Tool[] = [
     tags: ['英语', '离线', '词典'],
     status: 'online',
     runtime: 'client-only',
-    entry: '/tools/english-dict-reader.html',
+    entry: 'tools/english-dict-reader.html',
     cover: '🔤',
     version: '0.1.0',
     createdAt: '2025-01-18',
@@ -44,7 +48,7 @@ export const TOOLS: Tool[] = [
     tags: ['信息图', '卡片', '认知'],
     status: 'online',
     runtime: 'light-backend',
-    entry: '/tools/logic-fallacy-cards.html',
+    entry: 'tools/logic-fallacy-cards.html',
     cover: '🧩',
     version: '0.1.0',
     createdAt: '2025-02-01',
@@ -95,6 +99,20 @@ const ONLINE_STATUS = 'online' as const;
  */
 export function getToolById(id: string): Tool | undefined {
   return TOOLS.find((tool) => tool.id === id);
+}
+
+/**
+ * 取得工具 iframe 的完整访问 URL（带部署 base 前缀）。
+ *
+ * @param tool 工具条目
+ * @returns 可直接用于 iframe `src` / `window.open` 的 URL；
+ *          工具无 entry 时回退到 externalUrl，两者都无则返回空串。
+ */
+export function getToolEntryUrl(tool: Tool): string {
+  if (tool.entry) {
+    return publicUrl(tool.entry);
+  }
+  return tool.externalUrl ?? '';
 }
 
 /**

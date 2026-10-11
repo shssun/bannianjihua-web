@@ -1,7 +1,7 @@
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import type { Tool } from '@/types';
-import { getToolById, TOOL_RUNTIME_LABEL } from '@/data/tools';
+import { getToolById, getToolEntryUrl, TOOL_RUNTIME_LABEL } from '@/data/tools';
 import ToolFrame from '@/components/tools/ToolFrame';
 import EmptyState from '@/components/common/EmptyState';
 import StatusBadge from '@/components/common/StatusBadge';
@@ -83,9 +83,9 @@ export default function ToolViewPage(): JSX.Element {
         </Box>
       </Stack>
 
-      {/* 工具容器 / 占位 */}
+      {/* 工具容器 / 占位：entry URL 需带部署 base 前缀（见 lib/paths.ts） */}
       {tool.entry ? (
-        <ToolFrame src={tool.entry} title={tool.name} />
+        <ToolFrame src={getToolEntryUrl(tool)} title={tool.name} />
       ) : (
         <EmptyState
           icon="🚧"

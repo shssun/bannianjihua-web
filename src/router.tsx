@@ -9,6 +9,7 @@ import RoadmapPage from '@/pages/RoadmapPage';
 import MessageBoardPage from '@/pages/MessageBoardPage';
 import AboutPage from '@/pages/AboutPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import { BASE_PREFIX } from '@/lib/paths';
 
 /**
  * 路由表（createBrowserRouter 数据路由 API）。
@@ -16,6 +17,12 @@ import NotFoundPage from '@/pages/NotFoundPage';
  * 深层路径回退依赖：
  * - Cloudflare Pages：public/_redirects
  * - GitHub Pages：scripts/copy-404.mjs 生成的 dist/404.html
+ *
+ * 部署路径适配：
+ * - `basename` 取自 Vite 注入的 BASE_URL（见 lib/paths.ts）。
+ *   GitHub Pages 项目站点部署在 '/bannianjihua-web/' 下，
+ *   basename 会被设为 'bannianjihua-web'，从而让 `to="/tools"` 等
+ *   声明式/编程式导航自动带上子路径前缀；根路径部署时为 ''。
  *
  * 页面通过 MainLayout 的 <Outlet> 渲染。
  */
@@ -37,4 +44,4 @@ const routes: RouteObject[] = [
   },
 ];
 
-export const router = createBrowserRouter(routes);
+export const router = createBrowserRouter(routes, { basename: BASE_PREFIX });

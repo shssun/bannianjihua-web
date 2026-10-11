@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
-Sitemap: /sitemap.xml
+# 本站点无 sitemap.xml，暂不声明 Sitemap 指令（原 `/sitemap.xml` 属绝对路径，
+# 在 GitHub Pages 子路径 /bannianjihua-web/ 下会解析到域名根导致 404）。
+# 若日后生成 sitemap，请使用符合规范的完整 URL，例如：
+#   Sitemap: https://shssun.github.io/bannianjihua-web/sitemap.xml
+# 换用自定义域名后需同步更新该地址。

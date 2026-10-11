@@ -1,1 +1,4 @@
-/*  /index.html  200
+# Cloudflare Pages SPA 兜底规则（GitHub Pages 不读取此文件，仅作静态文件保留）。
+# 作用：所有未匹配到实体文件的路径都返回 /index.html 且状态码 200，由前端路由接管。
+# 若改在 Cloudflare Pages 部署，此文件会被平台自动识别；在 GitHub Pages 下它无害。
+/*    /index.html   200
