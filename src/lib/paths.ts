@@ -9,7 +9,8 @@
  * - 生产构建时由 vite.config.ts 的 `base` 决定；开发时为 '/'。
  *
  * 本模块提供两件事：
- * 1. `BASE_PREFIX`：去掉首尾斜杠的裸前缀（根部署为 ''），
+ * 1. `BASE_PREFIX`：**保留前导斜杠、去掉末尾斜杠** 的 basename
+ *    （根部署为 '/'，子路径为 '/bannianjihua-web'），
  *    用于给 `createBrowserRouter` 的 `basename` 传值。
  * 2. `publicUrl(path)`：把 `public/` 下资源的绝对路径（如 '/tools/x.html'）
  *    加上 base 前缀，得到可在任意部署路径下正确解析的 URL。

@@ -76,7 +76,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '📐',
     eta: '2025-Q4',
-    order: 4,
+    order: 5,
   },
   {
     id: 'intuition-zhika',
@@ -87,7 +87,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '💡',
     eta: '2026-Q1',
-    order: 5,
+    order: 6,
   },
   {
     id: 'markdown-slide',
@@ -98,7 +98,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '📊',
     eta: '2026-Q2',
-    order: 6,
+    order: 7,
   },
 ];
 

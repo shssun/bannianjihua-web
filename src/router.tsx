@@ -19,10 +19,13 @@ import { BASE_PREFIX } from '@/lib/paths';
  * - GitHub Pages：scripts/copy-404.mjs 生成的 dist/404.html
  *
  * 部署路径适配：
- * - `basename` 取自 Vite 注入的 BASE_URL（见 lib/paths.ts）。
- *   GitHub Pages 项目站点部署在 '/bannianjihua-web/' 下，
- *   basename 会被设为 'bannianjihua-web'，从而让 `to="/tools"` 等
- *   声明式/编程式导航自动带上子路径前缀；根路径部署时为 ''。
+ * - `basename` 取自 Vite 注入的 BASE_URL（见 lib/paths.ts），必须是
+ *   **带前导斜杠** 的路径（'/bannianjihua-web'）。若误写成不带斜杠的
+ *   'bannianjihua-web'，React Router 会匹配失败并抛
+ *   "Unexpected Application Error! 404 Not Found"。
+ *   GitHub Pages 项目站点部署在 '/bannianjihua-web/' 下时 basename 为
+ *   '/bannianjihua-web'，从而让 `to="/tools"` 等声明式/编程式导航自动带上
+ *   子路径前缀；根路径部署时为 '/'。
  *
  * 页面通过 MainLayout 的 <Outlet> 渲染。
  */
