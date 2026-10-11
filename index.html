@@ -2,8 +2,8 @@
 <html lang="zh-CN" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <!-- 使用相对路径：无需感知 base，根路径/子路径部署都能正确解析 -->
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- 根绝对路径：Vite 构建时按 base 重写为带前缀的绝对路径，嵌套路由下也能正确解析 -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
@@ -14,7 +14,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- 使用相对路径：Vite 构建时会按 base 正确改写为带前缀的绝对资源路径 -->
-    <script type="module" src="./src/main.tsx"></script>
+    <!-- 根绝对路径：Vite 构建时按 base 重写为带前缀的模块资源路径 -->
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
