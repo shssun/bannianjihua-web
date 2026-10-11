@@ -1,21 +1,23 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import type { Tool } from '@/types';
-import { TOOL_RUNTIME_LABEL } from '@/data/tools';
+import { TOOL_RUNTIME_LABEL, getToolEntryUrl } from '@/data/tools';
 import StatusBadge from '@/components/common/StatusBadge';
 import TagChip from '@/components/common/TagChip';
 
 interface ToolCardProps {
   tool: Tool;
-  /** 点击「打开」回调（通常为路由跳转） */
-  onOpen: (tool: Tool) => void;
 }
 
 /**
  * 工具卡片：封面/图标 + 名称 + 一句话描述 + 标签 + 状态徽章 + 打开按钮。
+ *
+ * 「打开」用真实 <a> 链接新标签页打开工具产物（而非 window.open），
+ * 可避免被浏览器弹窗拦截，且中键/右键「新标签打开」正常可用。
  */
-export default function ToolCard({ tool, onOpen }: ToolCardProps): JSX.Element {
+export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
   const canOpen = tool.status === 'online';
+  const toolUrl = getToolEntryUrl(tool);
 
   return (
     <Box
@@ -86,13 +88,16 @@ export default function ToolCard({ tool, onOpen }: ToolCardProps): JSX.Element {
         </Stack>
       ) : null}
 
-      {/* 打开按钮 */}
+      {/* 打开按钮：新标签页直接打开工具（真实 <a> 链接，避免弹窗拦截） */}
       <Button
         variant={canOpen ? 'contained' : 'outlined'}
         size="small"
         disabled={!canOpen}
         endIcon={canOpen ? <OpenInNewIcon fontSize="small" /> : undefined}
-        onClick={() => onOpen(tool)}
+        component={canOpen ? 'a' : 'button'}
+        href={canOpen ? toolUrl : undefined}
+        target={canOpen ? '_blank' : undefined}
+        rel={canOpen ? 'noopener noreferrer' : undefined}
         sx={{ alignSelf: 'flex-start' }}
       >
         {canOpen ? '打开' : '敬请期待'}

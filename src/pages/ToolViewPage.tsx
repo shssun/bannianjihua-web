@@ -1,14 +1,17 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import type { Tool } from '@/types';
 import { getToolById, getToolEntryUrl, TOOL_RUNTIME_LABEL } from '@/data/tools';
-import ToolFrame from '@/components/tools/ToolFrame';
 import EmptyState from '@/components/common/EmptyState';
 import StatusBadge from '@/components/common/StatusBadge';
 import TagChip from '@/components/common/TagChip';
 
 /**
- * 工具页 `/tools/:id`：查注册表 → 渲染 ToolFrame 或友好占位（不白屏）。
+ * 工具页 `/tools/:id`：工具详情页。
+ *
+ * 工具为自包含单文件 HTML，本页不再内嵌 iframe，而是展示工具信息 +
+ * 「打开工具」按钮，在新标签页直接打开产物（保留路由以便分享/深链）。
  */
 export default function ToolViewPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +31,8 @@ export default function ToolViewPage(): JSX.Element {
       </Box>
     );
   }
+
+  const toolUrl = getToolEntryUrl(tool);
 
   return (
     <Box className="container-page" sx={{ py: 4 }}>
@@ -83,9 +88,33 @@ export default function ToolViewPage(): JSX.Element {
         </Box>
       </Stack>
 
-      {/* 工具容器 / 占位：entry URL 需带部署 base 前缀（见 lib/paths.ts） */}
+      {/* 打开工具：新标签页直接打开产物（toolUrl 已带部署 base 前缀，见 lib/paths.ts） */}
       {tool.entry ? (
-        <ToolFrame src={getToolEntryUrl(tool)} title={tool.name} />
+        <Box
+          className="surface-card"
+          sx={{
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: 1.5,
+          }}
+        >
+          <Button
+            variant="contained"
+            size="large"
+            endIcon={<OpenInNewIcon />}
+            component="a"
+            href={toolUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            打开工具
+          </Button>
+          <Typography variant="caption" color="var(--muted)" sx={{ wordBreak: 'break-all' }}>
+            {toolUrl}
+          </Typography>
+        </Box>
       ) : (
         <EmptyState
           icon="🚧"

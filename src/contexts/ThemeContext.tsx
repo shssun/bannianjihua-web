@@ -14,7 +14,7 @@ import { safeGetItem, safeSetItem, STORAGE_PREFIX } from '@/lib/utils';
  * 主题上下文：管理深浅色模式、持久化到 localStorage，并同步到 <html> class。
  *
  * 默认 **深色**；localStorage key：`bannianjihua:theme`。
- * iframe 内工具的主题同步由 ToolFrame 监听 mode 变化后 postMessage 广播。
+ * 工具改为新标签页直接打开（自包含单文件），不再与主站做 iframe 主题同步。
  */
 
 /** localStorage 主题 key。 */
