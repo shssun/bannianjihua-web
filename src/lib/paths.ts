@@ -19,10 +19,14 @@
 const RAW_BASE: string = import.meta.env.BASE_URL ?? '/';
 
 /**
- * 去掉首尾斜杠的裸 base，用作 React Router 的 basename。
- * 例：'/bannianjihua-web/' → 'bannianjihua-web'；'/' → ''。
+ * React Router 的 basename（必须以 '/' 开头）。
+ * 例：'/bannianjihua-web/' → '/bannianjihua-web'；'/' → '/'。
+ *
+ * 注意：RR v6 的 basename 若缺少前导斜杠（如 'bannianjihua-web'），
+ * 路由匹配会整体失败并表现为 Unexpected Application Error 404。
  */
-export const BASE_PREFIX: string = RAW_BASE.replace(/^\/+/, '').replace(/\/+$/, '');
+export const BASE_PREFIX: string =
+  RAW_BASE === '/' ? '/' : RAW_BASE.replace(/\/+$/, '');
 
 /**
  * 为 `public/` 目录下的绝对资源路径补上 base 前缀。
