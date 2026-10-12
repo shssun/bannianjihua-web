@@ -176,6 +176,9 @@
               <button class="chip" id="subBtn" style="margin-left:6px">字幕：英文</button>
             </div>
             <div class="sentence" id="sentence"></div>
+            <div class="controls" id="voiceRateRow" style="display:none">
+              <span class="label">语速档</span>
+            </div>
             <div class="controls" id="voiceRow" style="display:none">
               <span class="label">换个人说</span>
             </div>
@@ -253,6 +256,7 @@ var VOICE_ORIG = '__orig__';
 var voiceManifest = null;   // voices/manifest.json 内容（拿不到则为 null）
 var voiceAudio = new Audio();  // 多说话人独立音轨；不参与 <video> / tick() 循环
 var voiceIdx = VOICE_ORIG;     // 当前选中的说话人 id，VOICE_ORIG = 原声
+var voiceRateId = 'clear';     // 当前 TTS 语速档 id（与「速度」chips 的视频 playbackRate 是两个维度）
 
 var video = document.getElementById('video');
 var sentenceEl = document.getElementById('sentence');
@@ -262,6 +266,7 @@ var statEl = document.getElementById('stat');
 var recStatusEl = document.getElementById('recStatus');
 var scoreBox = document.getElementById('scoreBox');
 var voiceRowEl = document.getElementById('voiceRow');
+var voiceRateRowEl = document.getElementById('voiceRateRow');
 var subBtnEl = document.getElementById('subBtn');
 var vwrapEl = document.getElementById('vwrap');
 var vMaskEl = document.getElementById('vMask');
@@ -932,13 +937,77 @@ function loadVoices() {
     })
     .catch(function () { voiceManifest = null; renderVoiceRow(); }); // 缺失 → 隐藏整行，不报错
 }
-/** 当前句的备选音轨数组；没有则返回 null */
+/** 语速档列表：优先 manifest.rates；v1（无 rates）用内置常量兜底 */
+var VOICE_RATES_FALLBACK = [{ id: 'clear', label: '清晰' }];
+function voiceRates() {
+  var rs = (voiceManifest && voiceManifest.rates) || null;
+  var out = [];
+  if (rs && rs.length) {
+    for (var i = 0; i < rs.length; i++) {
+      if (rs[i] && rs[i].id) out.push(rs[i]);
+    }
+  }
+  return out.length ? out : VOICE_RATES_FALLBACK;
+}
+/** 保证 voiceRateId 一定落在当前可用档位里（否则取第一档） */
+function normalizeVoiceRate() {
+  var rates = voiceRates();
+  for (var i = 0; i < rates.length; i++) {
+    if (rates[i].id === voiceRateId) return;
+  }
+  voiceRateId = rates[0].id;
+}
+/**
+ * 当前句「当前语速档」下的音轨映射 {speakerId: relPath}；
+ * 该档一个音轨都没有则返回 null。兼容 v1：条目无 rate 键时按 'clear' 处理。
+ */
 function currentVoiceTracks() {
   if (!voiceManifest || !voiceManifest.items || !current) return null;
   var arr = voiceManifest.items[current.file];
   if (!arr) return null;
-  var t = arr[curSentIdx];
-  return (t && t.length) ? t : null;
+  var group = arr[curSentIdx];
+  if (!group || !group.length) return null;
+  var map = null;
+  for (var i = 0; i < group.length; i++) {
+    var t = group[i];
+    if (!t || !t.speaker || !t.file) continue;
+    if ((t.rate || 'clear') !== voiceRateId) continue;   // v1 无 rate → 当作清晰档
+    if (!map) map = {};
+    if (!map[t.speaker]) map[t.speaker] = t.file;
+  }
+  return map;
+}
+/** 该句在**任一**档下是否存在音轨（与当前选中档无关）—— 用于语速档行的可恢复性 */
+function sentenceHasAnyTracks() {
+  if (!voiceManifest || !voiceManifest.items || !current) return false;
+  var arr = voiceManifest.items[current.file];
+  if (!arr) return false;
+  var group = arr[curSentIdx];
+  if (!group || !group.length) return false;
+  for (var i = 0; i < group.length; i++) {
+    var t = group[i];
+    if (t && t.speaker && t.file) return true;
+  }
+  return false;
+}
+/** 按 manifest.speakers 顺序返回该档下有音轨的说话人 id 列表 */
+function voiceSpeakersInOrder(tracks) {
+  var out = [], seen = {};
+  var speakers = (voiceManifest && voiceManifest.speakers) || [];
+  speakers.forEach(function (sp) {
+    if (sp && sp.id && tracks[sp.id] && !seen[sp.id]) { seen[sp.id] = true; out.push(sp.id); }
+  });
+  Object.keys(tracks).forEach(function (id) {   // manifest 未列出、但音轨里出现的说话人补在后面
+    if (!seen[id]) { seen[id] = true; out.push(id); }
+  });
+  return out;
+}
+function voiceLabelOf(id) {
+  var speakers = (voiceManifest && voiceManifest.speakers) || [];
+  for (var i = 0; i < speakers.length; i++) {
+    if (speakers[i] && speakers[i].id === id) return speakers[i].label || id;
+  }
+  return id;
 }
 function makeVoiceChip(id, label) {
   var b = document.createElement('button');
@@ -952,28 +1021,77 @@ function makeVoiceChip(id, label) {
   });
   return b;
 }
-/** 按 manifest.speakers 顺序渲染「原声 + 各说话人」；当前句无音轨则整行隐藏 */
+/** 语速档那一行：按 manifest.rates 顺序渲染 chip + 高亮；show=false 时整行隐藏 */
+function renderVoiceRateRow(show) {
+  if (!voiceRateRowEl) return;
+  voiceRateRowEl.innerHTML = '<span class="label">语速档</span>';
+  if (!show) { voiceRateRowEl.style.display = 'none'; return; }
+  voiceRates().forEach(function (r) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.innerHTML = escapeHtml(r.label || r.id);
+    b.dataset.voiceRate = r.id;
+    b.addEventListener('click', function () { selectVoiceRate(r.id); });
+    voiceRateRowEl.appendChild(b);
+  });
+  voiceRateRowEl.style.display = 'flex';
+  syncVoiceRateChips();
+}
+function syncVoiceRateChips() {
+  if (!voiceRateRowEl) return;
+  Array.prototype.forEach.call(voiceRateRowEl.querySelectorAll('button'), function (b) {
+    b.classList.toggle('on', b.dataset.voiceRate === voiceRateId);
+  });
+}
+/**
+ * 切换语速档：
+ *  - 当前选中「原声」→ 只更新档位高亮，不碰 voiceAudio（原声是真值，不随档位变）
+ *  - 当前选中某说话人且新档有他的音轨 → 更新 src；原本在播则继续播
+ *  - 该说话人新档无音轨 → 回退到新档第一个可用说话人（不改播放状态，只更新选中与 src）
+ */
+function selectVoiceRate(id) {
+  if (id === voiceRateId) return;
+  var rates = voiceRates(), valid = false;
+  for (var i = 0; i < rates.length; i++) if (rates[i].id === id) valid = true;
+  if (!valid) return;
+  voiceRateId = id;                          // 保留档位选择（resetVoice 不重置它）
+  var tracks = currentVoiceTracks();
+  if (voiceIdx !== VOICE_ORIG) {
+    if (tracks && tracks[voiceIdx]) {
+      var wasPlaying = !voiceAudio.paused;
+      voiceAudio.src = tracks[voiceIdx];
+      voiceAudio.playbackRate = currentRate;
+      if (wasPlaying) { try { voiceAudio.currentTime = 0; } catch (e) {} voiceAudio.play().catch(function () {}); }
+    } else if (tracks) {
+      var ids = voiceSpeakersInOrder(tracks);
+      if (ids.length) {
+        voiceIdx = ids[0];
+        voiceAudio.src = tracks[ids[0]];
+        voiceAudio.playbackRate = currentRate;
+      } else {
+        voiceIdx = VOICE_ORIG;
+      }
+    } else {
+      voiceIdx = VOICE_ORIG;                 // 新档整句无音轨
+    }
+  }
+  renderVoiceRow();
+}
+/** 「换个人说」行 + 「语速档」行：
+ *  - 语速档行：该句「任一档有音轨」且「档位 ≥2」即显示（与当前选中档无关，保证能切回来）
+ *  - 说话人行：仅当前档该句有音轨时显示 */
 function renderVoiceRow() {
   if (!voiceRowEl) return;
+  normalizeVoiceRate();
+  var tracks = currentVoiceTracks();          // {speakerId: relPath} 或 null
+  // 语速档行：只要「该句任一档有音轨」且「档位 ≥2」就显示，与当前选中档无关 ——
+  // 否则切到缺音轨的档后没有任何入口切回来（单点死路）
+  renderVoiceRateRow(sentenceHasAnyTracks() && voiceRates().length >= 2);
   voiceRowEl.innerHTML = '<span class="label">换个人说</span>';
-  var tracks = currentVoiceTracks();
   if (!tracks) { voiceRowEl.style.display = 'none'; return; }
-  var present = {}, ordered = [], labelOf = {};
-  tracks.forEach(function (t) { if (t && t.speaker) present[t.speaker] = true; });
-  var speakers = (voiceManifest && voiceManifest.speakers) || [];
-  speakers.forEach(function (sp) {
-    if (sp && sp.id) {
-      labelOf[sp.id] = sp.label || sp.id;
-      if (present[sp.id]) ordered.push(sp.id);
-    }
-  });
-  // manifest 未列出、但音轨里出现的说话人补在后面
-  tracks.forEach(function (t) {
-    if (t && t.speaker && ordered.indexOf(t.speaker) < 0) ordered.push(t.speaker);
-  });
   voiceRowEl.appendChild(makeVoiceChip(VOICE_ORIG, '原声'));
-  ordered.forEach(function (id) {
-    voiceRowEl.appendChild(makeVoiceChip(id, labelOf[id] || id));
+  voiceSpeakersInOrder(tracks).forEach(function (id) {
+    voiceRowEl.appendChild(makeVoiceChip(id, voiceLabelOf(id)));
   });
   voiceRowEl.style.display = 'flex';
   syncVoiceChips();
@@ -985,19 +1103,14 @@ function syncVoiceChips() {
     b.classList.toggle('on', on);
   });
 }
-/** 播放某个说话人的音轨（独立 Audio，不动 <video>） */
+/** 播放某个说话人（当前语速档）的音轨（独立 Audio，不动 <video>） */
 function playVoiceTrack(speaker) {
   var tracks = currentVoiceTracks();
-  if (!tracks) return;
-  var track = null;
-  for (var i = 0; i < tracks.length; i++) {
-    if (tracks[i] && tracks[i].speaker === speaker) { track = tracks[i]; break; }
-  }
-  if (!track || !track.file) return;
+  if (!tracks || !tracks[speaker]) return;
   stopAb();
   video.pause();
   voiceAudio.pause();
-  voiceAudio.src = track.file;              // 相对 tool/ 目录
+  voiceAudio.src = tracks[speaker];           // 相对 tool/ 目录
   voiceAudio.playbackRate = currentRate;
   voiceAudio.currentTime = 0;
   voiceIdx = speaker;

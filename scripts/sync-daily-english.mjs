@@ -43,8 +43,10 @@
  * ----
  * - **白名单**：只处理 mp4 / 三个数据文件 / voices，绝不把 *.py、_qa/、
  *   __pycache__、docs/ 带进 dist。
- * - **幂等**：重复执行结果一致；以「文件大小」判定是否需重拷（二进制素材
- *   内容变化必然伴随大小变化，足够可靠）。需要强制重拷用 `--force`。
+ * - **幂等**：重复执行结果一致；以「大小 + 内容 sha1」判定是否需重拷。
+ *   曾经只用「大小」，在 edge-tts 重做的音频上失效（MP3 时长被量化在帧栅格上，
+ *   同长但不同内容），一次漏拷 246 个文件、其中 4 个内容必须更新。
+ *   **大小相同 ≠ 内容相同。** 需要强制重拷用 `--force`。
  * - **CI 友好**：源目录不存在时（如 GitHub Actions 没有本地素材）打印警告后
  *   **以 0 退出**，直接复用仓库里已提交的产物，不阻断构建。
  * - 源目录可用环境变量 `DAILY_EN_DIR` 覆盖。
@@ -53,11 +55,13 @@ import {
   copyFileSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   readdirSync,
   rmdirSync,
   statSync,
   unlinkSync,
 } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
@@ -138,6 +142,21 @@ function human(bytes) {
   if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
   if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${bytes} B`;
+}
+
+/**
+ * 文件内容指纹（sha1 十六进制）。
+ *
+ * 为什么不能只用「大小」判断是否需要重拷：
+ * 本站音轨是 edge-tts 合成的 MP3，时长被量化在 MP3 帧栅格上（约 24ms 一帧），
+ * 因此**同一句话重新合成后，大小极可能完全不变、而字节内容不同**。
+ * 这不是理论：clear 音轨全量重做 255 条后，只有 9 条大小发生变化，
+ * 其余 246 条被「大小相同即跳过」漏掉，其中 **4 条恰好是内容必须更新的**
+ * （念的是订正前的旧句子），站点上静默留了错句音频。
+ * 结论：**大小相同 ≠ 内容相同。** 判定与校验都必须比内容指纹。
+ */
+function fileSha1(abs) {
+  return createHash('sha1').update(readFileSync(abs)).digest('hex');
 }
 
 // ---------------------------------------------------------------- 前置检查
@@ -222,9 +241,14 @@ let copied = 0;
 let skipped = 0;
 for (const [rel, src] of expected) {
   const dst = join(TARGET_DIR, ...rel.split('/'));
-  if (!FORCE && existsSync(dst) && statSync(dst).size === statSync(src).size) {
-    skipped += 1;
-    continue;
+  if (!FORCE && existsSync(dst)) {
+    // 大小不同 ⇒ 内容必然不同，直接重拷；
+    // 大小相同还不够，必须再比内容指纹（理由见 fileSha1 的注释）。
+    const sameSize = statSync(dst).size === statSync(src).size;
+    if (sameSize && fileSha1(dst) === fileSha1(src)) {
+      skipped += 1;
+      continue;
+    }
   }
   mkdirSync(dirname(dst), { recursive: true });
   copyFileSync(src, dst);
@@ -233,9 +257,12 @@ for (const [rel, src] of expected) {
 
 // ---------------------------------------------------------------- 4) 校验
 //
-// 逐文件确认「存在且大小与源一致」。这一步不是形式主义：
+// 逐文件确认「存在且内容与源一致」。这一步不是形式主义：
 // 它曾在一次真实的 shim 故障中抓出 "声称同步成功、实际丢了 256 个文件"，
 // 以及 cpSync 留下的文件真空。绝不允许静默产出残缺站点。
+//
+// 校验**必须比内容指纹**，不能只比大小 —— 「大小相同、内容不同」这类漏拷
+// 会静默通过，且已真实发生过一次（4 条音轨在站点上留着错句音频）。
 
 const mismatched = [];
 for (const [rel, src] of expected) {
@@ -244,10 +271,10 @@ for (const [rel, src] of expected) {
     mismatched.push(`${rel}（目标缺失）`);
     continue;
   }
-  const srcSize = statSync(src).size;
-  const dstSize = statSync(dst).size;
-  if (srcSize !== dstSize) {
-    mismatched.push(`${rel}（源 ${srcSize}B ≠ 目标 ${dstSize}B）`);
+  if (fileSha1(src) !== fileSha1(dst)) {
+    mismatched.push(
+      `${rel}（源 ${statSync(src).size}B / 目标 ${statSync(dst).size}B，内容指纹不一致）`,
+    );
   }
 }
 
