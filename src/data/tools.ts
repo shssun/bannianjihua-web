@@ -55,6 +55,23 @@ export const TOOLS: Tool[] = [
     order: 3,
   },
   {
+    id: 'daily-english',
+    name: '每日英语跟读',
+    description:
+      '精听英文口语短视频：逐词高亮、变速循环跟读、录音与原声比对，专攻连读弱读。',
+    tags: ['英语', '听力', '口语'],
+    status: 'online',
+    runtime: 'client-only',
+    // 多文件工具（HTML + data.json + zh.json + voices/ + mp4 素材），
+    // 由 scripts/sync-daily-english.mjs 从本地工作目录同步进 public/，
+    // 目录层级刻意镜像本地，工具内部的相对路径才能原样成立。
+    entry: 'tools/daily-english/tool/index.html',
+    cover: '🎧',
+    version: '0.1.0',
+    createdAt: '2026-10-12',
+    order: 4,
+  },
+  {
     id: 'logic-fallacy-cards',
     name: '逻辑谬误卡片',
     description: '公众号长文渲染为深色信息图卡（PNG），用于收藏与速查。',
@@ -65,7 +82,7 @@ export const TOOLS: Tool[] = [
     cover: '🧩',
     version: '0.1.0',
     createdAt: '2025-02-01',
-    order: 4,
+    order: 5,
   },
   {
     id: 'set-theory-cards',
@@ -76,7 +93,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '📐',
     eta: '2025-Q4',
-    order: 5,
+    order: 6,
   },
   {
     id: 'intuition-zhika',
@@ -87,7 +104,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '💡',
     eta: '2026-Q1',
-    order: 6,
+    order: 7,
   },
   {
     id: 'markdown-slide',
@@ -98,7 +115,7 @@ export const TOOLS: Tool[] = [
     runtime: 'client-only',
     cover: '📊',
     eta: '2026-Q2',
-    order: 7,
+    order: 8,
   },
 ];
 

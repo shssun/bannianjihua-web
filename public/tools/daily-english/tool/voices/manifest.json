@@ -1,0 +1,1173 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-12T21:53:37+08:00",
+  "engine": "edge-tts",
+  "speakers": [
+    {
+      "id": "en-US-AriaNeural",
+      "label": "美·女"
+    },
+    {
+      "id": "en-US-GuyNeural",
+      "label": "美·男"
+    },
+    {
+      "id": "en-GB-SoniaNeural",
+      "label": "英·女"
+    },
+    {
+      "id": "en-AU-NatashaNeural",
+      "label": "澳·女"
+    },
+    {
+      "id": "en-US-BrianNeural",
+      "label": "美·男 2"
+    }
+  ],
+  "items": {
+    "you are just in time.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-just-in-time/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-just-in-time/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-just-in-time/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-just-in-time/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-just-in-time/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-just-in-time/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-just-in-time/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-just-in-time/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-just-in-time/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-just-in-time/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-just-in-time/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-just-in-time/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-just-in-time/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-just-in-time/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-just-in-time/s02_brian.mp3"
+        }
+      ]
+    ],
+    "you are way of line.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-way-of-line/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-way-of-line/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-way-of-line/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-way-of-line/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-way-of-line/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-way-of-line/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-way-of-line/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-way-of-line/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-way-of-line/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-way-of-line/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-way-of-line/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-way-of-line/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-way-of-line/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-way-of-line/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-way-of-line/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-are-way-of-line/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-are-way-of-line/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-are-way-of-line/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-are-way-of-line/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-are-way-of-line/s03_brian.mp3"
+        }
+      ]
+    ],
+    "you attract me.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-attract-me/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-attract-me/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-attract-me/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-attract-me/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-attract-me/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-attract-me/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-attract-me/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-attract-me/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-attract-me/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-attract-me/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-attract-me/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-attract-me/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-attract-me/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-attract-me/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-attract-me/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-attract-me/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-attract-me/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-attract-me/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-attract-me/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-attract-me/s03_brian.mp3"
+        }
+      ]
+    ],
+    "you can count on me.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-can-count-on-me/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-can-count-on-me/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-can-count-on-me/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-can-count-on-me/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-can-count-on-me/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-can-count-on-me/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-can-count-on-me/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-can-count-on-me/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-can-count-on-me/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-can-count-on-me/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-can-count-on-me/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-can-count-on-me/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-can-count-on-me/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-can-count-on-me/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-can-count-on-me/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-can-count-on-me/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-can-count-on-me/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-can-count-on-me/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-can-count-on-me/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-can-count-on-me/s03_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-can-count-on-me/s04_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-can-count-on-me/s04_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-can-count-on-me/s04_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-can-count-on-me/s04_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-can-count-on-me/s04_brian.mp3"
+        }
+      ]
+    ],
+    "you gotta be kidding me.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-gotta-be-kidding-me/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-gotta-be-kidding-me/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-gotta-be-kidding-me/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-gotta-be-kidding-me/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-gotta-be-kidding-me/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-gotta-be-kidding-me/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-gotta-be-kidding-me/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-gotta-be-kidding-me/s03_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s04_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-gotta-be-kidding-me/s04_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s04_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-gotta-be-kidding-me/s04_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-gotta-be-kidding-me/s04_brian.mp3"
+        }
+      ]
+    ],
+    "you have my word.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-have-my-word/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-have-my-word/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-have-my-word/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-have-my-word/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-have-my-word/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-have-my-word/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-have-my-word/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-have-my-word/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-have-my-word/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-have-my-word/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-have-my-word/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-have-my-word/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-have-my-word/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-have-my-word/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-have-my-word/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-have-my-word/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-have-my-word/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-have-my-word/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-have-my-word/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-have-my-word/s03_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-have-my-word/s04_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-have-my-word/s04_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-have-my-word/s04_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-have-my-word/s04_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-have-my-word/s04_brian.mp3"
+        }
+      ]
+    ],
+    "you'll get used to it.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s03_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s04_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s04_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s04_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s04_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s04_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-ll-get-used-to-it/s05_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-ll-get-used-to-it/s05_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-ll-get-used-to-it/s05_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-ll-get-used-to-it/s05_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-ll-get-used-to-it/s05_brian.mp3"
+        }
+      ]
+    ],
+    "you're in my heart.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-re-in-my-heart/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-re-in-my-heart/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-re-in-my-heart/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-re-in-my-heart/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-re-in-my-heart/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/you-re-in-my-heart/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/you-re-in-my-heart/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/you-re-in-my-heart/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/you-re-in-my-heart/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/you-re-in-my-heart/s01_brian.mp3"
+        }
+      ]
+    ],
+    "一路顺风.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-8/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-8/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-8/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-8/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-8/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-8/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-8/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-8/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-8/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-8/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-8/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-8/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-8/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-8/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-8/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-8/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-8/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-8/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-8/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-8/s03_brian.mp3"
+        }
+      ]
+    ],
+    "有空吗.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s03_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s04_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s04_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s04_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s04_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s04_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s05_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s05_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s05_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s05_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s05_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s06_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s06_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s06_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s06_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s06_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s07_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s07_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s07_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s07_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s07_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-9/s08_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-9/s08_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-9/s08_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-9/s08_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-9/s08_brian.mp3"
+        }
+      ]
+    ],
+    "有趣的.mp4": [
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-10/s00_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-10/s00_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-10/s00_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-10/s00_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-10/s00_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-10/s01_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-10/s01_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-10/s01_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-10/s01_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-10/s01_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-10/s02_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-10/s02_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-10/s02_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-10/s02_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-10/s02_brian.mp3"
+        }
+      ],
+      [
+        {
+          "speaker": "en-US-AriaNeural",
+          "file": "voices/clip-10/s03_aria.mp3"
+        },
+        {
+          "speaker": "en-US-GuyNeural",
+          "file": "voices/clip-10/s03_guy.mp3"
+        },
+        {
+          "speaker": "en-GB-SoniaNeural",
+          "file": "voices/clip-10/s03_sonia.mp3"
+        },
+        {
+          "speaker": "en-AU-NatashaNeural",
+          "file": "voices/clip-10/s03_natasha.mp3"
+        },
+        {
+          "speaker": "en-US-BrianNeural",
+          "file": "voices/clip-10/s03_brian.mp3"
+        }
+      ]
+    ]
+  }
+}
