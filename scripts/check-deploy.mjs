@@ -43,42 +43,52 @@ function localGitInfo() {
   return info.commitFull === 'unknown' ? null : info;
 }
 
-/** 用 curl 取线上 version.json；成功返回解析后的对象，失败返回 null。 */
-function fetchRemoteVersion(proxy) {
-  const curlArgs = [
-    '-sS',
-    '--max-time',
-    '20',
-    '-H',
-    'Cache-Control: no-cache',
-    `${site}/version.json`,
-  ];
-  const withProxy = proxy ? ['-x', proxy, ...curlArgs] : curlArgs;
-
+/** 用 Node 内置 fetch 直连获取线上 version.json；失败返回 null。
+ *
+ * 实测：GitHub Pages（*.github.io，走 CDN）在国内通常可直连，
+ * 只有 github.com 主站才需要代理。因此优先走这条路 —— 不依赖任何子进程。
+ */
+async function fetchViaNode(url) {
   try {
-    const raw = execFileSync('curl', withProxy, { encoding: 'utf8' });
-    return JSON.parse(raw);
+    const res = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
+    if (!res.ok) return null; // 线上尚无 version.json 时是 404
+    return await res.json();
   } catch {
     return null;
   }
 }
 
-/** 依次尝试各个代理方案，返回 { version, usedProxy } 或 null。 */
-function resolveRemote() {
+/** 用 curl 经代理获取（fetch 直连失败时的兜底，例如站点被墙）。 */
+function fetchViaCurl(url, proxy) {
+  const base = ['-sS', '--max-time', '20', '-H', 'Cache-Control: no-cache', url];
+  const args = proxy ? ['-x', proxy, ...base] : base;
+  try {
+    return JSON.parse(execFileSync('curl', args, { encoding: 'utf8' }));
+  } catch {
+    return null;
+  }
+}
+
+/** 依次尝试各条通路，返回 { version, via } 或 null。 */
+async function resolveRemote() {
+  const url = `${site}/version.json`;
+
+  // 1) Node fetch 直连
+  const direct = await fetchViaNode(url);
+  if (direct) return { version: direct, via: 'fetch 直连' };
+
+  // 2) 显式代理 → curl
   if (explicitProxy) {
-    const version = fetchRemoteVersion(explicitProxy);
-    return version ? { version, usedProxy: explicitProxy } : null;
+    const viaExplicit = fetchViaCurl(url, explicitProxy);
+    if (viaExplicit) return { version: viaExplicit, via: `curl 经代理 ${explicitProxy}` };
   }
 
-  // 先直连
-  const direct = fetchRemoteVersion('');
-  if (direct) return { version: direct, usedProxy: null };
-
-  // 再逐个尝试常见本地代理
+  // 3) 常见本地代理 → curl
   for (const proxy of FALLBACK_PROXIES) {
-    const version = fetchRemoteVersion(proxy);
-    if (version) return { version, usedProxy: proxy };
+    const viaProxy = fetchViaCurl(url, proxy);
+    if (viaProxy) return { version: viaProxy, via: `curl 经代理 ${proxy}` };
   }
+
   return null;
 }
 
@@ -119,16 +129,16 @@ if (local) {
   console.log('  ✗ 无法读取本地 git 版本（不是 git 仓库，或 .git 不可读）');
 }
 
-const remote = resolveRemote();
+const remote = await resolveRemote();
 console.log('\n--- 线上 ---');
 if (!remote) {
   console.log('  ✗ 无法获取线上 version.json');
   console.log('    · 若线上是"加入版本标识之前"部署的，属预期（需先部署一次新版）');
-  console.log('    · 也可能是网络/代理不通，可用 --proxy=... 指定代理重试');
+  console.log('    · 也可能是网络不通，可用 --proxy=... 指定代理重试');
   process.exitCode = 1;
 } else {
   const v = remote.version;
-  if (remote.usedProxy) console.log(`  (经由代理 ${remote.usedProxy})`);
+  console.log(`  (经由 ${remote.via})`);
   console.log(`  version : ${v.version ?? '?'}`);
   console.log(`  commit  : ${v.commit ?? '?'} (${v.branch ?? '?'})`);
   console.log(`  buildAt : ${v.buildTime ?? '?'}`);
