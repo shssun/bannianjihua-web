@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
   "model": "small",
-  "generatedAt": "2026-10-12T21:13:13+08:00",
+  "generatedAt": "2026-10-12T23:28:53+08:00",
   "items": [
     {
       "file": "you are just in time.mp4",
@@ -720,57 +720,63 @@
     {
       "file": "you attract me.mp4",
       "filenameText": "you attract me",
-      "text": "I'm attracted. I met you attracted to me. I'm attracted to you. I'm attracted to you.",
+      "text": "You attracted me. I bet you're attracted to me. I'm attracted to you. I'm attracted to you.",
       "duration": 5.72,
-      "wordCount": 16,
+      "wordCount": 17,
       "words": [
         {
-          "word": "I'm",
+          "word": "You",
           "start": 0.0,
-          "end": 0.56,
-          "prob": 0.64
+          "end": 0.22,
+          "prob": 0.9
         },
         {
-          "word": "attracted.",
-          "start": 0.56,
-          "end": 0.56,
-          "prob": 0.986
+          "word": "attracted",
+          "start": 0.22,
+          "end": 0.44,
+          "prob": 0.9
+        },
+        {
+          "word": "me.",
+          "start": 0.44,
+          "end": 0.66,
+          "prob": 0.9
         },
         {
           "word": "I",
           "start": 1.28,
           "end": 1.8,
-          "prob": 0.872
+          "prob": 0.896
         },
         {
-          "word": "met",
+          "word": "bet",
           "start": 1.8,
-          "end": 1.96,
-          "prob": 0.849
+          "end": 1.98,
+          "prob": 0.006
         },
         {
-          "word": "you",
-          "start": 1.96,
-          "end": 2.1,
-          "prob": 0.801
+          "word": "you're",
+          "start": 1.98,
+          "end": 2.16,
+          "prob": 0.902
         },
         {
           "word": "attracted",
-          "start": 2.1,
+          "start": 2.16,
           "end": 2.48,
-          "prob": 0.979
+          "prob": 0.999
         },
         {
           "word": "to",
           "start": 2.48,
           "end": 2.72,
-          "prob": 0.566
+          "prob": 0.92
         },
         {
           "word": "me.",
           "start": 2.72,
           "end": 2.86,
-          "prob": 0.918
+          "prob": 0.878
         },
         {
           "word": "I'm",
@@ -824,27 +830,33 @@
       "sentences": [
         {
           "index": 0,
-          "text": "I'm attracted.",
+          "text": "You attracted me.",
           "start": 0.0,
-          "end": 0.56,
+          "end": 0.66,
           "words": [
             {
-              "word": "I'm",
+              "word": "You",
               "start": 0.0,
-              "end": 0.56,
-              "prob": 0.64
+              "end": 0.22,
+              "prob": 0.9
             },
             {
-              "word": "attracted.",
-              "start": 0.56,
-              "end": 0.56,
-              "prob": 0.986
+              "word": "attracted",
+              "start": 0.22,
+              "end": 0.44,
+              "prob": 0.9
+            },
+            {
+              "word": "me.",
+              "start": 0.44,
+              "end": 0.66,
+              "prob": 0.9
             }
           ]
         },
         {
           "index": 1,
-          "text": "I met you attracted to me.",
+          "text": "I bet you're attracted to me.",
           "start": 1.28,
           "end": 2.86,
           "words": [
@@ -852,37 +864,37 @@
               "word": "I",
               "start": 1.28,
               "end": 1.8,
-              "prob": 0.872
+              "prob": 0.896
             },
             {
-              "word": "met",
+              "word": "bet",
               "start": 1.8,
-              "end": 1.96,
-              "prob": 0.849
+              "end": 1.98,
+              "prob": 0.006
             },
             {
-              "word": "you",
-              "start": 1.96,
-              "end": 2.1,
-              "prob": 0.801
+              "word": "you're",
+              "start": 1.98,
+              "end": 2.16,
+              "prob": 0.902
             },
             {
               "word": "attracted",
-              "start": 2.1,
+              "start": 2.16,
               "end": 2.48,
-              "prob": 0.979
+              "prob": 0.999
             },
             {
               "word": "to",
               "start": 2.48,
               "end": 2.72,
-              "prob": 0.566
+              "prob": 0.92
             },
             {
               "word": "me.",
               "start": 2.72,
               "end": 2.86,
-              "prob": 0.918
+              "prob": 0.878
             }
           ]
         },
