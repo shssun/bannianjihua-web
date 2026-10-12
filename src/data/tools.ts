@@ -132,10 +132,10 @@ export function getToolById(id: string): Tool | undefined {
 }
 
 /**
- * 取得工具 iframe 的完整访问 URL（带部署 base 前缀）。
+ * 取得工具产物的完整访问 URL（带部署 base 前缀）。
  *
  * @param tool 工具条目
- * @returns 可直接用于 iframe `src` / `window.open` 的 URL；
+ * @returns 可直接用于 `<a href>` / `window.open` 的 URL；
  *          工具无 entry 时回退到 externalUrl，两者都无则返回空串。
  */
 export function getToolEntryUrl(tool: Tool): string {

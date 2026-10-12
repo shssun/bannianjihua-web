@@ -25,34 +25,27 @@ sequenceDiagram
     H-->>U: 渲染 Hero + 已上线工具 + 研发计划 + 最新文章 + 留言入口
     Note over H,SB: fallback=true 时 UI 显示"演示数据"角标
 
-    Note over U,TC: ==== 工具 iframe 加载与主题同步 ====
+    Note over U,TO: ==== 工具打开流程（新标签页直开） ====
 
-    actor U as 访客
+    participant TL as ToolListPage(/tools)
     participant TV as ToolViewPage(/tools/:id)
     participant TR as ToolRegistry
-    participant TF as ToolFrame
-    participant IF as iframe(public/tools/*.html)
-    participant TC as ThemeContext
+    participant TB as 新标签页
+    participant TO as 工具产物(public/tools/*.html)
 
-    U->>TV: 访问 /tools/md-to-html-reader
-    TV->>TR: getToolById('md-to-html-reader')
-    TR-->>TV: Tool 或 undefined
+    U->>TL: 浏览工具箱
+    TL->>TR: getOnlineTools()
+    TR-->>TL: Tool[]（本地同步，立即渲染）
+    U->>TV: 进入详情页
+    TV->>TR: getToolById(id)
     alt 工具不存在 / 无 entry
         TV-->>U: 渲染 EmptyState 友好占位（不白屏）
     else 正常
-        TV->>TF: <ToolFrame src={entry} tool={tool} />
-        TF-->>U: 显示加载态（Skeleton/Spinner）
-        TF->>IF: 设置 src，开始加载
-        IF-->>TF: onLoad
-        TF->>IF: postMessage({type:'theme', value: mode})
-        IF-->>TF: postMessage({type:'resize', height: N})
-        TF->>TF: 应用 height（含最小高度兜底）
-        TF-->>U: 隐藏加载态，展示工具
+        TR-->>TV: Tool
+        TV-->>U: 工具信息 + 「打开工具」按钮（href 已补 base 前缀）
     end
 
-    U->>TC: 点击 ThemeToggle（切换主题）
-    TC->>TC: 更新 mode + 写入 localStorage
-    TC-->>TF: mode 变化触发 useEffect
-    TF->>IF: postMessage({type:'theme', value: newMode})
-    IF->>IF: 应用暗/浅色
-    Note over TF,IF: 超时 3s 未收到 onLoad → 显示错误态 + "新标签打开"/"全屏"兜底
+    U->>TB: 点「打开工具」（真实 <a target="_blank" rel="noopener noreferrer">）
+    TB->>TO: 新标签页加载独立文档
+    TO->>TO: 自持主题与布局，与主站零耦合
+    Note over TV,TO: 工具是独立文档，不依赖主站任何运行时；不存在跨文档通信协议

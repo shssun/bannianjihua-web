@@ -87,14 +87,6 @@ classDiagram
         +ThemeToggle themeToggle
     }
 
-    class ToolFrame {
-        +string src
-        +Tool tool
-        +void onThemeChange()
-        +void onResize()
-        +boolean fullscreen
-    }
-
     class ToolCard {
         +Tool tool
         +void onOpen()
@@ -118,8 +110,6 @@ classDiagram
     MessagesService ..> Message : produces
     ToolRegistry ..> Tool : manages
     MainLayout --> Navbar
-    MainLayout --> ToolFrame : page outlet
     Navbar --> ThemeToggle
     ToolCard --> Tool
-    ToolFrame --> Tool
     MessageBoardPage --> MessagesService

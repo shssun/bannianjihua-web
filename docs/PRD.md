@@ -104,29 +104,21 @@ Logo(首页) | 文章(Blog) | 工具箱(Tools) | 研发计划(Roadmap) | 留言�
 
 ---
 
-## 6. 工具呈现形态候选方案对比（结论：推荐 B — iframe）
+## 6. 工具呈现形态（已定稿）
 
-> 前提：每个工具都是**独立 HTML 单文件**，需离线运行（file:// 或静态站内路径直接可跑），需与主站样式隔离。
+**定稿：新标签页直接打开工具产物** —— 主站用真实 `<a target="_blank" rel="noopener noreferrer">` 打开。
 
-| 维度 | A. 独立页面内嵌组件（作为 SPA 组件引入） | B. iframe 嵌入（推荐） | C. 外部跳转链接（新标签打开） |
-|---|---|---|---|
-| 样式隔离 | 差：工具 CSS 会与 Tailwind/MUI 冲突，需大量改造 | **强：天然沙箱隔离** | 强（不在同页） |
-| 保持单文件产物 | 差：需把单文件改造成 React 组件，破坏「独立可离线」属性 | **优：单文件原样放进 `public/tools/xxx.html` 即可** | 优 |
-| 离线可运行 | 需重新打包 | **优：iframe src 指向静态 HTML，本地可跑** | 优 |
-| 开发/维护成本 | 高 | **低：加工具=放文件+注册表加一行** | 低 |
-| 用户体验 | 优（无边框） | 良好（可全屏/自适应高度，通过 postMessage 同步高度与主题） | 中（跳出站） |
-| 与主站通信 | 直接 | 通过 postMessage（够用） | 无 |
-| 移动端适配 | 好 | 好（iframe 响应式） | 好 |
-| 安全 | 共享源有风险 | **iframe sandbox 可控** | — |
+> 本节原先是对三方案（A 内嵌组件 / B iframe 嵌入 / C 新标签打开）的对比论证，当时结论为推荐 B。
+> **该结论已于 2026-10-11 推翻并移除**（如需追溯可查 git history）。改为 C 的原因：
+> 单文件工具产出即成品，新标签页打开是**零改造**方案，天然无样式冲突（不同文档，不需要沙箱约束），
+> 也不受 iframe 对下载/剪贴板/全屏的限制；工具自持主题，省掉一整套跨文档通信协议。
 
-**明确推荐：B. iframe 嵌入。**
-理由：
-1. 老板现有工具都是「HTML+CSS/JS 渲染 + 无头Chrome 导出」的**自包含单文件**，iframe 是唯一能**原样复用、零改造**的方案，最省事且保住离线能力。
-2. **样式天然隔离**，不污染主站 Tailwind/MUI，也不被主站污染。
-3. 加工具 = 丢一个 HTML 进 `public/tools/` + 注册表加一条，维护成本最低，契合「架构打底、长期加工具」目标。
-4. 通过 `postMessage` 可同步主题（深浅色）和自适应高度，体验损失很小；`sandbox` 属性提供安全边界。
+约定：
 
-**兜底策略**：iframe 内提供「在新标签打开」按钮（等价 C 方案），应对个别工具在 iframe 中受限（如需要下载/剪贴板/大屏）的情况。**A 方案仅在工具本身就是业务组件时采用，不作为现有工具的落地方案。**
+1. 打开动作一律用真实 `<a>`，**不要用 `window.open`**（会被弹窗拦截，且中键/右键「新标签打开」失效）。
+2. `/tools/:id` 路由保留为**详情页**（工具信息 + 「打开工具」按钮 + 完整 URL 展示），仅作落地页与分享入口。
+3. 加工具的成本 = 丢一个 HTML 进 `public/tools/` + `src/data/tools.ts` 加一行。
+4. 多文件工具（带素材/数据/音轨）走镜像同步脚本，见 `scripts/sync-daily-english.mjs`。
 
 > 待确认：`logic-fallacy-cards` 产出是 PNG（可能需要无头 Chrome 生成）。若其运行依赖 Node/无头浏览器，则**无法在纯静态/浏览器端运行**，应改为「已生成图集 + 静态展示」或标注为「轻后端交互」，见 §9 Q3。
 
@@ -160,8 +152,8 @@ export interface Tool {
   tags: string[];          // 如 ['阅读器','离线','Markdown']
   status: ToolStatus;      // 状态：用于首页「已上线/研发中」分类
   runtime: ToolRuntime;    // 运行形态：默认 client-only
-  entry?: string;          // iframe 指向的静态 HTML 路径，如 '/tools/md-to-html-reader.html'
-  externalUrl?: string;    // 可选：外部跳转/新标签打开
+  entry?: string;          // 工具产物的静态路径（相对 public/，不带前导斜杠），如 'tools/md-to-html-reader.html'
+  externalUrl?: string;    // 可选：外部兜底跳转（新标签打开）
   cover?: string;          // 卡片封面/图标
   version?: string;
   createdAt?: string;      // ISO 日期

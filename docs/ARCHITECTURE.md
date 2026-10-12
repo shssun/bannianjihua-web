@@ -14,10 +14,10 @@
 | # | 挑战 | 应对策略 |
 |---|---|---|
 | C1 | 纯静态托管下 SPA 深层路由（`/blog/xxx` 直接访问）会 404 | `createBrowserRouter` + Cloudflare Pages `_redirects` 回退；GitHub Pages 用 `404.html` 兜底（见 §1.3） |
-| C2 | 工具是"自包含单文件 HTML"，需零改造复用 + 样式隔离 + 离线可跑 | **iframe 方案**：单文件放 `public/tools/*.html`，主站 `<iframe sandbox>` 加载 + postMessage 同步 |
+| C2 | 工具是"自包含单文件 HTML"，需零改造复用 + 样式隔离 + 离线可跑 | **新标签页直接打开**：单文件放 `public/tools/*.html`，用真实 `<a target="_blank">` 打开（不做同页嵌入，见 §1.3） |
 | C3 | 环境变量缺失（未配 Supabase）时不能让整站崩溃 | `isSupabaseConfigured` 守卫 + Service 层本地 fallback 数据，留言板降级为"后端未配置"提示 |
 | C4 | 无后端时的留言防滥用 | Honeypot + localStorage 60s 限流 + 长度校验 + 可选 Turnstile 开关（默认关） |
-| C5 | 主题（深/浅色）需同时驱动 MUI + Tailwind + iframe 内工具 | 三轨同步：MUI ThemeProvider + `:root` CSS 变量 + postMessage 广播（见 §4 时序图 2、§6 共享知识） |
+| C5 | 主题（深/浅色）需同时驱动 MUI + Tailwind | 双轨同步：MUI ThemeProvider + `:root` CSS 变量（工具是独立文档、自持主题，不参与同步） |
 | C6 | `logic-fallacy-cards` 依赖无头 Chrome 生成 PNG，浏览器端无法实时运行 | 定位为"已生成图集静态展示"，注册表 `runtime: 'light-backend'` 且 `entry` 指向静态图集页（见「待明确事项 Q3」） |
 
 #### 1.2 框架与库选型（锁定版本）
@@ -41,7 +41,7 @@
 #### 1.3 架构模式与关键决策
 
 - **模式**：分层 SPA —— `pages`（路由页）→ `components`（展示）→ `services`（数据访问）→ `lib`（基础设施）。数据访问统一经 Service，页面不直接调 supabase。
-- **状态管理**：当前无需 Redux/Zustand。仅用 React Context 管两件事：**主题 ThemeContext**、**主题同步广播**（供 iframe 消费）。全局态极简，避免过度设计。
+- **状态管理**：当前无需 Redux/Zustand。仅用 React Context 管一件事：**主题 ThemeContext**（含 localStorage 持久化）。全局态极简，避免过度设计。
 - **路由方案（C1 落地）**：
   - `src/router.tsx` 使用 `createBrowserRouter`。
   - **主站托管（Cloudflare Pages）**：在 `public/_redirects` 写入：
@@ -50,7 +50,7 @@
     ```
     使所有深层路径回退到 SPA 入口，由前端路由接管。
   - **GitHub Pages 兜底**：构建后复制 `dist/index.html` 为 `dist/404.html`（通过 npm script `postbuild` 或 `vite-plugin` 完成），GitHub Pages 命中 404 时返回该页，SPA 重新接管路由。**注意 GH Pages 子路径需在 `vite.config.ts` 设置 `base`。**
-- **工具呈现（C2 落地）**：iframe + sandbox + postMessage，详见 §3 `ToolFrame` 与 §4 时序图 2。
+- **工具呈现（C2 落地）**：`/tools/:id` 详情页 + 真实 `<a target="_blank" rel="noopener noreferrer">` 新标签页打开静态产物，**不做 iframe 嵌入**（2026-10-11 推翻原方案，见 PRD §6）。
 - **降级策略（C3 落地）**：`isSupabaseConfigured` 为 false 时，`postsService`/`messagesService` 返回本地 fallback 数据或"未配置"错误对象，页面优雅提示而不崩溃。
 
 ---
@@ -111,7 +111,6 @@ bannianjihua_web/
     │   │   └── ErrorState.tsx          # 错误/降级提示（含"后端未配置"文案）
     │   ├── tools/
     │   │   ├── ToolCard.tsx            # 工具卡片（图标/名称/描述/标签/状态/打开）
-    │   │   ├── ToolFrame.tsx           # ★ iframe 容器：sandbox/加载态/错误态/全屏/新标签
     │   │   └── ToolFilterBar.tsx       # 工具筛选（状态 + 标签）
     │   ├── blog/
     │   │   ├── PostCard.tsx            # 文章卡片
@@ -127,7 +126,7 @@ bannianjihua_web/
     │   ├── BlogListPage.tsx            # /blog
     │   ├── BlogPostPage.tsx            # /blog/:slug
     │   ├── ToolListPage.tsx            # /tools
-    │   ├── ToolViewPage.tsx            # /tools/:id（含 ToolFrame 容器）
+    │   ├── ToolViewPage.tsx            # /tools/:id 详情页（信息 + 「打开工具」按钮）
     │   ├── RoadmapPage.tsx             # /roadmap
     │   ├── MessageBoardPage.tsx        # /message（表单 + 列表 + 防滥用）
     │   ├── AboutPage.tsx               # /about
@@ -154,7 +153,7 @@ export interface Tool {
   tags: string[];
   status: ToolStatus;
   runtime: ToolRuntime;       // 默认 'client-only'
-  entry?: string;             // iframe 静态 HTML 路径，如 /tools/xx.html
+  entry?: string;             // 工具产物静态路径（相对 public/，不带前导斜杠），如 tools/xx.html
   externalUrl?: string;       // 外部兜底跳转（新标签）
   cover?: string;
   version?: string;
@@ -345,13 +344,6 @@ classDiagram
     class Navbar {
         +ThemeToggle themeToggle
     }
-    class ToolFrame {
-        +string src
-        +Tool tool
-        +void onThemeChange()
-        +void onResize()
-        +boolean fullscreen
-    }
     class ToolCard {
         +Tool tool
         +void onOpen()
@@ -365,10 +357,8 @@ classDiagram
     }
 
     MainLayout --> Navbar
-    MainLayout --> ToolFrame : page outlet
     Navbar --> ThemeToggle
     ToolCard --> Tool
-    ToolFrame --> Tool
     MessageBoardPage --> MessagesService
 ```
 
@@ -407,40 +397,34 @@ sequenceDiagram
     Note over H,SB: fallback=true 时 UI 显示"演示数据"角标
 ```
 
-#### 4.2 工具 iframe 加载与主题同步
+#### 4.2 工具打开流程（新标签页直开）
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor U as 访客
-    participant TV as ToolViewPage(/tools/:id)
+    participant TL as ToolListPage(/tools)
+    participant TD as ToolViewPage(/tools/:id)
     participant TR as ToolRegistry
-    participant TF as ToolFrame
-    participant IF as iframe(public/tools/*.html)
-    participant TC as ThemeContext
+    participant TB as 新标签页
+    participant TO as 工具产物(public/tools/*.html)
 
-    U->>TV: 访问 /tools/md-to-html-reader
-    TV->>TR: getToolById('md-to-html-reader')
-    TR-->>TV: Tool 或 undefined
+    U->>TL: 浏览工具箱
+    TL->>TR: getOnlineTools()
+    TR-->>TL: Tool[]（本地同步，立即渲染）
+    U->>TD: 进入详情页
+    TD->>TR: getToolById(id)
     alt 工具不存在 / 无 entry
-        TV-->>U: 渲染 EmptyState 友好占位（不白屏）
+        TD-->>U: 渲染 EmptyState 友好占位（不白屏）
     else 正常
-        TV->>TF: <ToolFrame src={entry} tool={tool} />
-        TF-->>U: 显示加载态（Skeleton/Spinner）
-        TF->>IF: 设置 src，开始加载
-        IF-->>TF: onLoad
-        TF->>IF: postMessage({type:'theme', value: mode})
-        IF-->>TF: postMessage({type:'resize', height: N})
-        TF->>TF: 应用 height（含最小高度兜底）
-        TF-->>U: 隐藏加载态，展示工具
+        TR-->>TD: Tool
+        TD-->>U: 工具信息 + 「打开工具」按钮（href 已经 publicUrl() 补好 base 前缀）
     end
 
-    U->>TC: 点击 ThemeToggle（切换主题）
-    TC->>TC: 更新 mode + 写入 localStorage
-    TC-->>TF: mode 变化触发 useEffect
-    TF->>IF: postMessage({type:'theme', value: newMode})
-    IF->>IF: 应用暗/浅色
-    Note over TF,IF: 超时 3s 未收到 onLoad → 显示错误态 + "新标签打开"/"全屏"兜底
+    U->>TB: 点「打开工具」（真实 <a target="_blank" rel="noopener noreferrer">）
+    TB->>TO: 新标签页加载独立文档
+    TO->>TO: 自持主题与布局，与主站零耦合
+    Note over TD,TO: 工具是独立文档，不依赖主站任何运行时；不存在跨文档通信协议
 ```
 
 ---
@@ -564,7 +548,7 @@ sequenceDiagram
 
 #### **T03 — 核心 UI：布局 + 通用组件 + 页面**（优先级 P0，依赖 T01、T02）
 
-**目标**：实现全部页面与主干组件，完成站点的可见形态与路由闭环（不含工具 iframe 容器细化）。
+**目标**：实现全部页面与主干组件，完成站点的可见形态与路由闭环。
 
 **涉及文件**：
 | 文件 | 职责 |
@@ -605,32 +589,28 @@ sequenceDiagram
 
 ---
 
-#### **T04 — 工具容器与集成收尾**（优先级 P0，依赖 T01–T03）
+#### **T04 — 工具详情页与集成收尾**（优先级 P0，依赖 T01–T03）
 
-**目标**：实现 `ToolFrame` iframe 容器 + `/tools/:id` 页面 + 留言板页面（防滥用） + 工具占位 HTML + 最终联调。
+**目标**：实现 `/tools/:id` 详情页 + 留言板页面（防滥用） + 工具占位 HTML + 最终联调。
+
+> 2026-10-11 变更：原计划的 `ToolFrame` iframe 容器与 `lib/postMessage.ts` 协议**已废弃并删除**，
+> 改为新标签页直接打开工具产物（见 PRD §6 / 本文 §1.3）。下列文件均不再创建。
 
 **涉及文件**：
 | 文件 | 职责 |
 |---|---|
-| `src/components/tools/ToolFrame.tsx` | ★ iframe 容器（sandbox/postMessage/加载态/错误态/全屏/新标签） |
-| `src/pages/ToolViewPage.tsx` | `/tools/:id`：查注册表 → 渲染 ToolFrame 或占位 |
+| `src/pages/ToolViewPage.tsx` | `/tools/:id` 详情页：查注册表 → 工具信息 + 「打开工具」按钮（真实 `<a target="_blank">`），无 entry 时占位 |
 | `src/pages/MessageBoardPage.tsx` | `/message`：表单 + 列表 + honeypot + 限流 + 长度校验 + Turnstile 开关 |
 | `public/tools/md-to-html-reader.html` | 工具产物占位（真实产物由老板替换） |
 | `public/tools/english-dict-reader.html` | 工具产物占位 |
 | `public/tools/logic-fallacy-cards.html` | 逻辑谬误图集静态展示页 |
-| `src/lib/postMessage.ts` | postMessage 协议常量与类型（`ThemeMsg`/`ResizeMsg`）+ 发送 helper |
 
 **关键实现要点**：
-- `ToolFrame`：`<iframe sandbox="allow-scripts allow-same-origin allow-downloads allow-popups" src={entry}>`；`useEffect` 监听 `message` 事件，仅处理 `resize`（`Number.isFinite` 校验 height，设上下限）；`mode` 变化时 `iframe.contentWindow.postMessage({type:'theme',value:mode}, '*')`；3s onLoad 超时 → 错误态 + "全屏（含 `requestFullscreen`）"/"新标签打开"按钮。
-- **协议常量**（`lib/postMessage.ts`）：
-  ```ts
-  export const MSG_THEME = 'theme';   // 主站→工具 {type:'theme', value:'light'|'dark'}
-  export const MSG_RESIZE = 'resize'; // 工具→主站 {type:'resize', height:number}
-  ```
-- 工具占位 HTML 内需内置一小段脚本：监听 `theme` 消息切换自身配色 + `postMessage resize` 上报高度（正式工具由老板按同协议改造）。
+- 打开动作一律用真实 `<a href target="_blank" rel="noopener noreferrer">`，**不用 `window.open`**（避免弹窗拦截，保证中键/右键「新标签打开」可用）。
+- 工具 URL 必须经 `lib/paths.ts` 的 `publicUrl()` 补部署 base 前缀（GitHub Pages 子路径场景，见 §1.3 C1）。
 - `MessageBoardPage`：`turnstile` 由 `VITE_TURNSTILE_SITE_KEY` 是否配置决定是否渲染（默认不渲染 = 关闭）；提交走 `messagesService.create`，成功后刷新列表。
 
-**验收**：`/tools/:id` 能加载占位工具并与主站主题同步、高度自适应；不存在工具显示占位；留言板在无后端时优雅提示、防滥用规则生效。
+**验收**：全部 `/tools/:id` 可达，且「打开工具」能在新标签页正确打开产物（含子路径部署）；不存在工具显示占位；留言板在无后端时优雅提示、防滥用规则生效。
 
 ---
 
@@ -658,11 +638,11 @@ sequenceDiagram
    - `runtime` 默认 `'client-only'`；依赖非浏览器能力的标 `'light-backend'`。
    - `entry` 为 `public/` 下静态路径（以 `/tools/` 开头）；`externalUrl` 作兜底跳转。
 
-5. **iframe postMessage 协议（冻结）**
-   - 主站 → 工具：`{ type: 'theme', value: 'light' | 'dark' }`
-   - 工具 → 主站：`{ type: 'resize', height: number }`
-   - 通信一律 `window.postMessage(msg, '*')`；接收端必须校验 `msg.type` 与数值合法性。
-   - `sandbox="allow-scripts allow-same-origin allow-downloads allow-popups"`。
+5. **工具呈现约定**
+   - 工具产物是**完全独立的文档**，放 `public/tools/`，用真实 `<a target="_blank" rel="noopener noreferrer">` 打开。
+   - 工具 URL **一律经 `lib/paths.ts` 的 `publicUrl()` 构造**，不要手拼 base 前缀（子路径部署会断链）。
+   - **不做 iframe 嵌入，也不存在跨文档 postMessage 协议**（2026-10-11 起废弃并删除代码）。
+   - 多文件工具（带素材/数据/音轨）走镜像同步脚本：`scripts/sync-daily-english.mjs`，挂在 `prebuild`。
 
 6. **数据访问层约定**
    - 所有 service 返回 `APIResult<T>`：`{ data, error, fallback? }`；**不抛异常**。
@@ -692,7 +672,7 @@ sequenceDiagram
 | Q3 | **`logic-fallacy-cards` 形态** | 因 PNG 依赖无头 Chrome，定位为"已生成图集静态展示"，`runtime:'light-backend'`，`entry` 指向 `/tools/logic-fallacy-cards.html`（静态图集页） | 是否已有生成好的 PNG 图集可直接放入？还是需要改成别的形态（如外部链接）？ |
 | Q4 | 文章内容来源 | 运行时从 Supabase `posts` 拉取；无后端用本地 fallback 演示 | 是否接受首屏文章在无网/无配置时为演示数据？ |
 | Q5 | 静态托管平台 | Cloudflare Pages 首选（`_redirects`）；兼容 GitHub Pages（`404.html` + `base`） | 最终选 Cloudflare Pages 还是 GitHub Pages？影响 `base` 与 CI 设置 |
-| Q6 | 工具 HTML 真实产物 | 先用占位 HTML（含主题/高度协议脚本）跑通链路 | 老板何时提供 `md-to-html-reader.html` / `english-dict-reader.html` 真实文件？ |
+| Q6 | 工具 HTML 真实产物 | 先用占位 HTML 跑通链路（工具是独立文档，无需任何主站协议脚本） | 老板何时提供 `md-to-html-reader.html` / `english-dict-reader.html` 真实文件？ |
 | Q7 | SEO/分享（PRD P1） | 本轮未纳入任务（纯静态 SPA 的 meta/sitemap 需额外方案） | 是否需要在本轮加入 sitemap/RSS/OG？ |
 
 ---
@@ -704,7 +684,7 @@ graph TD
     T01[T01 项目基础设施与构建配置<br/>package.json / vite / ts / tailwind / main.tsx / App.tsx / router.tsx / theme]
     T02[T02 数据层<br/>supabase.ts / tools.ts / postsService / messagesService / fallback]
     T03[T03 核心 UI<br/>layout / common / blog / home 组件 + 全部 Page]
-    T04[T04 工具容器与集成收尾<br/>ToolFrame / ToolViewPage / MessageBoardPage / 工具HTML / postMessage]
+    T04[T04 工具详情页与集成收尾<br/>ToolViewPage / MessageBoardPage / 工具HTML]
 
     T01 --> T02
     T01 --> T03

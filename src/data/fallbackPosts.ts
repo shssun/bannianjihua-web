@@ -46,36 +46,48 @@ export function add(a: number, b: number): number {
   },
   {
     id: 'fallback-post-2',
-    slug: 'iframe-sandbox-notes',
-    title: '用 iframe 沙箱零改造复用单文件工具',
+    slug: 'open-tools-in-new-tab',
+    title: '为什么工具是「新标签页直接打开」而不是内嵌',
     excerpt:
-      '工具是独立的单文件 HTML，如何在不破坏其「可离线」属性的前提下嵌入主站？答案是一个带 sandbox 的 iframe 与一套极简 postMessage 协议。',
-    tags: ['前端', 'iframe', '架构'],
+      '工具是独立的自包含单文件 HTML。嵌入主站看起来更一体化，却会引入沙箱、跨文档通信和一整套额外协议。本文说明最后为什么选了最朴素的做法。',
+    tags: ['前端', '架构', '工具'],
     published: true,
     publishedAt: '2025-03-05T09:30:00.000Z',
     createdAt: '2025-03-05T09:30:00.000Z',
-    contentMd: `# 用 iframe 沙箱零改造复用单文件工具
+    contentMd: `# 为什么工具是「新标签页直接打开」而不是内嵌
 
 ## 问题
 
-工具产物是自包含单文件 HTML（HTML + CSS/JS 渲染），
-若改造成 React 组件，会破坏它的「离线可跑」属性。
+工具产物是自包含单文件 HTML（HTML + CSS/JS 渲染）。
+若改造成 React 组件，会破坏它「离线可跑」的属性。
 
-## 方案：iframe + sandbox
+## 曾经考虑过：iframe + sandbox
 
 \`\`\`html
 <iframe
-  sandbox="allow-scripts allow-same-origin allow-downloads allow-popups"
+  sandbox="allow-scripts allow-same-origin"
   src="/tools/xxx.html"
 ></iframe>
 \`\`\`
 
-## postMessage 协议
+它确实能隔离样式，但代价是一整套跨文档通信协议（主题同步、高度上报、加载超时兜底），
+而且下载、剪贴板、全屏等能力在沙箱里处处受限。
 
-- 主站 → 工具：\`{ type: 'theme', value: 'light' | 'dark' }\`
-- 工具 → 主站：\`{ type: 'resize', height: number }\`
+## 最终采用：真实链接 + 新标签页
 
-接收端必须校验 \`type\` 与数值合法性，并通过高度上下限做兜底。
+\`\`\`tsx
+<a href={toolUrl} target="_blank" rel="noopener noreferrer">
+  打开工具
+</a>
+\`\`\`
+
+- **零改造**：工具产出即成品，不需要为「被嵌入」做任何适配
+- **无样式冲突**：本来就是两个独立文档，不需要沙箱来隔离
+- **能力不受限**：下载、剪贴板、全屏原样可用
+- **工具自持主题**：省掉主题同步协议
+
+代价是「跳出站」的观感。但对工具类页面来说，独立标签页反而更贴合使用习惯
+—— 用户常常希望工具和文章并排对照。
 
 这样，加一个工具 = 丢一个 HTML 进 \`public/tools/\` + 注册表加一行。`,
   },
