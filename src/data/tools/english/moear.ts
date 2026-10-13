@@ -36,6 +36,7 @@ const tool: Tool = {
   version: '0.1.0',
   createdAt: '2026-10-13',
   order: 3,
+  icap: ['passive'],
 };
 
 export default tool;

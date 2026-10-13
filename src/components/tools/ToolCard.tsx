@@ -4,6 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import type { Tool } from '@/types';
 import { TOOL_RUNTIME_LABEL, getToolEntryUrl } from '@/data/tools';
 import { getChannelById } from '@/data/channels';
+import { ICAP_LEVELS } from '@/data/icap';
 import StatusBadge from '@/components/common/StatusBadge';
 import TagChip from '@/components/common/TagChip';
 
@@ -21,6 +22,12 @@ export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
   const canOpen = tool.status === 'online';
   const toolUrl = getToolEntryUrl(tool);
   const channel = getChannelById(tool.channel);
+
+  // ICAP 徽章：取该工具声明的**最高**层级（order 最大者）展示。
+  // ⚠️ 展示的是**设计意图**，非学习者的实际层级。
+  const topIcap = ICAP_LEVELS.filter((level) => tool.icap?.includes(level.id)).sort(
+    (a, b) => b.order - a.order,
+  )[0];
 
   return (
     <Box
@@ -88,6 +95,15 @@ export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
             label={`预计 ${tool.eta}`}
             size="small"
             variant="outlined"
+            sx={{ borderColor: 'var(--border)' }}
+          />
+        ) : null}
+        {topIcap ? (
+          <Chip
+            label={`ICAP · ${topIcap.name}`}
+            size="small"
+            variant="outlined"
+            title={`ICAP 认知层级（设计意图）：${topIcap.name} ${topIcap.en} —— ${topIcap.description}`}
             sx={{ borderColor: 'var(--border)' }}
           />
         ) : null}

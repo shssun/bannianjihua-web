@@ -15,6 +15,7 @@ const tool: Tool = {
   cover: '💡',
   eta: '2026-Q1',
   order: 2,
+  icap: ['passive'],
 };
 
 export default tool;

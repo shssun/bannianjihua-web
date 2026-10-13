@@ -1,4 +1,4 @@
-import type { Tool } from '@/types';
+import type { Tool, ICAPLevel } from '@/types';
 import { publicUrl } from '@/lib/paths';
 
 /**
@@ -61,6 +61,21 @@ export function getToolsByChannel(channelId: string): Tool[] {
  */
 export function getToolsByCollection(collectionId: string): Tool[] {
   return TOOLS.filter((tool) => tool.collections?.includes(collectionId)).sort(sortByOrder);
+}
+
+/**
+ * 获取某个 ICAP 认知层级下的全部工具，按 order 升序。
+ *
+ * ICAP 是**认知投入**维度的虚拟归口（见 `src/data/icap.ts`），
+ * 与物理唯一的 `channel`、来源维度的 `collections` 均正交。
+ *
+ * ⚠️ 命中的是工具的**设计意图**（`Tool.icap`），不是学习者的实际层级 ——
+ * 实际层级取决于学习者是否真的产出了「超出所给材料之物」。
+ *
+ * @param level ICAP 层级 id（对应 src/data/icap.ts 的 IcapLevel.id）
+ */
+export function getToolsByIcap(level: ICAPLevel): Tool[] {
+  return TOOLS.filter((tool) => tool.icap?.includes(level)).sort(sortByOrder);
 }
 
 /**

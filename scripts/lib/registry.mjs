@@ -137,3 +137,21 @@ export function loadCollectionIds(repoRoot) {
   }
   return loadDeclaredIds(file);
 }
+
+/**
+ * 读取 ICAP 层级 id 列表（解析 `src/data/icap.ts`）。
+ *
+ * ICAP 是**认知投入**维度的虚拟归口，与物理唯一的频道、来源维度的集合均正交。
+ * 与 `loadCollectionIds` 同理：层级是固定四层、表结构一致，故复用同一套
+ * 「单引号 id 字面量」正则解析；文件不存在时返回空数组。
+ *
+ * @param {string} repoRoot 仓库根目录
+ * @returns {string[]}
+ */
+export function loadIcapLevelIds(repoRoot) {
+  const file = join(repoRoot, 'src', 'data', 'icap.ts');
+  if (!existsSync(file)) {
+    return [];
+  }
+  return loadDeclaredIds(file);
+}

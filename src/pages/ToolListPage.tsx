@@ -7,6 +7,7 @@ import type { Channel } from '@/data/channels';
 import { getSortedChannels } from '@/data/channels';
 import type { Collection } from '@/data/collections';
 import { getTopLevelCollections } from '@/data/collections';
+import { getSortedIcapLevels } from '@/data/icap';
 import Section from '@/components/common/Section';
 import ToolCard from '@/components/tools/ToolCard';
 import ToolFilterBar, {
@@ -143,6 +144,50 @@ function CollectionStrip(): JSX.Element | null {
 }
 
 /**
+ * 「按认知层级」图例（ICAP）。
+ *
+ * ⚠️ 本期**只作图例、不可点击** —— 可点击筛选需要新增路由（如
+ * `/tools/icap/:level`），属下一期（方案 D），本期不做。
+ * 这里只把 ICAP 四层（passive → active → constructive → interactive）
+ * 各自的行为 · 机制 · 结果摊开，给后续讨论提供共同语言。
+ *
+ * ⚠️ 展示的是各工具的**设计意图**，不是学习者的实际层级 ——
+ * ICAP 原文强调「意图 ≠ 实际」，实际层级取决于学习者是否真的产出了
+ * 「超出所给材料之物」，故此处附注不可省。
+ */
+function IcapLegend(): JSX.Element {
+  const levels = useMemo(() => getSortedIcapLevels(), []);
+
+  return (
+    <Box>
+      <Typography variant="caption" color="var(--muted)">
+        按认知层级（设计意图 · 学习效果递增）
+      </Typography>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        {levels.map((level) => (
+          <Grid item xs={12} sm={6} md={3} key={level.id}>
+            <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
+              <Typography variant="h3" sx={{ fontSize: '1rem' }}>
+                {level.name}
+                <Typography component="span" variant="body2" color="var(--muted)" sx={{ ml: 1 }}>
+                  {level.en}
+                </Typography>
+              </Typography>
+              <Typography variant="caption" color="var(--muted)">
+                {level.description}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+      <Typography variant="caption" color="var(--muted)" sx={{ display: 'block', mt: 1 }}>
+        ⚠️ 以上为各工具的**设计意图**；ICAP 原文强调「意图 ≠ 实际」——实际层级取决于学习者是否真的产出了「超出所给材料之物」。
+      </Typography>
+    </Box>
+  );
+}
+
+/**
  * 工具箱页 `/tools`。
  *
  * - **默认视图**：先给出「按来源浏览」入口条（集合，虚拟多对多），
@@ -215,6 +260,7 @@ export default function ToolListPage(): JSX.Element {
       ) : (
         <Stack spacing={5}>
           <CollectionStrip />
+          <IcapLegend />
           {channelSections.map(({ channel, online, upcoming: upcomingInChannel }) => (
             <Box key={channel.id}>
               <ChannelHeading channel={channel} count={online.length} />

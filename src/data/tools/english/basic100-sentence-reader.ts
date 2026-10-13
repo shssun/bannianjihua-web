@@ -23,6 +23,7 @@ const tool: Tool = {
   createdAt: '2026-10-13',
   order: 12,
   collections: ['books', 'dragon-english-basic100'],
+  icap: ['passive'],
 };
 
 export default tool;

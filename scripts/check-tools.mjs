@@ -14,13 +14,16 @@
  *   | 有 entry 时 public/<entry> 真实存在            | error |
  *   | collections[] 里的每个 id 存在于 COLLECTIONS   | error |
  *   | collections[] 内部无重复 id                     | error |
+ *   | icap 是字符串数组                              | error |
+ *   | icap[] 里的每个值存在于 ICAP_LEVELS            | error |
+ *   | icap[] 内部无重复值                            | error |
  *   | 有 entry 时文件名以 index.html 结尾            | warn  |
  *   | 同频道内 order 重复                            | warn  |
  */
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve } from 'node:path';
-import { loadChannelIds, loadCollectionIds, loadToolRegistry } from './lib/registry.mjs';
+import { loadChannelIds, loadCollectionIds, loadIcapLevelIds, loadToolRegistry } from './lib/registry.mjs';
 
 const TAG = '[check-tools]';
 const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -50,6 +53,7 @@ function rel(abs) {
 
 const channelIds = new Set(loadChannelIds(repoRoot));
 const collectionIds = new Set(loadCollectionIds(repoRoot));
+const icapIds = new Set(loadIcapLevelIds(repoRoot));
 const tools = loadToolRegistry(repoRoot);
 
 // ---- id 唯一性（分组报告，避免同一冲突刷屏） ----
@@ -114,6 +118,33 @@ for (const tool of tools) {
     }
   }
 
+  // ---- icap[]：属于「认知投入」维度的虚拟归口，多对多 ----
+  // 与 collections 完全同构：只校验「引用有效」与「不自我重复」，
+  // 不限制数量、也不要求每工具必填。
+  // ⚠️ 命中的是工具的**设计意图**（Tool.icap），不是学习者的实际层级。
+  if (object.icap !== undefined) {
+    if (!Array.isArray(object.icap)) {
+      errors.push(`${where}: icap 必须是字符串数组（当前是 ${typeof object.icap}）`);
+    } else {
+      const seenIcap = new Set();
+      for (const level of object.icap) {
+        if (typeof level !== 'string' || level.length === 0) {
+          errors.push(`${where}: icap 里存在非字符串或空字符串项：${JSON.stringify(level)}`);
+          continue;
+        }
+        if (seenIcap.has(level)) {
+          errors.push(`${where}: icap 里 "${level}" 重复`);
+        }
+        seenIcap.add(level);
+        if (!icapIds.has(level)) {
+          errors.push(
+            `${where}: icap 里的 "${level}" 不在 ICAP_LEVELS 中（见 src/data/icap.ts）`,
+          );
+        }
+      }
+    }
+  }
+
   if (object.entry) {
     const entryRel = String(object.entry);
     const entryAbs = join(repoRoot, 'public', ...entryRel.split('/'));
@@ -154,7 +185,7 @@ for (const [channel, list] of byChannel) {
 
 // ---- 汇总输出 ----
 console.log(
-  `${TAG} 频道 ${channelIds.size} 个 · 集合 ${collectionIds.size} 个 · 工具 ${tools.length} 个`,
+  `${TAG} 频道 ${channelIds.size} 个 · 集合 ${collectionIds.size} 个 · ICAP ${icapIds.size} 层 · 工具 ${tools.length} 个`,
 );
 
 if (warnings.length > 0) {

@@ -20,6 +20,7 @@ const tool: Tool = {
   version: '0.1.0',
   createdAt: '2025-02-01',
   order: 1,
+  icap: ['passive'],
 };
 
 export default tool;

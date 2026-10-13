@@ -12,6 +12,9 @@ export type ToolStatus = 'online' | 'planned' | 'developing' | 'paused';
 /** 工具运行形态：默认 100% 浏览器端；依赖非浏览器能力的标 light-backend。 */
 export type ToolRuntime = 'client-only' | 'light-backend';
 
+/** ICAP 认知投入层级（学习效果递增：passive → active → constructive → interactive）。取值见 src/data/icap.ts。 */
+export type ICAPLevel = 'passive' | 'active' | 'constructive' | 'interactive';
+
 /** 工具注册表条目。 */
 export interface Tool {
   /** 唯一标识，用作路由 /tools/:id；同时等于工具目录名 */
@@ -47,6 +50,18 @@ export interface Tool {
    * 一本书产出的多个工具共享同一个「书」集合，从而天然表达「一本书 → N 个工具」。
    */
   collections?: string[];
+  /**
+   * 该工具**设计上**要唤起的 ICAP 认知层级（可多值，如同时含 active + passive）。
+   *
+   * ⚠️ 这是**设计意图**，不是实际层级 —— ICAP 原文强调「意图 ≠ 实际」：
+   * 被要求「自我解释」的学习者可能只是在复述，实际仍停在 active。
+   * 实际层级取决于**学习者是否真的产出了「超出所给材料之物」**，
+   * 因此 UI 上必须与「产出物留存」信息并列展示，不可单独立论。
+   *
+   * id 取值见 `src/data/icap.ts`；构建期 `scripts/check-tools.mjs`
+   * 校验每个值 ∈ ICAPLevel 且数组内不重复。与 `collections` 同构（纯字面量数组）。
+   */
+  icap?: ICAPLevel[];
   /** 状态：用于首页「已上线 / 研发中」分类 */
   status: ToolStatus;
   /** 运行形态 */

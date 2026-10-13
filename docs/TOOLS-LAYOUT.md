@@ -367,6 +367,9 @@ export interface Tool {
 | `collections[]` 里每个 id 存在于 `COLLECTIONS` | **报错退出** |
 | `collections[]` 内部 id 无重复 | **报错退出** |
 | `collections` 是字符串数组 | **报错退出** |
+| `icap` 是字符串数组 | **报错退出** |
+| `icap[]` 里的每个值存在于 `ICAP_LEVELS` | **报错退出** |
+| `icap[]` 内部无重复值 | **报错退出** |
 | 有 `entry` 时文件名必须为 `index.html` | 警告 |
 | 同频道内 `order` 重复 | 警告 |
 
@@ -446,6 +449,8 @@ export interface Tool {
 | 内容主键（工具内数据） | `sha1(内容)[:10]`，**不用文件名** | `tool/voices/<hash>/s00.mp3` |
 
 **保留 id（不可作工具 id）**：`channel`、`collection` —— 它们已被静态路由段占用。
+
+> 注意：`icap` **不是**路由段，因此**不是**保留 id（本期只做标注 + 展示，不做按层级的路由/筛选页）。
 
 **id 为什么足够独特**：注册表是**全局平铺**的，路由 `/tools/:id` 也是全局的，
 再加上「目录名 = channel / 文件名 = id」的强约束与构建期唯一性校验，
