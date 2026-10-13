@@ -79,8 +79,9 @@ function ToolGrid({ tools }: { tools: Tool[] }): JSX.Element {
 /**
  * 工具箱页 `/tools`。
  *
- * - **默认视图**：按频道分区展示已上线工具（每区一个频道标题 + 卡片网格），
- *   末尾再单独一节展示「研发中」工具。
+ * - **默认视图**：按频道分区，**列出全部频道**（每区一个频道标题），
+ *   区内先展示已上线工具，再以「研发中」小标题展示该频道尚未上线的工具；
+ *   无任何已上线工具的频道给出占位说明。每个工具只在其所属频道出现一次。
  * - **筛选时**：状态/标签筛选生效，退化为一张平铺结果网格。
  */
 export default function ToolListPage(): JSX.Element {
@@ -103,18 +104,21 @@ export default function ToolListPage(): JSX.Element {
     }).sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
   }, [status, tag]);
 
-  /** 默认视图：已上线工具按频道分组（只保留非空频道）。 */
+  /**
+   * 默认视图：**列出全部频道**（二级目录 = 频道，须始终可见），
+   * 每个频道内再分「已上线」与「研发中」两组；空频道给出占位说明。
+   * 这样老板规划好的 english / math / cognition / general 四个二级目录永远都在，
+   * 且每个工具只在其所属频道出现一次，不会在两处重复展示。
+   */
   const channelSections = useMemo(() => {
     const online = getOnlineTools();
-    return getSortedChannels()
-      .map((channel) => ({
-        channel,
-        tools: online.filter((tool) => tool.channel === channel.id),
-      }))
-      .filter((section) => section.tools.length > 0);
+    const upcoming = getUpcomingTools();
+    return getSortedChannels().map((channel) => ({
+      channel,
+      online: online.filter((tool) => tool.channel === channel.id),
+      upcoming: upcoming.filter((tool) => tool.channel === channel.id),
+    }));
   }, []);
-
-  const upcoming = useMemo<Tool[]>(() => getUpcomingTools(), []);
 
   return (
     <Section title="工具箱" subtitle="默认浏览器本地运行 · 按频道浏览，或筛选查找">
@@ -143,26 +147,29 @@ export default function ToolListPage(): JSX.Element {
         )
       ) : (
         <Stack spacing={5}>
-          {channelSections.map(({ channel, tools }) => (
+          {channelSections.map(({ channel, online, upcoming: upcomingInChannel }) => (
             <Box key={channel.id}>
-              <ChannelHeading channel={channel} count={tools.length} />
-              <ToolGrid tools={tools} />
+              <ChannelHeading channel={channel} count={online.length} />
+              {online.length > 0 ? (
+                <ToolGrid tools={online} />
+              ) : (
+                <Typography variant="body2" color="var(--muted)" sx={{ mb: 1 }}>
+                  该频道暂无已上线工具，研发中 {upcomingInChannel.length} 个。
+                </Typography>
+              )}
+
+              {upcomingInChannel.length > 0 ? (
+                <Box sx={{ mt: online.length > 0 ? 2 : 1.5 }}>
+                  <Typography variant="caption" color="var(--muted)">
+                    研发中 · {upcomingInChannel.length}
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <ToolGrid tools={upcomingInChannel} />
+                  </Box>
+                </Box>
+              ) : null}
             </Box>
           ))}
-
-          {upcoming.length > 0 ? (
-            <Box>
-              <Typography variant="h3" sx={{ fontSize: '1.15rem', mb: 0.5 }}>
-                研发中
-              </Typography>
-              <Typography variant="caption" color="var(--muted)">
-                正在路上 / 规划中的工具
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                <ToolGrid tools={upcoming} />
-              </Box>
-            </Box>
-          ) : null}
         </Stack>
       )}
     </Section>

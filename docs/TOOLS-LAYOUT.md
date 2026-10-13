@@ -47,6 +47,11 @@ public/tools/                              ← L1 容器
 │   │       └── voices/                    （多说话人音轨）
 │   └── dict-reader/                       ← L3 工具 · 英文句读（单文件）
 │       └── index.html
+│   └── movie-line-listening/              ← L3 工具 · 影视台词磨耳朵（多文件）
+│       ├── index.html                     （源文件名 player.html，经 rename 映射而来）
+│       ├── tool/phrases.json
+│       ├── audio_norm/                    （1900 条响度归一真人原声 + 清单）
+│       └── tool_phrase/voices/            （692 条短语级标准音 TTS）
 ├── math/                                  ← L2 频道 · 数学
 │   └── set-theory-cards/                  ← 集合论卡片（规划中，无产物）
 ├── cognition/                             ← L2 频道 · 认知
@@ -76,6 +81,7 @@ public/tools/                              ← L1 容器
 ```
 D:/workspaces/
 ├── 每日英语/                         ← 影视台词跟读（movie-line-shadowing）的数据工作区（保持现名，不动）
+├── 每日英语台词/                     ← 影视台词磨耳朵（movie-line-listening）的数据工作区（保持现名，不动）
 └── ...
 ```
 
@@ -143,6 +149,7 @@ src/data/
 │   ├── index.ts                 ← 汇总器，用 glob 自动收集，几乎不用改
 │   ├── english/
 │   │   ├── movie-line-shadowing.ts
+│   │   ├── movie-line-listening.ts
 │   │   └── dict-reader.ts
 │   ├── math/
 │   │   └── set-theory-cards.ts
@@ -264,10 +271,32 @@ export interface Tool {
 `package.json` 里**永远只有这一条**：
 
 ```json
-"prebuild": "node scripts/check-tools.mjs && node scripts/sync-tools.mjs"
+"prebuild": "node scripts/sync-tools.mjs && node scripts/check-tools.mjs"
 ```
 
-> 单文件工具**不需要**同步清单 —— 直接把 HTML 放进 `public/tools/<channel>/<tool>/index.html` 提交即可。
+> **顺序是 `sync-tools → check-tools`，不能反。**
+> `check-tools.mjs` 会校验 `entry` 指向的文件在 `public/` 下真实存在，
+> 而这个文件正是**由 sync 产出的**。若 check 在前，新增多文件工具首次构建时
+> 必然报「entry 指向的文件不存在」并 `exit 1`，**根本走不到 sync**，新工具永远上不去。
+
+单文件工具**不需要**同步清单 —— 直接把 HTML 放进 `public/tools/<channel>/<tool>/index.html` 提交即可。
+
+### 6.2.1 `rename` 字段（源文件名 ≠ 站内规范名时）
+
+清单可给一个 `rename` 对象，把**源相对路径**精确映射为**目标相对路径**：
+
+```json
+{
+  "rename": { "player.html": "index.html" }
+}
+```
+
+- 用于「工具本体文件名不符合站内命名规范」的场合：源播放器叫 `player.html`
+  （工具本体是已验收产物、零改动），而站内单文件工具统一要求 `index.html`，
+  并由 `check-tools.mjs` 对非 `index.html` 的 entry 报 warn。
+  **不许改工具本体文件名**，所以由同步器做映射。
+- ⚠️ `required` 仍按**源**相对路径判定，不按映射后的。
+- sync 的「期望集合 key」= 目标相对路径，因此拷贝 / 校验 / 孤儿清理自动基于目标名，无需额外处理。
 
 ### 6.3 ⚠️ 两条必须记住的坑
 
@@ -304,9 +333,9 @@ export interface Tool {
 **这才是「不冲突」的最后一道保险**：不靠人（或 AI）自觉，靠构建失败。
 可直接运行 `npm run check:tools` 单独校验。
 
-> 说明：`prebuild` 的顺序是 `check-tools && sync-tools`（先校验后同步）。
-> 这依赖「同步产物已提交进仓库」这一约定（多文件工具首次落位时需先手动跑一次
-> `npm run sync:tools` 并提交产物，此后 CI 才能通过校验）。若希望更宽松，可把两步顺序对调。
+> 说明：`prebuild` 的顺序已确定为 **`sync-tools && check-tools`**（先同步后校验）。
+> 因为 `entry` 指向的产物正是 sync 产出的，若 check 在前，新增多文件工具首次构建
+> 必然因「entry 文件不存在」而 `exit 1`，永远走不到 sync。**顺序不可反。**
 
 ---
 
@@ -336,6 +365,7 @@ export interface Tool {
 | `set-theory-cards` | 集合论卡片 | —（规划中） | `tools/math/set-theory-cards/index.html` | `math` |
 | `intuition-cards` | 直觉之卡 | —（规划中） | `tools/cognition/intuition-cards/index.html` | `cognition` |
 | `markdown-slide` | Markdown 幻灯 | —（规划中） | `tools/general/markdown-slide/index.html` | `general` |
+| `movie-line-listening` | 影视台词磨耳朵 | —（新增） | `tools/english/movie-line-listening/index.html` | `english` |
 
 **id 变更**：`daily-english` → `movie-line-shadowing`；`english-dict-reader` → `dict-reader`；`intuition-zhika` → `intuition-cards`。
 **名称变更**：`每日英语跟读` → `影视台词跟读`（其余名称不变）。
@@ -374,5 +404,5 @@ export interface Tool {
 1. **旧路径是否需要 301 兼容层？** 迁移后 `/tools/xxx.html` 与 `/tools/daily-english/...` 会 404。
    若要保守，可在 `public/_redirects` 里加 301。当前判定：站点自用为主，暂不加。
 2. **`general` 这个兜底频道名**是否换成「其他 / 实用 / 杂项」？
-3. **`prebuild` 顺序**（`check-tools` → `sync-tools`）是否改为 `sync-tools` → `check-tools`，
-   以便「新增多文件工具时产物尚未提交」也能一次构建通过？
+3. **~~`prebuild` 顺序~~** —— **已定**：`sync-tools && check-tools`（先同步后校验），
+   见 §6.2 / §7 说明。原因：`entry` 产物由 sync 产出，check 在前会阻断新增工具。

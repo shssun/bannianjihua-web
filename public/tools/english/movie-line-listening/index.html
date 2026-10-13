@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>磨耳朵 · 英语台词</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-2:#121821;
+    --panel:#161d28;
+    --panel-2:#1c2532;
+    --line:#28313f;
+    --line-soft:#202836;
+    --txt:#e6edf6;
+    --txt-dim:#9fb0c3;
+    --txt-faint:#697a8d;
+    --accent:#4ea1ff;
+    --accent-2:#7c5cff;
+    --good:#37d67a;
+    --warn:#ffb020;
+    --bad:#ff5d5d;
+    --radius:12px;
+    --radius-sm:8px;
+    --font-en:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-zh:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans CJK SC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 700px at 15% -10%,#182233 0%,var(--bg) 55%) fixed;
+    color:var(--txt);
+    font-family:var(--font-en),var(--font-zh);
+    font-size:14px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  button{font-family:inherit;color:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  .wrap{max-width:1280px;margin:0 auto;padding:14px 16px 40px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:10px 4px 14px;border-bottom:1px solid var(--line-soft);margin-bottom:16px;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;letter-spacing:.3px;white-space:nowrap;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);}
+  .tabs{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;}
+  .tabs button{
+    border:0;background:transparent;color:var(--txt-dim);padding:7px 16px;border-radius:999px;
+    font-size:13px;font-weight:600;transition:.15s;white-space:nowrap;
+  }
+  .tabs button.on{background:linear-gradient(180deg,var(--accent),#3d8ee6);color:#06121f;box-shadow:0 2px 10px rgba(78,161,255,.35);}
+  .topmeta{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--txt-dim);}
+  .topmeta b{color:var(--txt);font-weight:600;}
+  .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;align-items:start;}
+  .grid > *{min-width:0;}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr;} }
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--radius);min-width:0;}
+
+  /* ---------- stage ---------- */
+  .stage{padding:26px 24px 20px;min-height:340px;display:flex;flex-direction:column;}
+  .stage .badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt-faint);margin-bottom:14px;flex-wrap:wrap;}
+  .stage .badge .tag{border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--txt-dim);}
+  .stage .badge .tag.acc{color:var(--accent);border-color:#2b4a72;}
+  .en{
+    font-size:clamp(26px,4.6vw,52px);line-height:1.18;font-weight:700;letter-spacing:.2px;
+    margin:12px 0 6px;min-height:1.2em;word-break:break-word;
+  }
+  .zh{
+    font-size:clamp(15px,2.2vw,22px);color:var(--txt-dim);font-family:var(--font-zh);
+    margin-top:6px;min-height:1.2em;transition:.15s;
+  }
+  .zh.hide{opacity:0;visibility:hidden;height:0;min-height:0;margin:0;}
+  .stage .spacer{flex:1;}
+  .progress{height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden;margin:20px 0 16px;cursor:pointer;}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-2),var(--accent));transition:width .2s;}
+
+  /* ---------- controls ---------- */
+  .ctrls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .btn{
+    border:1px solid var(--line);background:var(--panel-2);color:var(--txt);
+    border-radius:10px;padding:9px 14px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;
+    transition:.14s;
+  }
+  .btn:hover{border-color:#3a4757;background:#222c3b;}
+  .btn:active{transform:translateY(1px);}
+  .btn.play{background:linear-gradient(180deg,var(--accent),#3d8ee6);color:#06121f;border-color:transparent;min-width:104px;justify-content:center;box-shadow:0 3px 14px rgba(78,161,255,.3);}
+  .btn.skip{background:linear-gradient(180deg,#ff8a3d,#f2661d);color:#1a0d02;border-color:transparent;font-weight:800;box-shadow:0 3px 14px rgba(255,120,40,.28);}
+  .btn.ghost{background:transparent;}
+  .btn.icon{padding:9px 12px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn.sm{padding:6px 10px;font-size:12.5px;border-radius:8px;}
+  .btn.tog.on{background:#20304a;border-color:#35557f;color:#cfe3ff;}
+  .btn.good{background:linear-gradient(180deg,#2fbf6a,#22a055);color:#04170c;border-color:transparent;font-weight:700;}
+
+  .raterow{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap;}
+  .raterow .lbl{font-size:12.5px;color:var(--txt-faint);}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:2px;}
+  .seg button{border:0;background:transparent;color:var(--txt-dim);padding:6px 11px;border-radius:7px;font-size:12.5px;font-weight:600;}
+  .seg button.on{background:#22314a;color:#cfe3ff;}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:4px;background:var(--panel-2);outline:none;width:150px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #0d1117;}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #0d1117;}
+  .ratenum{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);min-width:44px;}
+
+  .opts{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line-soft);font-size:12.5px;color:var(--txt-dim);}
+  .switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+  .switch .track{width:34px;height:19px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);position:relative;transition:.15s;}
+  .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--txt-faint);transition:.15s;}
+  .switch.on .track{background:#20304a;border-color:#35557f;}
+  .switch.on .track::after{left:17px;background:var(--accent);}
+
+  /* ---------- side panel ---------- */
+  .side{padding:16px;display:flex;flex-direction:column;max-height:calc(100vh - 120px);position:sticky;top:14px;}
+  @media (max-width:980px){ .side{position:static;max-height:none;} }
+  .side h3{margin:0 0 10px;font-size:13px;letter-spacing:.4px;color:var(--txt-dim);text-transform:uppercase;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+  .side h3 .cnt{color:var(--txt-faint);font-weight:600;text-transform:none;letter-spacing:0;}
+  .search{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:9px 11px;font-size:13px;margin-bottom:10px;}
+  .search::placeholder{color:var(--txt-faint);}
+  .filters{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+  .frow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .frow .flbl{font-size:11.5px;color:var(--txt-faint);min-width:40px;}
+  .chip{border:1px solid var(--line);background:var(--panel-2);color:var(--txt-dim);border-radius:999px;padding:3px 10px;font-size:11.5px;transition:.12s;}
+  .chip.on{background:#22314a;border-color:#35557f;color:#cfe3ff;}
+  .subbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px;}
+  .subbar .num{width:64px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:6px 8px;font-size:13px;text-align:center;}
+  .list{overflow:auto;flex:1;min-height:120px;border:1px solid var(--line-soft);border-radius:10px;background:var(--bg-2);}
+  .row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:13px;}
+  .row:last-child{border-bottom:0;}
+  .row:hover{background:#182130;}
+  .row.cur{background:#1d2c42;box-shadow:inset 3px 0 0 var(--accent);}
+  .row .idx{color:var(--txt-faint);font-variant-numeric:tabular-nums;min-width:30px;font-size:11.5px;}
+  .row .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .row .txt .zhs{color:var(--txt-faint);font-size:11.5px;margin-left:6px;}
+  .row .meta{color:var(--txt-faint);font-size:11px;white-space:nowrap;}
+  .row input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);flex:none;}
+  .row .diff{color:var(--warn);font-size:10.5px;letter-spacing:1px;white-space:nowrap;}
+  .row.bad .txt{color:var(--txt-faint);text-decoration:line-through;}
+
+  .hint{font-size:11.5px;color:var(--txt-faint);margin-top:8px;line-height:1.6;}
+  .kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px;color:var(--txt-dim);background:var(--panel-2);font-family:monospace;}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#20293a;border:1px solid var(--line);border-radius:10px;padding:9px 16px;font-size:13px;color:var(--txt);box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:90vw;text-align:center;}
+  .toast.on{opacity:1;bottom:30px;}
+  .errbox{margin:20px auto;max-width:560px;padding:16px 18px;border:1px solid #5a2b2b;background:#241417;border-radius:12px;color:#ffb4b4;font-size:13.5px;}
+  .empty{padding:26px;text-align:center;color:var(--txt-faint);font-size:13px;}
+  .srcnote{font-size:11px;color:var(--txt-faint);}
+
+  @media (max-width:560px){
+    .wrap{padding:12px 10px 32px;}
+    .brand{font-size:15px;}
+    .tabs button{padding:7px 11px;font-size:12.5px;}
+    .topmeta{gap:8px;}
+    .pill{padding:3px 9px;font-size:12px;}
+    input[type=range]{width:110px;}
+    .stage{padding:20px 16px 16px;}
+    .side{padding:13px;}
+    .en{font-size:clamp(24px,7.4vw,40px);}
+    .ctrls .btn{padding:9px 12px;}
+    .btn.play{min-width:92px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>磨耳朵 · 英语台词</div>
+    <div class="tabs" id="tabs">
+      <button data-mode="read" class="on">📖 串读长文</button>
+      <button data-mode="ear">🎧 随机磨耳朵</button>
+    </div>
+    <div class="topmeta">
+      <span class="pill">共 <b id="metaTotal">0</b> 条</span>
+      <span class="pill">第 <b id="metaPos">0</b> / <b id="metaLen">0</b></span>
+      <span class="pill" id="metaEta">预计 --</span>
+      <span class="pill" id="metaSrc">音源 --</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- ============ STAGE ============ -->
+    <section class="card stage">
+      <div class="badge" id="stageBadge"></div>
+      <div class="en" id="stageEn">加载中…</div>
+      <div class="zh hide" id="stageZh"></div>
+      <div class="spacer"></div>
+      <div class="progress" id="progress"><i id="progressBar"></i></div>
+
+      <div class="ctrls">
+        <button class="btn icon" id="btnPrev" title="上一条 (←)">⏮ 上一条</button>
+        <button class="btn play" id="btnPlay" title="播放/暂停 (空格)">▶ 播放</button>
+        <button class="btn icon" id="btnNext" title="下一条 (→)">下一条 ⏭</button>
+        <button class="btn skip" id="btnSkip" title="听不懂就跳过 (→)">⏭ 听不懂，跳过</button>
+      </div>
+
+      <div class="raterow">
+        <span class="lbl">速度</span>
+        <div class="seg" id="rateSeg">
+          <button data-rate="0.75">0.75×</button>
+          <button data-rate="1">1.0×</button>
+          <button data-rate="1.25">1.25×</button>
+          <button data-rate="1.5">1.5×</button>
+          <button data-rate="2" class="on">2.0×</button>
+        </div>
+        <input type="range" id="rateRange" min="0.5" max="3" step="0.05" value="2" />
+        <span class="ratenum" id="rateNum">2.00×</span>
+      </div>
+
+      <div class="opts">
+        <span class="switch" id="swZh"><span class="track"></span>显示中文</span>
+        <span class="lbl">音源</span>
+        <div class="seg" id="srcSeg">
+          <button data-src="real">🎬 真人原声</button>
+          <button data-src="tts">🤖 TTS 标准音</button>
+        </div>
+        <span class="switch on" id="swLoop"><span class="track"></span>循环</span>
+        <span class="srcnote" id="srcNote"></span>
+      </div>
+    </section>
+
+    <!-- ============ SIDE ============ -->
+    <aside class="card side">
+      <!-- MODE A panel -->
+      <div id="panelRead">
+        <h3>串读清单 <span class="cnt" id="readCnt"></span></h3>
+        <div class="hint">全部短语按顺序连成一条流，用 TTS 标准音朗读。点任意一条即可跳转。</div>
+        <div style="height:10px"></div>
+        <div class="list" id="listRead"></div>
+      </div>
+
+      <!-- MODE B panel -->
+      <div id="panelEar" style="display:none;flex:1;flex-direction:column;">
+        <h3>筛选 / 勾选 <span class="cnt" id="earCnt"></span></h3>
+        <input class="search" id="search" type="text" placeholder="搜索英文 / 中文 / id…" />
+        <div class="filters">
+          <div class="frow"><span class="flbl">难度</span><span id="fDiff"></span></div>
+          <div class="frow"><span class="flbl">功能</span><span id="fFunc"></span></div>
+          <div class="frow"><span class="flbl">场景</span><span id="fScene"></span></div>
+        </div>
+        <div class="subbar">
+          <button class="btn sm" id="btnClearFilter">清空筛选</button>
+          <button class="btn sm" id="btnAll">全选</button>
+          <button class="btn sm" id="btnNone">清空勾选</button>
+        </div>
+        <div class="subbar">
+          <span class="lbl" style="font-size:11.5px;color:var(--txt-faint)">随机条数</span>
+          <button class="btn sm" data-n="20">20</button>
+          <button class="btn sm" data-n="50">50</button>
+          <button class="btn sm" data-n="100">100</button>
+          <button class="btn sm" data-n="0">全部</button>
+          <input class="num" id="customN" type="number" min="1" max="346" value="20" />
+          <button class="btn sm good" id="btnRand">🎲 随机生成</button>
+        </div>
+        <div class="subbar">
+          <button class="btn sm" id="btnUseChecked">用勾选项生成清单</button>
+        </div>
+        <div class="list" id="listEar"></div>
+        <div class="hint">勾选清单与筛选相互独立：筛选只影响“随机生成”的候选池，勾选可跨筛选累积。</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<audio id="player" preload="auto"></audio>
+
+<script>
+"use strict";
+/* =====================================================================
+   磨耳朵 · 英语台词  单文件播放器
+   数据源: tool/phrases.json   真人原声: audio/<key>/s<idx>.mp3
+   TTS: tool/voices/... (unit 级) ; 未来 tool_phrase/voices/... (短语级 ttsPhrase)
+   ===================================================================== */
+
+const LS_PREFIX = "moear:";
+const FILE_RE = { phrases: "tool/phrases.json" };
+
+/* ---------- 音轨层定位（分层：audio_norm 归一层优先，audio 原始层回退） ----------
+   不硬编码任何目录前缀：启动时读 _manifest.json 的 path 字段拿真实路径。
+   可选 URL 参数 ?audio=<root> 强制指定根（便于手动模拟回退）。 */
+const _forceRoot = new URLSearchParams(location.search).get("audio");
+const AUDIO_ROOTS = _forceRoot ? [_forceRoot] : ["audio_norm", "audio"];
+let AUDIO_ROOT = AUDIO_ROOTS[0];
+const AUDIO_INDEX = new Map();   // "<key>/s<idx2>" -> 真实相对路径
+const LOUDNESS = new Map();      // "<key>/s<idx2>" -> {lufs,silent,peakLimited,...}
+
+async function loadAudioManifest() {
+  for (const root of AUDIO_ROOTS) {
+    try {
+      const r = await fetch(root + "/_manifest.json", { cache: "no-cache" });
+      if (!r.ok) continue;
+      const mf = await r.json();
+      if (!Array.isArray(mf) || !mf.length) continue;
+      for (const x of mf) {
+        if (x && x.key != null && x.index != null && x.path) {
+          AUDIO_INDEX.set(x.key + "/s" + pad2(x.index), x.path);
+        }
+      }
+      AUDIO_ROOT = root;
+      return root;
+    } catch (e) { /* 试下一个 root */ }
+  }
+  return null;
+}
+
+async function loadLoudness() {
+  for (const root of ["audio_norm", "audio"]) {
+    try {
+      const r = await fetch(root + "/_loudness.json", { cache: "no-cache" });
+      if (!r.ok) continue;
+      const l = await r.json();
+      if (l && typeof l === "object") {
+        for (const k of Object.keys(l)) LOUDNESS.set(k, l[k] || {});
+        return root;
+      }
+    } catch (e) { /* 读不到就当非静音，不报错 */ }
+  }
+  return null;
+}
+
+/** 由 key+index 求真实音轨路径：manifest 优先，未加载完则按 AUDIO_ROOT 拼。 */
+function audioPathFor(key, index) {
+  const k = key + "/s" + pad2(index);
+  return AUDIO_INDEX.get(k) || (AUDIO_ROOT + "/" + key + "/s" + pad2(index) + ".mp3");
+}
+/** 读取该音轨的静音标记（读不到 = 非静音）。 */
+function isSilent(key, index) {
+  const l = LOUDNESS.get(key + "/s" + pad2(index));
+  return !!(l && l.silent === true);
+}
+
+/* ---------- 小工具 ---------- */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const pad2 = (n) => String(n).padStart(2, "0");
+const dedupe = (arr) => { const s = new Set(); return arr.filter((x) => x && !s.has(x) && s.add(x)); };
+const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmtTime = (sec) => {
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m > 0 ? (m + " 分 " + s + " 秒") : (s + " 秒");
+};
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(LS_PREFIX + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(LS_PREFIX + k, JSON.stringify(v)); } catch (e) {} },
+};
+
+/* ---------- 数据解析 ---------- */
+let CATALOG = [];                 // 全部短语（增强后）
+const byId = new Map();
+
+function unitTextNorm(s) { return (s || "").toLowerCase().replace(/[^a-z0-9']/g, ""); }
+
+/** 该 unit 文本是否即权威英文（或高度接近）。 */
+function enMatch(unitText, en) {
+  const a = unitTextNorm(unitText), b = unitTextNorm(en);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  return b.length >= 4 && (a.includes(b) || b.includes(a));
+}
+
+function buildEntry(p) {
+  const realUnits = [];
+  const ttsUnits  = [];
+  for (const clip of (p.clips || [])) {
+    const key = clip.key;
+    for (const u of (clip.units || [])) {
+      const dur = Math.max(0, (u.end || 0) - (u.start || 0));
+      const hasRef = (key != null && u.index != null);
+      realUnits.push({
+        url: hasRef ? audioPathFor(key, u.index) : null,
+        key: hasRef ? key : null,
+        index: hasRef ? u.index : null,
+        silent: hasRef ? isSilent(key, u.index) : false,
+        text: u.text || "",
+        dur,
+        isCanonical: !!u.isCanonical,
+      });
+      const t = u.tts || {};
+      ttsUnits.push({
+        aria: t.aria || null,
+        sonia: t.sonia || null,
+        text: u.text || "",
+        isCanonical: !!u.isCanonical,
+        dur,
+      });
+    }
+  }
+  const ttsPhrase = (p.ttsPhrase && (p.ttsPhrase.aria || p.ttsPhrase.sonia)) ? p.ttsPhrase : null;
+  const words = typeof p.words === "number" ? p.words : (p.en || "").trim().split(/\s+/).length;
+  const entry = {
+    id: p.id, en: p.en || "", zh: p.zh || "",
+    difficulty: p.difficulty || 3,
+    function: p.function || [], scene: p.scene || [],
+    tone: p.tone || "", words,
+    realUnits, ttsUnits, ttsPhrase,
+  };
+  return entry;
+}
+
+function pickRepTtsUnit(entry) {
+  const u = entry.ttsUnits;
+  if (!u.length) return null;
+  return u.find((x) => x.isCanonical && enMatch(x.text, entry.en))
+      || u.find((x) => enMatch(x.text, entry.en))
+      || u.find((x) => x.isCanonical)
+      || u[0];
+}
+
+/** TTS 候选 URL（按语音偏好排序，phrase 级优先，其次 unit 级）。 */
+function ttsUrls(entry, voice) {
+  const order = voice === "sonia" ? ["sonia", "aria"] : ["aria", "sonia"];
+  const out = [];
+  if (entry.ttsPhrase) {
+    for (const v of order) {
+      const raw = entry.ttsPhrase[v];
+      if (!raw) continue;
+      const p = String(raw).replace(/^\.?\//, "");
+      out.push(p);
+      if (!/^tool_phrase\//.test(p) && !/^tool\//.test(p)) out.push("tool_phrase/" + p);
+    }
+  }
+  const rep = pickRepTtsUnit(entry);
+  if (rep) {
+    for (const v of order) {
+      const raw = rep[v];
+      if (!raw) continue;
+      const p = String(raw).replace(/^\.?\//, "");
+      out.push(/^(tool|tool_phrase|audio)\//.test(p) ? p : ("tool/" + p));
+    }
+  }
+  return dedupe(out);
+}
+
+/** 真人原声候选 URL。randomPick=true 时随机取一个 unit（另附一个备选）。
+ *  优先排除被标记 silent 的音轨（读不到 loudness 时视为非静音）。 */
+function realUrls(entry, randomPick) {
+  let list = entry.realUnits.filter((u) => u.url);
+  if (!list.length) return [];
+  const loud = list.filter((u) => !u.silent);
+  if (loud.length) list = loud;
+  if (randomPick) {
+    const pick = list[(Math.random() * list.length) | 0];
+    const out = [pick.url];
+    for (const u of list) { if (u.url !== pick.url) { out.push(u.url); break; } }
+    return out;
+  }
+  return list.map((u) => u.url);
+}
+
+/** 根据当前音源产生完整候选链（首位优先，其后为回退）。 */
+function candidatesFor(entry, useReal) {
+  if (useReal) return dedupe(realUrls(entry, true).concat(ttsUrls(entry, "aria")));
+  return dedupe(ttsUrls(entry, "aria").concat(realUrls(entry, false)));
+}
+
+/** 短语「代表性时长」估计（秒，1x）。 */
+function estDur(entry, useReal) {
+  if (useReal && entry.realUnits.length) {
+    const d = entry.realUnits.map((u) => u.dur).filter((x) => x > 0);
+    if (d.length) return d.reduce((a, b) => a + b, 0) / d.length;
+  }
+  return (entry.words || 2) * 0.45 + 0.35;
+}
+
+/* ---------- 状态 ---------- */
+const state = {
+  mode: store.get("mode", "read"),
+  rate: clamp(store.get("rate", 2), 0.5, 3),
+  source: store.get("source", "real"),
+  showZh: store.get("showZh", false),
+  loop: store.get("loop", true),
+  playlist: [],      // 当前模式的播放清单（entry 引用数组）
+  index: 0,
+  playing: false,
+  loop: true,        // 由 per-mode 存档决定（串读默认关，磨耳朵默认开）
+  lastSrc: null,     // 最近一次实际使用的音源相对路径（诊断用）
+  selected: new Set(store.get("selected", [])),
+  filters: { diff: new Set(), func: new Set(), scene: new Set(), q: "" },
+  customN: store.get("customN", 20),
+};
+const unplayable = new Set(store.get("unplayable", []));
+
+/* 音源是否走真人（仅 B 模式可选，A 模式固定 TTS） */
+function useReal() { return state.mode === "ear" && state.source === "real"; }
+/* 循环设置按模式分别存储：串读默认关，磨耳朵默认开 */
+function loopKeyFor(m) { return m === "ear" ? "loopEar" : "loopRead"; }
+
+/* ---------- 音频内核 ---------- */
+const audio = $("#player");
+const blobCache = new Map();     // url -> Promise<string|null>(objectURL)
+const blobOrder = [];            // FIFO 用于回收
+const MAX_BLOB = 120;
+
+function getBlobUrl(url) {
+  if (blobCache.has(url)) return blobCache.get(url);
+  const pr = fetch(url, { cache: "force-cache" })
+    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.blob(); })
+    .then((b) => { const u = URL.createObjectURL(b); blobOrder.push({ url, obj: u }); trimBlob(); return u; })
+    .catch(() => null);
+  blobCache.set(url, pr);
+  return pr;
+}
+function trimBlob() {
+  while (blobOrder.length > MAX_BLOB) {
+    const old = blobOrder.shift();
+    if (blobCache.has(old.url) && blobCache.get(old.url) && blobCache.get(old.url).__used) continue;
+    try { URL.revokeObjectURL(old.obj); } catch (e) {}
+    blobCache.delete(old.url);
+  }
+}
+window.addEventListener("beforeunload", () => { blobOrder.forEach((o) => { try { URL.revokeObjectURL(o.obj); } catch (e) {} }); });
+
+/** 依候选链解析出可播放的 blob URL。 */
+async function resolveCands(cands) {
+  for (const u of cands) {
+    const bu = await getBlobUrl(u);
+    if (bu) { return { obj: bu, src: u }; }
+  }
+  return null;
+}
+
+/* 预取计划：保证「预取的下一条」与「真正播放的下一条」用同一候选链 */
+let plan = null; // {idx, cands}
+function planFor(idx) {
+  if (idx == null) return [];
+  if (plan && plan.idx === idx) return plan.cands;
+  plan = { idx, cands: candidatesFor(state.playlist[idx], useReal()) };
+  return plan.cands;
+}
+
+/* ---------- 播放控制 ---------- */
+function nextIndex() {
+  if (!state.playlist.length) return null;
+  if (state.index < state.playlist.length - 1) return state.index + 1;
+  if (state.loop) return 0;
+  return null;
+}
+
+async function playIndex(i, opts) {
+  opts = opts || {};
+  if (!state.playlist.length) return;
+  if (i == null) { stopPlayback(); return; }
+  state.index = clamp(i, 0, state.playlist.length - 1);
+  const entry = state.playlist[state.index];
+  renderStage(); renderList(); renderMeta();
+
+  const cands = planFor(state.index);
+  const res = await resolveCands(cands);
+  if (!res) {
+    if (!unplayable.has(entry.id)) { unplayable.add(entry.id); store.set("unplayable", Array.from(unplayable)); }
+    toast("该条无可用音源，已跳过：" + entry.en);
+    const ni = nextIndex();
+    if (ni != null && ni !== state.index) return playIndex(ni, opts);
+    stopPlayback(); renderList(); return;
+  }
+  plan = null;
+  state.lastSrc = res.src;
+  audio.src = res.obj;
+  audio.playbackRate = state.rate;
+  try { audio.currentTime = 0; } catch (e) {}
+  if (opts.autoplay !== false) {
+    try { await audio.play(); state.playing = true; }
+    catch (e) { state.playing = false; }
+  }
+  renderControls(); renderMeta();
+  prefetchAhead();
+}
+
+function prefetchAhead() {
+  const ni = nextIndex();
+  if (ni == null) return;
+  const cands = planFor(ni);
+  resolveCands(cands); // 预热：结果进 blobCache，切换时即时
+}
+
+function stopPlayback() {
+  state.playing = false;
+  try { audio.pause(); } catch (e) {}
+  renderControls();
+}
+
+async function togglePlay() {
+  if (!state.playlist.length) return;
+  if (state.playing) { stopPlayback(); return; }
+  if (!audio.src) { return playIndex(state.index, { autoplay: true }); }
+  try { await audio.play(); state.playing = true; } catch (e) { state.playing = false; }
+  renderControls();
+}
+
+function goNext() { if (!state.playlist.length) return; const ni = nextIndex(); if (ni == null) { stopPlayback(); return; } playIndex(ni, { autoplay: true }); }
+function goPrev() {
+  if (!state.playlist.length) return;
+  let pi = state.index - 1;
+  if (pi < 0) pi = state.loop ? state.playlist.length - 1 : 0;
+  playIndex(pi, { autoplay: true });
+}
+
+audio.addEventListener("ended", () => { goNext(); });
+audio.addEventListener("play",  () => { state.playing = true;  renderControls(); });
+audio.addEventListener("pause", () => { state.playing = false; renderControls(); });
+
+/* 设置播放速率（实时生效） */
+function setRate(v) {
+  state.rate = clamp(Math.round(v * 100) / 100, 0.5, 3);
+  audio.playbackRate = state.rate;
+  store.set("rate", state.rate);
+  $$("#rateSeg button").forEach((b) => b.classList.toggle("on", Math.abs(parseFloat(b.dataset.rate) - state.rate) < 0.001));
+  $("#rateRange").value = state.rate;
+  $("#rateNum").textContent = state.rate.toFixed(2) + "×";
+  renderMeta();
+}
+
+/* ---------- 清单构建 ---------- */
+function buildReadPlaylist() {
+  state.playlist = CATALOG.slice();
+  state.index = 0;
+}
+function buildEarPlaylist(entries) {
+  state.playlist = entries.slice();
+  state.index = 0;
+  store.set("earList", state.playlist.map((e) => e.id));
+}
+
+function filteredPool() {
+  const f = state.filters;
+  const q = f.q.trim().toLowerCase();
+  return CATALOG.filter((e) => {
+    if (f.diff.size && !f.diff.has(e.difficulty)) return false;
+    if (f.func.size && !e.function.some((x) => f.func.has(x))) return false;
+    if (f.scene.size && !e.scene.some((x) => f.scene.has(x))) return false;
+    if (q && !(e.en.toLowerCase().includes(q) || e.zh.toLowerCase().includes(q) || e.id.includes(q))) return false;
+    return true;
+  });
+}
+
+/* ---------- 渲染 ---------- */
+function currentEntry() { return state.playlist[state.index] || null; }
+
+function renderMeta() {
+  const total = CATALOG.length;
+  const len = state.playlist.length;
+  $("#metaTotal").textContent = total;
+  $("#metaPos").textContent = len ? (state.index + 1) : 0;
+  $("#metaLen").textContent = len;
+  let sum = 0;
+  for (const e of state.playlist) sum += estDur(e, useReal());
+  const sec = sum / state.rate;
+  $("#metaEta").textContent = len ? ("本清单 " + len + " 条 · 预计 " + fmtTime(sec)) : "本清单 0 条 · 预计 --";
+  $("#metaSrc").textContent = "音源 " + (useReal() ? "真人原声" : "TTS 标准音");
+  const pct = len ? ((state.index + (state.playing ? 1 : 0.5)) / len) * 100 : 0;
+  $("#progressBar").style.width = clamp(pct, 0, 100) + "%";
+}
+
+function renderStage() {
+  const e = currentEntry();
+  const badge = $("#stageBadge");
+  if (!e) {
+    $("#stageEn").textContent = state.mode === "read" ? "（清单为空）" : "（还没有清单，去右侧生成）";
+    $("#stageZh").textContent = "";
+    badge.innerHTML = "";
+    return;
+  }
+  $("#stageEn").textContent = e.en;
+  const zhEl = $("#stageZh");
+  const showZh = state.showZh && state.mode === "read";
+  zhEl.textContent = e.zh;
+  zhEl.classList.toggle("hide", !showZh);
+
+  const tags = [];
+  tags.push('<span class="tag">第 ' + (state.index + 1) + " / " + state.playlist.length + " 条</span>");
+  tags.push('<span class="tag acc">' + (useReal() ? "🎬 真人原声" : "🤖 TTS") + "</span>");
+  tags.push('<span class="tag">难度 ' + "★".repeat(e.difficulty) + "</span>");
+  if (e.function.length) tags.push('<span class="tag">' + e.function.join(" · ") + "</span>");
+  if (unplayable.has(e.id)) tags.push('<span class="tag" style="color:var(--bad);border-color:#5a2b2b">无音源</span>');
+  badge.innerHTML = tags.join("");
+}
+
+function renderControls() {
+  $("#btnPlay").textContent = state.playing ? "⏸ 暂停" : "▶ 播放";
+  $("#swZh").classList.toggle("on", state.showZh);
+  $("#swZh").style.opacity = state.mode === "ear" ? ".45" : "1";
+  $("#swLoop").classList.toggle("on", state.loop);
+  $$("#srcSeg button").forEach((b) => b.classList.toggle("on", b.dataset.src === state.source));
+  $$("#srcSeg button").forEach((b) => { b.disabled = (state.mode === "read"); b.style.opacity = state.mode === "read" ? ".45" : "1"; });
+  $("#srcNote").textContent = state.mode === "read" ? "串读模式固定使用 TTS 标准音" : "真人原声多演员，每轮随机取一句";
+}
+
+function renderList() {
+  if (state.mode === "read") {
+    const box = $("#listRead");
+    $("#readCnt").textContent = state.playlist.length + " 条";
+    const frag = document.createDocumentFragment();
+    state.playlist.forEach((e, i) => {
+      const row = document.createElement("div");
+      row.className = "row" + (i === state.index ? " cur" : "") + (unplayable.has(e.id) ? " bad" : "");
+      row.dataset.i = i;
+      row.innerHTML = '<span class="idx">' + (i + 1) + '</span>'
+        + '<span class="txt">' + esc(e.en) + '</span>';
+      row.addEventListener("click", () => playIndex(i, { autoplay: true }));
+      frag.appendChild(row);
+    });
+    box.innerHTML = ""; box.appendChild(frag);
+  } else {
+    renderEarList();
+  }
+  renderList_cursor();
+}
+
+function renderEarList() {
+  // B 模式左栏列表渲染“当前清单”；同时确保下拉/筛选面板已渲染 346 项
+  const box = $("#listEar");
+  const pool = filteredPool();
+  $("#earCnt").textContent = "候选 " + pool.length + " · 已选 " + state.selected.size;
+  const frag = document.createDocumentFragment();
+  pool.forEach((e) => {
+    const checked = state.selected.has(e.id);
+    const row = document.createElement("div");
+    row.className = "row" + (state.playlist[state.index] === e ? " cur" : "");
+    row.dataset.id = e.id;
+    row.innerHTML =
+      '<input type="checkbox"' + (checked ? " checked" : "") + ' />'
+      + '<span class="txt">' + esc(e.en) + '</span>'
+      + '<span class="diff">' + "★".repeat(e.difficulty) + '</span>';
+    const cb = row.querySelector("input");
+    cb.addEventListener("click", (ev) => { ev.stopPropagation(); toggleSelect(e.id, cb.checked); });
+    row.addEventListener("click", () => { const i = state.playlist.indexOf(e); if (i >= 0) playIndex(i, { autoplay: true }); });
+    frag.appendChild(row);
+  });
+  box.innerHTML = ""; box.appendChild(frag);
+  document.body.dataset.catalogSize = String(CATALOG.length);
+  document.body.dataset.poolSize = String(pool.length);
+}
+
+function renderList_cursor() {
+  const cur = state.playlist[state.index];
+  const box = state.mode === "ear" ? $("#listEar") : $("#listRead");
+  if (!box) return;
+  $$(".row.cur", box).forEach((r) => r.classList.remove("cur"));
+  if (!cur) return;
+  let target = null;
+  if (state.mode === "read") {
+    target = box.querySelector('.row[data-i="' + state.index + '"]');
+  } else {
+    target = box.querySelector('.row[data-id="' + cssEsc(cur.id) + '"]');
+  }
+  if (target) { target.classList.add("cur"); if (state.playing) target.scrollIntoView({ block: "nearest" }); }
+}
+
+function renderFilters() {
+  const diffs = [1, 2, 3, 4, 5];
+  const funcs = Array.from(new Set(CATALOG.flatMap((e) => e.function)));
+  const scenes = Array.from(new Set(CATALOG.flatMap((e) => e.scene)));
+  const make = (container, values, key, labelFn) => {
+    container.innerHTML = "";
+    values.forEach((v) => {
+      const b = document.createElement("button");
+      b.className = "chip" + (state.filters[key].has(v) ? " on" : "");
+      b.textContent = labelFn ? labelFn(v) : v;
+      b.addEventListener("click", () => {
+        const set = state.filters[key];
+        if (set.has(v)) set.delete(v); else set.add(v);
+        b.classList.toggle("on");
+        rerenderCurrentList();
+      });
+      container.appendChild(b);
+    });
+  };
+  make($("#fDiff"), diffs, "diff", (v) => "★".repeat(v));
+  make($("#fFunc"), funcs, "func");
+  make($("#fScene"), scenes, "scene");
+}
+function rerenderCurrentList() {
+  if (state.mode === "ear") renderEarList();
+}
+
+function renderAll() {
+  renderMeta(); renderStage(); renderControls();
+  $("#panelRead").style.display = state.mode === "read" ? "" : "none";
+  $("#panelEar").style.display = state.mode === "ear" ? "flex" : "none";
+  renderList();
+  renderFilters();
+  $$("#tabs button").forEach((b) => b.classList.toggle("on", b.dataset.mode === state.mode));
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function cssEsc(s) { return String(s).replace(/["\\]/g, "\\$&"); }
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), 2600);
+}
+
+/* ---------- 交互绑定 ---------- */
+function bind() {
+  $("#tabs").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-mode]"); if (!b) return;
+    switchMode(b.dataset.mode);
+  });
+  $("#btnPlay").addEventListener("click", togglePlay);
+  $("#btnNext").addEventListener("click", goNext);
+  $("#btnPrev").addEventListener("click", goPrev);
+  $("#btnSkip").addEventListener("click", goNext);
+  $("#rateSeg").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-rate]"); if (b) setRate(parseFloat(b.dataset.rate)); });
+  $("#rateRange").addEventListener("input", (ev) => setRate(parseFloat(ev.target.value)));
+  $("#srcSeg").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-src]"); if (!b || state.mode === "read") return;
+    state.source = b.dataset.src; store.set("source", state.source);
+    renderControls(); renderStage(); renderMeta(); plan = null;
+    if (state.playing) playIndex(state.index, { autoplay: true });
+  });
+  $("#swZh").addEventListener("click", () => {
+    if (state.mode === "ear") { toast("磨耳朵模式固定纯英文，不显示中文"); return; }
+    state.showZh = !state.showZh; store.set("showZh", state.showZh); renderControls(); renderStage();
+  });
+  $("#swLoop").addEventListener("click", () => { state.loop = !state.loop; store.set(loopKeyFor(state.mode), state.loop); renderControls(); });
+  $("#progress").addEventListener("click", (ev) => {
+    if (!state.playlist.length) return;
+    const r = ev.currentTarget.getBoundingClientRect();
+    const p = clamp((ev.clientX - r.left) / r.width, 0, 1);
+    playIndex(Math.min(state.playlist.length - 1, Math.floor(p * state.playlist.length)), { autoplay: true });
+  });
+
+  // B 面板
+  $("#panelEar").addEventListener("click", (ev) => {
+    const nbtn = ev.target.closest("button[data-n]");
+    if (nbtn) { doRandom(parseInt(nbtn.dataset.n, 10)); return; }
+  });
+  $("#search").addEventListener("input", (ev) => { state.filters.q = ev.target.value; renderEarList(); });
+  $("#btnClearFilter").addEventListener("click", clearFilters);
+  $("#btnAll").addEventListener("click", () => { filteredPool().forEach((e) => state.selected.add(e.id)); persistSelected(); renderEarList(); });
+  $("#btnNone").addEventListener("click", () => { filteredPool().forEach((e) => state.selected.delete(e.id)); persistSelected(); renderEarList(); });
+  $("#btnRand").addEventListener("click", () => {
+    const v = parseInt($("#customN").value, 10);
+    doRandom(isNaN(v) || v <= 0 ? 0 : v);
+  });
+  $("#customN").addEventListener("change", (ev) => { state.customN = parseInt(ev.target.value, 10) || 20; store.set("customN", state.customN); });
+  $("#btnUseChecked").addEventListener("click", () => {
+    const picked = CATALOG.filter((e) => state.selected.has(e.id));
+    if (!picked.length) { toast("还没有勾选任何条目"); return; }
+    buildEarPlaylist(shuffle(picked));
+    toast("已生成清单：" + picked.length + " 条");
+    renderAll();
+  });
+
+  // 全局键盘
+  document.addEventListener("keydown", (ev) => {
+    const tag = (ev.target && ev.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || ev.target.isContentEditable) return;
+    if (ev.code === "Space") { ev.preventDefault(); togglePlay(); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); goPrev(); }
+    else if (ev.key === "ArrowRight") { ev.preventDefault(); goNext(); }
+  });
+}
+
+function toggleSelect(id, on) {
+  if (on) state.selected.add(id); else state.selected.delete(id);
+  persistSelected();
+  $("#earCnt").textContent = "候选 " + filteredPool().length + " · 已选 " + state.selected.size;
+}
+function persistSelected() { store.set("selected", Array.from(state.selected)); }
+
+function clearFilters() {
+  state.filters = { diff: new Set(), func: new Set(), scene: new Set(), q: "" };
+  $("#search").value = "";
+  renderFilters(); renderEarList();
+}
+
+function doRandom(n) {
+  const pool = filteredPool();
+  if (!pool.length) { toast("没有可用的候选（筛选过窄）"); return; }
+  let take = (n && n > 0) ? n : pool.length;
+  take = Math.min(take, pool.length);
+  buildEarPlaylist(shuffle(pool).slice(0, take));
+  toast("已生成随机清单：" + take + " 条" + (n ? "" : "（全部候选）"));
+  renderAll();
+}
+
+function switchMode(m) {
+  if (m === state.mode) return;
+  state.mode = m; store.set("mode", m);
+  stopPlayback(); plan = null; audio.removeAttribute("src");
+  state.loop = store.get(loopKeyFor(m), m === "ear");
+  if (m === "read") buildReadPlaylist();
+  else restoreEarPlaylist();
+  renderAll();
+}
+
+function restoreEarPlaylist() {
+  const saved = store.get("earList", null);
+  if (Array.isArray(saved)) {
+    const list = saved.map((id) => byId.get(id)).filter(Boolean).filter((e) => !unplayable.has(e.id) || true);
+    const playable = list.filter((e) => !!e);
+    if (playable.length) { state.playlist = playable; state.index = clamp(store.get("earPos", 0), 0, playable.length - 1); return; }
+  }
+  // 无存档：默认随机 20 条
+  const pool = CATALOG.slice();
+  state.playlist = shuffle(pool).slice(0, Math.min(20, pool.length));
+  state.index = 0;
+}
+
+/* ---------- 启动 ---------- */
+async function init() {
+  bind();
+  // 先定位音轨层（manifest 决定真实路径），再构建目录
+  await loadAudioManifest();
+  await loadLoudness();
+  try {
+    const resp = await fetch(FILE_RE.phrases, { cache: "no-cache" });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    CATALOG = (data.phrases || []).map(buildEntry);
+    CATALOG.forEach((e) => byId.set(e.id, e));
+    if (!CATALOG.length) throw new Error("phrases.json 中 phrases 为空");
+  } catch (err) {
+    document.querySelector(".grid").innerHTML =
+      '<div class="errbox"><b>无法加载数据</b><br/>读取 <code>tool/phrases.json</code> 失败：'
+      + esc(err && err.message ? err.message : String(err))
+      + '<br/>请通过本地 HTTP 服务打开本页面（例如在素材根目录运行 <code>python -m http.server</code>）。</div>';
+    return;
+  }
+
+  // 应用存档
+  state.loop = store.get(loopKeyFor(state.mode), state.mode === "ear");
+  if (state.mode === "read") buildReadPlaylist(); else restoreEarPlaylist();
+  setRate(state.rate); // 同步 UI
+  renderFilters();
+  renderAll();
+  document.body.dataset.ready = "1";
+  document.body.dataset.catalogSize = String(CATALOG.length);
+  window.__MOEAR__ = {
+    CATALOG, state, byId, candidatesFor, estDur, unplayable,
+    setRate, togglePlay, playIndex, goNext, goPrev, renderAll,
+    resolveCands, ttsUrls, realUrls, getBlobUrl,
+    AUDIO_INDEX, LOUDNESS, audioPathFor, isSilent, loadAudioManifest,
+    get AUDIO_ROOT() { return AUDIO_ROOT; },
+  };
+  document.body.dataset.audioRoot = AUDIO_ROOT;
+
+  // B 面板事件里 data-n 在 document 级已委托给 panelEar.click；此处在 document 再兜底一次
+  document.addEventListener("click", (ev) => {
+    const nbtn = ev.target.closest && ev.target.closest("#panelEar button[data-n]");
+    if (nbtn && !nbtn.__handled) { nbtn.__handled = true; }
+  });
+}
+
+init();
+</script>
+</body>
+</html>

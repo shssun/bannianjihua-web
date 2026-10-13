@@ -28,6 +28,9 @@
  *   只做增量新增/覆盖，**绝不做「清空重拷」**（清空重拷会撞宿主的批量删除配额）。
  * - **只拷单个文件一律用 `copyFileSync`**：`cpSync` 覆盖已存在文件时会走
  *   「先删目标再拷」分支，中途失败会留下文件真空（实测踩到 ESRCH）。
+ * - **rename 映射**：清单可给 `"rename": { "player.html": "index.html" }`，
+ *   把源相对路径精确映射为目标相对路径（用于工具本体文件名不符合站内命名规范的场合）。
+ *   ⚠️ `required` 仍按**源**相对路径判定，不按映射后的。
  * - **CI 友好**：源目录不存在 → 打印警告并继续（整体 exit 0），
  *   直接复用仓库里已提交的产物，不阻断构建。
  */
@@ -165,6 +168,7 @@ for (const manifestName of manifestFiles) {
   const include = Array.isArray(manifest.include) ? manifest.include : [];
   const exclude = Array.isArray(manifest.exclude) ? manifest.exclude : [];
   const required = Array.isArray(manifest.required) ? manifest.required : [];
+  const rename = manifest.rename && typeof manifest.rename === 'object' ? manifest.rename : {};
 
   console.log(`${TAG} ── ${id}  (${manifestName})`);
 
@@ -184,18 +188,23 @@ for (const manifestName of manifestFiles) {
 
   // ---- 1) 期望集合（白名单） ----
   const expected = new Map();
+  const seenSrc = new Set();
   for (const abs of walkFiles(srcDir)) {
     if (abs.endsWith('.part')) {
       continue; // TTS 原子写盘中间态，绝不带走
     }
-    const relPosix = toPosix(relative(srcDir, abs));
-    if (!isIncluded(relPosix, include, exclude)) {
+    const srcRel = toPosix(relative(srcDir, abs));
+    if (!isIncluded(srcRel, include, exclude)) {
       continue;
     }
-    expected.set(relPosix, abs);
+    seenSrc.add(srcRel);
+    const dstRel = Object.prototype.hasOwnProperty.call(rename, srcRel)
+      ? rename[srcRel]
+      : srcRel;
+    expected.set(dstRel, abs); // key = 目标相对路径
   }
 
-  const missingRequired = required.filter((rel) => !expected.has(rel));
+  const missingRequired = required.filter((rel) => !seenSrc.has(rel));
   if (missingRequired.length > 0) {
     console.error(
       `${TAG}   缺少必需文件：${missingRequired.join('、')}（应在 ${srcDir}）`,

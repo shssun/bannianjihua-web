@@ -7,6 +7,8 @@ node_modules
 dist
 dist-ssr
 dist-check
+qa-dist
+qa-dist2
 
 # env files
 .env

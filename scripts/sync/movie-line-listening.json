@@ -1,0 +1,26 @@
+{
+  "id": "movie-line-listening",
+  "src": "D:/workspaces/每日英语台词",
+  "srcEnv": "MOVIE_LINE_LISTENING_SRC",
+  "dest": "public/tools/english/movie-line-listening",
+  "include": [
+    "player.html",
+    "tool/phrases.json",
+    "audio_norm/**/*.mp3",
+    "audio_norm/_manifest.json",
+    "audio_norm/_loudness.json",
+    "tool_phrase/voices/**/*.mp3"
+  ],
+  "exclude": [
+    "**/_qa/**",
+    "**/__pycache__/**",
+    "**/*.py",
+    "**/*.part",
+    "**/.*"
+  ],
+  "rename": {
+    "player.html": "index.html"
+  },
+  "required": ["player.html", "tool/phrases.json", "audio_norm/_manifest.json"],
+  "optional": true
+}
