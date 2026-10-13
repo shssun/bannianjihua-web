@@ -87,19 +87,53 @@ export function loadToolRegistry(repoRoot) {
 }
 
 /**
- * 读取频道 id 列表（解析 `src/data/channels.ts`）。
- * @param {string} repoRoot 仓库根目录
- * @returns {string[]}
+ * 从一个「声明式数组文件」里读出全部 `id: '...'` 字面量。
+ *
+ * 用于 `channels.ts` / `collections.ts` —— 它们都是「一个汇总文件里放一个
+ * 对象数组」，且**极少变更**，所以不值得为它们做结构化解析。
+ *
+ * 只匹配**带单引号的 id 字面量**，因此：
+ * - interface 里的 `id: string`（不带引号）不会被误收；
+ * - 反向引用字段（如集合的 `parentId: 'books'`）不会被误收 ——
+ *   `\b` 要求 `id` 前面是词边界，而 `parentId` 里 `I` 前是词字符 `t`；
+ *   且正则大小写敏感，`Id` 也不等于 `id`。
+ *
+ * @param {string} file 文件绝对路径
+ * @returns {string[]} 声明顺序的 id 列表
  */
-export function loadChannelIds(repoRoot) {
-  const file = join(repoRoot, 'src', 'data', 'channels.ts');
+function loadDeclaredIds(file) {
   const text = readFileSync(file, 'utf8');
   const ids = [];
-  // 只匹配「带引号的 id 字面量」——interface 里的 `id: string` 不带引号，不会被误收。
   const re = /\bid\s*:\s*'([^']+)'/g;
   let match;
   while ((match = re.exec(text)) !== null) {
     ids.push(match[1]);
   }
   return ids;
+}
+
+/**
+ * 读取频道 id 列表（解析 `src/data/channels.ts`）。
+ * @param {string} repoRoot 仓库根目录
+ * @returns {string[]}
+ */
+export function loadChannelIds(repoRoot) {
+  return loadDeclaredIds(join(repoRoot, 'src', 'data', 'channels.ts'));
+}
+
+/**
+ * 读取集合 id 列表（解析 `src/data/collections.ts`）。
+ *
+ * 集合是**来源 / 主题**维度的虚拟归口，与物理唯一的频道正交。
+ * 文件不存在时返回空数组（在集合机制引入前的老提交上仍可运行）。
+ *
+ * @param {string} repoRoot 仓库根目录
+ * @returns {string[]}
+ */
+export function loadCollectionIds(repoRoot) {
+  const file = join(repoRoot, 'src', 'data', 'collections.ts');
+  if (!existsSync(file)) {
+    return [];
+  }
+  return loadDeclaredIds(file);
 }

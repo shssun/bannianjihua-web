@@ -30,6 +30,23 @@ export interface Tool {
   description: string;
   /** 标签，如 ['阅读器', '离线', 'Markdown'] */
   tags: string[];
+  /**
+   * 所属「集合」id 列表（**多对多**，可选）。
+   *
+   * **频道 vs 集合是两个正交维度，不要混用**：
+   * - `channel` = **科目维度**，**物理唯一**（等于工具注册表所在目录名与产物目录名，
+   *   由 `scripts/check-tools.mjs` 强制校验）→ 回答「在哪个学科下看」；
+   * - `collections` = **来源 / 主题维度**，**虚拟、多对多** → 回答「这东西从哪来的」。
+   *
+   * 典型场景：把某本书的方法做成工具时，它既属于「英语」频道，
+   * 又属于「书籍」集合和「那一本书」的集合。物理上仍然只存在一份。
+   *
+   * 例：`collections: ['books', 'dragon-english-basic100']`
+   *
+   * id 取值见 `src/data/collections.ts`；构建期会校验每个 id 存在且数组内不重复。
+   * 一本书产出的多个工具共享同一个「书」集合，从而天然表达「一本书 → N 个工具」。
+   */
+  collections?: string[];
   /** 状态：用于首页「已上线 / 研发中」分类 */
   status: ToolStatus;
   /** 运行形态 */

@@ -6,6 +6,7 @@ import BlogPostPage from '@/pages/BlogPostPage';
 import ToolListPage from '@/pages/ToolListPage';
 import ToolViewPage from '@/pages/ToolViewPage';
 import ChannelPage from '@/pages/ChannelPage';
+import CollectionPage from '@/pages/CollectionPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import MessageBoardPage from '@/pages/MessageBoardPage';
 import AboutPage from '@/pages/AboutPage';
@@ -43,6 +44,10 @@ const routes: RouteObject[] = [
       // 且静态段 'channel' 优先级高于动态段 ':id'，因此 `channel` 是保留字，不能作工具 id
       // （由 scripts/check-tools.mjs 在构建期强制校验）。
       { path: 'tools/channel/:channel', element: <ChannelPage /> },
+      // 集合页：**来源 / 主题**维度的虚拟归口（见 src/data/collections.ts）。
+      // 与频道正交 —— 同一个工具物理上只属于一个频道，但可以出现在多个集合里。
+      // 同理 'collection' 也是保留字，不能作工具 id。
+      { path: 'tools/collection/:collection', element: <CollectionPage /> },
       { path: 'tools/:id', element: <ToolViewPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'message', element: <MessageBoardPage /> },

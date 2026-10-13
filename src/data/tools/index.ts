@@ -51,6 +51,19 @@ export function getToolsByChannel(channelId: string): Tool[] {
 }
 
 /**
+ * 获取某个集合下的全部工具，按 order 升序。
+ *
+ * 集合是**来源 / 主题**维度的虚拟归口（见 `src/data/collections.ts`），
+ * 与物理唯一的 `channel` 正交 —— 同一个工具可以同时出现在
+ * 它的频道页和任意多个集合页里，物理上只有一份产物。
+ *
+ * @param collectionId 集合 id（对应 src/data/collections.ts 的 Collection.id）
+ */
+export function getToolsByCollection(collectionId: string): Tool[] {
+  return TOOLS.filter((tool) => tool.collections?.includes(collectionId)).sort(sortByOrder);
+}
+
+/**
  * 获取全部已上线工具（status === 'online'），按 order 升序。
  */
 export function getOnlineTools(): Tool[] {

@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Paper, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import type { Tool } from '@/types';
-import { TOOLS, getOnlineTools, getUpcomingTools } from '@/data/tools';
+import { TOOLS, getOnlineTools, getToolsByCollection, getUpcomingTools } from '@/data/tools';
 import type { Channel } from '@/data/channels';
 import { getSortedChannels } from '@/data/channels';
+import type { Collection } from '@/data/collections';
+import { getTopLevelCollections } from '@/data/collections';
 import Section from '@/components/common/Section';
 import ToolCard from '@/components/tools/ToolCard';
 import ToolFilterBar, {
@@ -77,9 +79,74 @@ function ToolGrid({ tools }: { tools: Tool[] }): JSX.Element {
 }
 
 /**
+ * 「按来源浏览」入口条。
+ *
+ * 工具箱默认视图是**按频道（科目）分区**的；但一组工具常常有另一个共同来源
+ * —— 例如「把某本书的学习方法做成的工具」。频道与来源是两个正交维度：
+ * 一个工具物理上只属于一个频道，却可能同时属于多个集合。
+ *
+ * 这里只列**顶层集合**（如「书与方法」），具体的书作为其子集合在集合页里展开，
+ * 避免把「某一本书」和「书籍」平铺在一起造成层级混乱。
+ */
+function CollectionStrip(): JSX.Element | null {
+  const collections = useMemo<Collection[]>(() => getTopLevelCollections(), []);
+  const withCounts = collections
+    .map((collection) => ({ collection, count: getToolsByCollection(collection.id).length }))
+    .filter((item) => item.count > 0);
+
+  if (withCounts.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box>
+      <Typography variant="caption" color="var(--muted)">
+        按来源浏览
+      </Typography>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        {withCounts.map(({ collection, count }) => (
+          <Grid item xs={12} sm={6} md={4} key={collection.id}>
+            <Paper
+              component={RouterLink}
+              to={`/tools/collection/${collection.id}`}
+              variant="outlined"
+              sx={{
+                display: 'block',
+                p: 2,
+                height: '100%',
+                textDecoration: 'none',
+                color: 'inherit',
+                transition: 'border-color .15s ease, transform .15s ease',
+                '&:hover': { borderColor: 'var(--primary)', transform: 'translateY(-2px)' },
+              }}
+            >
+              <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 0.5 }}>
+                <Typography component="span" sx={{ fontSize: '1.4rem' }} aria-hidden>
+                  {collection.cover}
+                </Typography>
+                <Typography variant="h3" sx={{ fontSize: '1.05rem' }}>
+                  {collection.name}
+                  <Typography component="span" variant="body2" color="var(--muted)" sx={{ ml: 1 }}>
+                    {count}
+                  </Typography>
+                </Typography>
+              </Stack>
+              <Typography variant="caption" color="var(--muted)">
+                {collection.description}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+}
+
+/**
  * 工具箱页 `/tools`。
  *
- * - **默认视图**：按频道分区，**列出全部频道**（每区一个频道标题），
+ * - **默认视图**：先给出「按来源浏览」入口条（集合，虚拟多对多），
+ *   再按频道分区，**列出全部频道**（每区一个频道标题），
  *   区内先展示已上线工具，再以「研发中」小标题展示该频道尚未上线的工具；
  *   无任何已上线工具的频道给出占位说明。每个工具只在其所属频道出现一次。
  * - **筛选时**：状态/标签筛选生效，退化为一张平铺结果网格。
@@ -147,6 +214,7 @@ export default function ToolListPage(): JSX.Element {
         )
       ) : (
         <Stack spacing={5}>
+          <CollectionStrip />
           {channelSections.map(({ channel, online, upcoming: upcomingInChannel }) => (
             <Box key={channel.id}>
               <ChannelHeading channel={channel} count={online.length} />

@@ -29,6 +29,43 @@
 
 **深度上限 3 层**（`public/tools/` 不计入）。工具自己的素材子目录（如 `tool/`、`voices/`）算**工具内部结构**，不计层级。
 
+### 1.1 频道之外还有「集合」——两个正交维度
+
+上面的三层是**物理归属**，回答「这东西放在哪」。但工具有时还有**第二个身份**：
+它可能来自某个共同来源（例如「把某本书的学习方法做成的一批工具」）。
+这个来源**不该、也不能**塞进频道层级 —— 否则《基本英文100》就得在「英语」和「书籍」之间二选一，
+还会撞破「目录名 == channel」这条唯一性约束。
+
+因此把两件事分开：
+
+| | 频道 `channel` | 集合 `collection` |
+|---|---|---|
+| 维度 | **科目**（英语 / 数学 / 认知 / 通用） | **来源 · 主题**（书籍 / 某一本书 / 高考…） |
+| 定义位置 | `src/data/channels.ts` | `src/data/collections.ts` |
+| 存在形态 | **物理目录**，**唯一归属** | **虚拟**，**多对多** |
+| 回答 | 「在哪个学科下看」 | 「这东西从哪来的」 |
+| 落库字段 | `Tool.channel`（**必填**） | `Tool.collections?: string[]`（可选） |
+| 构建期校验 | 必须存在于 `CHANNELS` | 每个 id 必须存在于 `COLLECTIONS`，且数组内不重复 |
+
+**核心保证：物理上永远只有一份产物。** 集合只是**展示层的额外归口**，
+同一个工具会同时出现在它的频道页和任意多个集合页里，但磁盘上只有一个目录。
+
+**一本书 → N 个工具**：一本书产出的多个工具共享同一个「书」集合，
+该集合页天然就是这本书的落地页；它们又都挂在顶层集合（如 `books`）下，
+于是「来源」这个维度自动聚合了全部书籍类工具。
+
+```ts
+// src/data/tools/english/chinese-to-english-drill.ts
+collections: ['books', 'dragon-english-basic100'],
+//           ↑ 来源大类      ↑ 具体哪本书
+```
+
+集合支持一层父子关系（`Collection.parentId`）：顶层集合页会把子集合作为入口区块渲染在工具网格之上，
+避免把「某一本书」和「书籍」平铺在一起造成层级混乱。
+
+> 新增集合 = 在 `COLLECTIONS` 里加一项；给工具挂集合 = 在该工具的 `collections: []` 里加 id。
+> **两者都不需要改任何其他文件**，与「新增工具」一样保持零耦合。
+
 ---
 
 ## 2. 磁盘目录规范
@@ -323,10 +360,13 @@ export interface Tool {
 |---|---|
 | `id` 全局唯一 | **报错退出** |
 | `channel` 存在于 `CHANNELS` | **报错退出** |
-| `id` 未被保留字占用（`channel`） | **报错退出** |
+| `id` 未被保留字占用（`channel` / `collection`） | **报错退出** |
 | 注册表文件所在目录名 == `channel` | **报错退出** |
 | 注册表文件名字 == 对象里的 `id` | **报错退出** |
 | 有 `entry` 时 `public/<entry>` **真实存在** | **报错退出** |
+| `collections[]` 里每个 id 存在于 `COLLECTIONS` | **报错退出** |
+| `collections[]` 内部 id 无重复 | **报错退出** |
+| `collections` 是字符串数组 | **报错退出** |
 | 有 `entry` 时文件名必须为 `index.html` | 警告 |
 | 同频道内 `order` 重复 | 警告 |
 
@@ -343,12 +383,15 @@ export interface Tool {
 
 | 路由 | 页面 | 说明 |
 |---|---|---|
-| `/tools` | `ToolListPage` | **按频道分区**展示已上线工具（每区一个频道标题 + 卡片网格），末尾单独一节展示「研发中」；筛选时退化为平铺结果 |
+| `/tools` | `ToolListPage` | 先给「**按来源浏览**」入口条（集合），再**按频道分区**展示已上线工具（每区一个频道标题 + 卡片网格），区内另展示「研发中」；筛选时退化为平铺结果 |
 | `/tools/channel/:channel` | `ChannelPage` | 单频道页：频道名/描述 + 该频道下全部工具 |
+| `/tools/collection/:collection` | `CollectionPage` | 单集合页：先渲染子集合入口区块（若有），再渲染该集合下全部工具 |
 | `/tools/:id` | `ToolViewPage` | 工具详情 + 「打开工具」（真实 `<a target="_blank">`） |
 
-- `/tools/channel/x` 有 3 段、`/tools/:id` 只匹配 2 段，**不会冲突**；且静态段 `channel` 优先级高于动态段。
-- 因此 **`channel` 是保留字**，不许当工具 id（由 §7 校验兜住）。
+- `/tools/channel/x` 与 `/tools/collection/x` 都有 3 段、`/tools/:id` 只匹配 2 段，**不会冲突**；
+  且静态段优先级高于动态段。
+- 因此 **`channel` 与 `collection` 都是保留字**，不许当工具 id（由 §7 校验兜住）。
+  新增保留字时必须**同时**改 `scripts/check-tools.mjs` 的 `RESERVED_IDS` 与本表。
 - 路由 `basename` 取自 `src/lib/paths.ts` 的 `BASE_PREFIX`（适配 GitHub Pages 子路径部署）。
 
 ---
@@ -366,9 +409,17 @@ export interface Tool {
 | `intuition-cards` | 直觉之卡 | —（规划中） | `tools/cognition/intuition-cards/index.html` | `cognition` |
 | `markdown-slide` | Markdown 幻灯 | —（规划中） | `tools/general/markdown-slide/index.html` | `general` |
 | `moear` | 影视台词磨耳朵 | —（新增） | `tools/english/moear/index.html` | `english` |
+| `chinese-to-english-drill` | 中译英默写 · 基本英文100 | —（新增） | `tools/english/chinese-to-english-drill/index.html` | `english` |
+| `basic100-sentence-reader` | 纯句点词阅读 · 基本英文100 | —（新增） | `tools/english/basic100-sentence-reader/index.html` | `english` |
+| `grammar100-points-reader` | 高考语法讲点 · 必修英文法100 | —（新增） | `tools/english/grammar100-points-reader/index.html` | `english` |
 
 **id 变更**：`daily-english` → `movie-line-shadowing`；`english-dict-reader` → `dict-reader`；`intuition-zhika` → `intuition-cards`。
 **名称变更**：`每日英语跟读` → `影视台词跟读`（其余名称不变）。
+
+后三个是**书籍类工具**（2026-10-13 新增），全部来自竹冈广信《Dragon English》系列的中文精编版，
+源目录 `C:/Users/ZhuanZ1/Documents/WS/英文学习`。它们挂在集合
+`books`（全部）与 `dragon-english-basic100` / `dragon-english-grammar100`（按书）下 ——
+**这是「集合」机制的第一个用例**：同一个工具在频道（英语）看得到，在来源（书）也看得到。
 
 ### 迁移执行顺序（一次成型）
 
@@ -386,12 +437,15 @@ export interface Tool {
 | 对象 | 规则 | 例子 |
 |---|---|---|
 | 频道 id（L2） | 小写英文单词 | `english` / `math` / `cognition` / `general` |
+| 集合 id | 小写 kebab；书用 `书名缩写-系列名` 形式 | `books` / `dragon-english-basic100` |
 | 工具 id（L3） | 小写 kebab，**全局唯一、体现适用范围** | `movie-line-shadowing` |
 | 工具目录名 | == 工具 id | `public/tools/english/movie-line-shadowing/` |
 | 工具入口文件 | 恒为 `index.html` | — |
 | 注册表文件名 | == 工具 id | `src/data/tools/english/movie-line-shadowing.ts` |
 | 同步清单文件名 | == 工具 id | `scripts/sync/movie-line-shadowing.json` |
 | 内容主键（工具内数据） | `sha1(内容)[:10]`，**不用文件名** | `tool/voices/<hash>/s00.mp3` |
+
+**保留 id（不可作工具 id）**：`channel`、`collection` —— 它们已被静态路由段占用。
 
 **id 为什么足够独特**：注册表是**全局平铺**的，路由 `/tools/:id` 也是全局的，
 再加上「目录名 = channel / 文件名 = id」的强约束与构建期唯一性校验，
