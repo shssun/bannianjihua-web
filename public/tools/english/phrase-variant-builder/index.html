@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>短语变体练习 · 英语</title>
+<!--
+  ============================================================================
+  短语变体练习（phrase-variant-builder） —— 自包含单文件工具
+  ============================================================================
+
+  ## 本工具为何存在（ICAP「建构 constructive」缺口）
+  站内 12 个工具的实测落点为 Passive 10 · Active 2 · Constructive 0 · Interactive 0
+  （见 docs/ICAP-INTEGRATION.md §2）。ICAP（Chi & Wylie 2014）最硬的判据是
+  「看学习者产出的**产品**，不看意图」。本工具就是去填「建构」这一层：
+    1. 必须让学习者**写下文本**并**落盘**（否则无法判定实际层级）；
+    2. 练习必须是**变换**（换语气 / 换场景 / 换语用功能 / 提高难度）
+       —— 生成材料里没有的东西，「照抄 / 回忆」不算建构。
+
+  ## 数据依赖（运行期同源拉取，不复制数据进仓库）
+  相对本文件所在目录 `tools/english/phrase-variant-builder/`，请求
+  `../moear/tool/phrases.json` → 解析为 `tools/english/moear/tool/phrases.json`（346 条）。
+  每条短语自带四个语用轴（function / scene / tone / difficulty），
+  变换算子由这些元数据**推导**得出，无需另撰题目数据。
+  断网也要能跑 —— 唯一例外就是这一次同源请求；失败时给友好错误提示，不白屏、不抛异常。
+
+  ## 存储约定（与主站共享同一 IndexedDB）
+  工具与主站**同 origin** → localStorage / IndexedDB 天然共享，无需任何 IPC。
+  下方 <script> 内联了一份与 `src/lib/storage/idb.ts` **同名同结构**的逻辑
+  （删掉 export 关键字、去掉 TS 类型标注，**逻辑一字不改**）：
+    库名 `bannianjihua` · 版本 1 · 对象仓库 `records`（keyPath: 'id'）。
+  记录结构与主站 `src/lib/storage/index.ts` 的 `LearnerRecord` 完全一致（camelCase）：
+    { id, toolId, kind:'variant', refId, payload, createdAt }
+  导出包格式与主站一致：{ schema:'bannianjihua.records', version:1, exportedAt, records }。
+  所有存储操作**绝不抛异常**（隐私模式 / 配额满时静默失败并给用户提示）。
+  ============================================================================
+-->
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-2: #121821;
+    --panel: #161d28;
+    --panel-2: #1c2532;
+    --line: #28313f;
+    --line-soft: #202836;
+    --txt: #e6edf6;
+    --txt-dim: #9fb0c3;
+    --txt-faint: #697a8d;
+    --accent: #4ea1ff;
+    --accent-2: #7c5cff;
+    --good: #37d67a;
+    --warn: #ffb020;
+    --bad: #ff5d5d;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-zh: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 700px at 15% -10%, #182233 0%, var(--bg) 55%) fixed;
+    color: var(--txt);
+    font-family: var(--font-en), var(--font-zh);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  button, select, input, textarea { font-family: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 14px 16px 48px; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 4px 14px; border-bottom: 1px solid var(--line-soft); margin-bottom: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 16px; letter-spacing: .3px; }
+  .brand .ic { font-size: 18px; }
+  .topmeta { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--txt-dim); }
+  .pill { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+  .pill b { color: var(--txt); font-weight: 600; }
+  .pill.storage-ok { border-color: rgba(55,214,122,.45); color: #9ff0be; }
+  .pill.storage-bad { border-color: rgba(255,93,93,.5); color: #ffb3b3; }
+
+  /* ---------- controls ---------- */
+  .controls {
+    display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+    background: linear-gradient(180deg, var(--panel), var(--bg-2));
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11.5px; color: var(--txt-faint); letter-spacing: .3px; }
+  select {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 8px 10px; font-size: 13px; min-width: 150px; outline: none;
+  }
+  select:focus { border-color: var(--accent); }
+  .btn {
+    border: 1px solid var(--line); background: var(--panel-2);
+    border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary {
+    background: linear-gradient(180deg, var(--accent), #3d8ee6); color: #06121f; border-color: transparent;
+  }
+  .btn.primary:hover { color: #06121f; filter: brightness(1.06); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--line); color: inherit; }
+  .spacer { flex: 1 1 auto; }
+
+  /* ---------- cards ---------- */
+  .card {
+    background: linear-gradient(180deg, var(--panel), var(--bg-2));
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 20px 18px; margin-bottom: 16px;
+  }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tag { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--txt-dim); }
+  .tag b { color: var(--txt); font-weight: 600; }
+
+  .en { font-size: 25px; font-weight: 700; line-height: 1.3; margin: 4px 0 6px; letter-spacing: .2px; }
+  .zh { font-size: 14.5px; color: var(--txt-dim); margin-bottom: 16px; }
+
+  .operator {
+    border: 1px solid rgba(78,161,255,.35);
+    background: linear-gradient(180deg, rgba(78,161,255,.12), rgba(124,92,255,.08));
+    border-radius: var(--radius-sm); padding: 13px 15px; margin-bottom: 18px;
+  }
+  .operator .op-h { font-size: 11.5px; color: var(--accent); letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; }
+  .operator .op-t { font-size: 15px; line-height: 1.55; }
+  .operator .op-t b { color: #cfe4ff; }
+
+  .block-label { font-size: 13px; font-weight: 600; margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+  .block-label .hint { font-weight: 400; color: var(--txt-faint); font-size: 12px; }
+
+  textarea {
+    width: 100%; resize: vertical; outline: none;
+    background: #0b111b; border: 1px solid var(--line); border-radius: var(--radius-sm);
+    color: var(--txt); padding: 12px 13px; font-size: 15px; line-height: 1.55;
+  }
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(78,161,255,.14); }
+  #answer { min-height: 132px; font-family: var(--font-en); }
+  #explain { min-height: 104px; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .status { font-size: 12.5px; color: var(--txt-dim); }
+  .status.ok { color: #8ef0b6; }
+  .status.err { color: #ffb3b3; }
+
+  /* ---------- example (collapsible) ---------- */
+  .example { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 14px; }
+  .ex-note {
+    font-size: 12.5px; color: #ffd79a; background: rgba(255,176,32,.10);
+    border: 1px solid rgba(255,176,32,.32); border-radius: var(--radius-sm);
+    padding: 9px 12px; margin-bottom: 12px; line-height: 1.5;
+  }
+  .ex-item {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 9px 12px; margin-bottom: 8px; font-family: var(--font-en); font-size: 15px;
+  }
+  .ex-item .who { font-family: var(--font-zh); font-size: 11px; color: var(--txt-faint); display: block; margin-top: 3px; }
+
+  .gate {
+    margin-top: 14px; border: 1px solid rgba(124,92,255,.4);
+    background: linear-gradient(180deg, rgba(124,92,255,.10), rgba(124,92,255,.04));
+    border-radius: var(--radius-sm); padding: 14px 15px;
+  }
+  .gate .g-h { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .gate .g-d { font-size: 12px; color: var(--txt-faint); margin-bottom: 10px; }
+
+  /* ---------- data panel ---------- */
+  .data-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .data-note { font-size: 12px; color: var(--txt-faint); margin-top: 10px; line-height: 1.55; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+    background: #1b2534; border: 1px solid var(--line); color: var(--txt);
+    padding: 11px 18px; border-radius: 999px; font-size: 13.5px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s; z-index: 50; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.ok { border-color: rgba(55,214,122,.5); }
+  .toast.err { border-color: rgba(255,93,93,.55); }
+
+  .hidden { display: none !important; }
+
+  .errorbox {
+    border: 1px solid rgba(255,93,93,.5); background: rgba(255,93,93,.08);
+    border-radius: var(--radius-sm); padding: 16px; color: #ffc9c9; line-height: 1.6;
+  }
+  .errorbox b { color: #ffdede; }
+
+  @media (max-width: 640px) {
+    body { font-size: 13.5px; }
+    .en { font-size: 21px; }
+    .wrap { padding: 12px 12px 40px; }
+    select { min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="ic">🔀</span><span>短语变体练习</span></div>
+    <div class="topmeta">
+      <span class="pill" id="progress">已练 <b>—</b> / 共 — 条</span>
+      <span class="pill" id="storage">存储检测中…</span>
+    </div>
+  </div>
+
+  <!-- 控制条 -->
+  <div class="controls">
+    <div class="field">
+      <label for="diffFilter">难度</label>
+      <select id="diffFilter">
+        <option value="">全部难度</option>
+        <option value="1">1 · 入门</option>
+        <option value="2">2 · 简单</option>
+        <option value="3">3 · 中等</option>
+        <option value="4">4 · 偏难</option>
+        <option value="5">5 · 难</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="sceneFilter">场景</label>
+      <select id="sceneFilter"><option value="">全部场景</option></select>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn primary" id="drawBtn">抽一题</button>
+  </div>
+
+  <!-- 错误提示（拉取失败 / 结构不符） -->
+  <div class="card hidden" id="errorCard">
+    <div class="errorbox" id="errorText"></div>
+  </div>
+
+  <!-- 题面（加载后显示） -->
+  <div class="card hidden" id="promptCard">
+    <div class="meta" id="meta"></div>
+    <div class="en" id="en"></div>
+    <div class="zh" id="zh"></div>
+    <div class="operator">
+      <div class="op-h" id="opHead">本轮的变换算子</div>
+      <div class="op-t" id="opText"></div>
+    </div>
+
+    <div class="block-label">用英文写出你的变体 <span class="hint">必须动手写，不要只在脑子里想</span></div>
+    <textarea id="answer" placeholder="用英文写下你的变体……（这里写下的文本会被保存，作为你产出的「产品」）"></textarea>
+
+    <div class="row">
+      <button class="btn" id="showExampleBtn">看示范（先自己写，再对照）</button>
+      <span class="status" id="answerStatus"></span>
+    </div>
+
+    <!-- 示范（默认折叠） -->
+    <div class="example hidden" id="example">
+      <div class="ex-note">
+        ⚠️ 这不是标准答案。同一句话有很多种正确的改法 —— 下面是数据里收录的<b>真人说法</b>或原句说明，
+        用来给你一个参照，不是唯一解。
+      </div>
+      <div id="exampleBody"></div>
+    </div>
+
+    <!-- 自我解释闸门（看示范后出现，不填不能保存） -->
+    <div class="gate hidden" id="gate">
+      <div class="g-h" id="gateTitle">自我解释（不填不能保存）</div>
+      <div class="g-d" id="gateDesc"></div>
+      <textarea id="explain" placeholder="写下你改了什么、为什么这样改更贴合本轮的目标……"></textarea>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="saveBtn" disabled>保存这条练习</button>
+      <span class="status" id="saveStatus"></span>
+    </div>
+  </div>
+
+  <!-- 数据面板 -->
+  <div class="card">
+    <div class="data-row">
+      <button class="btn" id="exportBtn">导出全部记录（JSON）</button>
+      <button class="btn" id="importBtn">导入记录（JSON）</button>
+      <input type="file" id="importFile" accept="application/json,.json" class="hidden" />
+      <span class="status" id="dataStatus"></span>
+    </div>
+    <div class="data-note">
+      记录写入浏览器本地 IndexedDB（库 <b>bannianjihua</b> · 仓库 <b>records</b>），与主站同 origin 共享，
+      换设备 / 清缓存会丢，请用「导出全部记录」备份。导出包格式与主站一致
+      （<b>bannianjihua.records</b>, version 1）。
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================================
+ * 内联存储层 —— 摘自 src/lib/storage/idb.ts（删掉 export、去掉 TS 类型，逻辑一字不改）
+ * 与主站同库同结构：库名 bannianjihua · 版本 1 · 仓库 records（keyPath: 'id'）。
+ * 约定：所有函数返回 Promise；任何异常都不向上抛，失败返回 null / [] / false。
+ * ========================================================================== */
+var DB_NAME = 'bannianjihua';
+var DB_VERSION = 1;
+var RECORDS_STORE = 'records';
+
+var dbPromise = null;
+
+function openDatabase() {
+  if (dbPromise) {
+    return dbPromise;
+  }
+  dbPromise = new Promise(function (resolve) {
+    try {
+      if (typeof indexedDB === 'undefined' || indexedDB === null) {
+        resolve(null);
+        return;
+      }
+      var request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = function () {
+        var db = request.result;
+        if (!db.objectStoreNames.contains(RECORDS_STORE)) {
+          db.createObjectStore(RECORDS_STORE, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = function () { resolve(request.result); };
+      request.onerror = function () { resolve(null); };
+      request.onblocked = function () { resolve(null); };
+    } catch (e) {
+      resolve(null);
+    }
+  });
+  return dbPromise;
+}
+
+function writeTx(store, run) {
+  return openDatabase().then(function (db) {
+    if (!db) {
+      return false;
+    }
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readwrite');
+        run(tx.objectStore(store));
+        tx.oncomplete = function () { resolve(true); };
+        tx.onerror = function () { resolve(false); };
+        tx.onabort = function () { resolve(false); };
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  });
+}
+
+function put(store, value) {
+  return writeTx(store, function (objectStore) {
+    objectStore.put(value);
+  });
+}
+
+function get(store, key) {
+  return openDatabase().then(function (db) {
+    if (!db) { return null; }
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readonly');
+        var request = tx.objectStore(store).get(key);
+        request.onsuccess = function () { resolve(request.result == null ? null : request.result); };
+        request.onerror = function () { resolve(null); };
+        tx.onabort = function () { resolve(null); };
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  });
+}
+
+function getAll(store) {
+  return openDatabase().then(function (db) {
+    if (!db) { return []; }
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readonly');
+        var request = tx.objectStore(store).getAll();
+        request.onsuccess = function () {
+          resolve(Array.isArray(request.result) ? request.result : []);
+        };
+        request.onerror = function () { resolve([]); };
+        tx.onabort = function () { resolve([]); };
+      } catch (e) {
+        resolve([]);
+      }
+    });
+  });
+}
+
+/* ============================================================================
+ * 常量与工具函数
+ * ========================================================================== */
+var TOOL_ID = 'phrase-variant-builder';
+var PHRASES_URL = '../moear/tool/phrases.json';
+var RECORDS_SCHEMA = 'bannianjihua.records';
+var RECORDS_SCHEMA_VERSION = 1;
+
+/** 全部语气取值（实测 7 种）。 */
+var TONES = ['friendly', 'neutral', 'formal', 'urgent', 'confrontational', 'affectionate', 'sarcastic'];
+var TONE_LABEL = {
+  friendly: '友善', neutral: '中性', formal: '正式', urgent: '急切',
+  confrontational: '对抗', affectionate: '亲昵', sarcastic: '讽刺'
+};
+var TONE_HINT = {
+  formal: '设想在职场、对客户或上级的场合说：收掉口语化的部分，保持礼貌但不要亲昵。',
+  sarcastic: '字面意思不变，但用反话 / 挖苦的腔调说出来，让对方听得出你在阴阳。',
+  confrontational: '设想你正在正面顶撞 / 争论：把话说得更硬、更直接、更有攻击性。',
+  affectionate: '设想对很亲近的人说：可以加一点撒娇或暖意。',
+  urgent: '设想有急事、要对方立刻行动：节奏加快、语气加重。',
+  friendly: '设想轻松的寒暄：让它听起来更随和、更好接近。',
+  neutral: '去掉情绪色彩，像陈述事实一样平静地说出来。'
+};
+/** 换语气时优先挑「反差大」的目标语气。 */
+var CONTRAST_TONES = ['formal', 'sarcastic', 'confrontational'];
+
+/** 全部场景取值（实测 14 种）。 */
+var SCENES = [
+  '日常寒暄', '朋友聚会', '冲突争吵', '职场办公', '交通出行', '金钱往来',
+  '购物消费', '家庭', '约会亲密', '酒吧餐厅', '离别送行', '安慰疗伤',
+  '紧急状况', '电话沟通'
+];
+var SCENE_HINT = {
+  '日常寒暄': '设想在路上遇到熟人，随口一句。',
+  '朋友聚会': '设想在朋友聚会上，气氛轻松、大家都在闲聊。',
+  '冲突争吵': '设想双方起了冲突、正在对峙。',
+  '职场办公': '设想在职场会议 / 办公室里，有同事和上级在场。',
+  '交通出行': '设想在通勤路上 / 打车 / 问路。',
+  '金钱往来': '设想正涉及钱的场合（借钱、买单、谈价）。',
+  '购物消费': '设想在店里购物、和店员打交道。',
+  '家庭': '设想在家里对家人说。',
+  '约会亲密': '设想在约会、和恋人独处的时候。',
+  '酒吧餐厅': '设想在酒吧或餐厅，环境有点吵、语气随意。',
+  '离别送行': '设想在送别、分别的时刻。',
+  '安慰疗伤': '设想对方正难过，你在安慰他。',
+  '紧急状况': '设想突发紧急情况，时间很紧。',
+  '电话沟通': '设想在打电话，对方看不见你的表情。'
+};
+
+/** 全部语用功能取值（实测 20 种）。由数据推导，用于展示。 */
+var FUNCTIONS = [
+  '表达感谢', '示好赞美', '惊讶', '抱怨吐槽', '承诺保证', '劝告建议', '许可', '安慰鼓励',
+  '警告威胁', '请求', '问候寒暄', '表达爱意', '质疑不信', '道别', '道歉', '拒绝',
+  '表示无所谓', '催促', '反问讽刺', '转移话题'
+];
+
+/** 生成简易唯一 ID（对齐主站 src/lib/utils.ts 的 uuid()）。 */
+function uuid() {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch (e) { /* 走降级分支 */ }
+  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
+/** 稳定字符串哈希（FNV-1a 32 位），用于「按短语确定性挑选算子」。 */
+function hashStr(str) {
+  var h = 2166136261 >>> 0;
+  var s = String(str || '');
+  for (var i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** HTML 转义（动态文本注入前必过）。 */
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** 把 `**加粗**` 渲染成 <b>（先转义再替换，安全）。 */
+function renderBold(str) {
+  return escapeHtml(str).replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>');
+}
+
+/** 归一化英文文本（去首尾标点 / 折叠空白 / 小写），用于变体去重与比对。 */
+function normEn(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[.!?,;:。！？，；：]+$/g, '')
+    .trim();
+}
+
+/* ============================================================================
+ * 变换算子（**从元数据推导**，不另撰题目数据）
+ * ----------------------------------------------------------------------------
+ * 每条短语生成 1 个算子。四个算子按「优先序」排列：
+ *   1. 换语气（tone）→ 2. 换场景（scene）→ 3. 换语用功能（function）→ 4. 提高难度（difficulty）
+ * 为**避免整份数据都被第 1 条垄断**（换语气对任何短语都成立，若严格按序则场景 / 功能算子永不出现，
+ * 与设计里给出的示例不符），这里采用：先按 `can()` 过滤出「本轮可用」的算子，
+ * 再用「短语 id 的稳定哈希」选一个入口 —— 保证四类算子在全量数据上都有分布，
+ * 且同一短语每次生成的算子完全确定（刷新 / 重抽不变）。
+ * ========================================================================== */
+
+/** 从候选集合里，按 seed 确定性地挑一个 ≠ 排除项的值。 */
+function pickDifferent(pool, excluded, seed) {
+  var usable = pool.filter(function (x) { return excluded.indexOf(x) === -1; });
+  if (usable.length === 0) { return null; }
+  return usable[seed % usable.length];
+}
+
+/**
+ * 生成某条短语的变换算子。
+ * @returns {{type:string, head:string, text:string, askLabel:string, target:string}}
+ */
+function buildOperator(phrase) {
+  var seed = hashStr(phrase.id || phrase.en);
+  var curTone = phrase.tone;
+  var scenes = Array.isArray(phrase.scene) ? phrase.scene : [];
+  var funcs = Array.isArray(phrase.function) ? phrase.function : [];
+  var difficulty = typeof phrase.difficulty === 'number' ? phrase.difficulty : 1;
+
+  // 1) 换语气
+  function makeTone() {
+    var contrast = CONTRAST_TONES.filter(function (t) { return t !== curTone; });
+    var pool = contrast.length > 0 ? contrast : TONES.filter(function (t) { return t !== curTone; });
+    var target = pool[seed % pool.length];
+    var label = TONE_LABEL[target] + '（' + target + '）';
+    return {
+      type: 'tone',
+      head: '换语气',
+      target: label,
+      askLabel: label + ' 语气',
+      text: '把这句话改成 **' + label + '** 的说法：' + TONE_HINT[target] +
+        '原句的语气是「' + (TONE_LABEL[curTone] || curTone) + '（' + curTone + '）」，请保持原意、只换语气。'
+    };
+  }
+
+  // 2) 换场景
+  function makeScene() {
+    var target = pickDifferent(SCENES, scenes, seed);
+    if (!target) { return null; }
+    return {
+      type: 'scene',
+      head: '换场景',
+      target: target,
+      askLabel: target + ' 场景',
+      text: '把这句话搬到 **「' + target + '」** 场景下：' + (SCENE_HINT[target] || '') +
+        '想想在这个场合，同一句话该怎么说才自然。'
+    };
+  }
+
+  // 3) 换语用功能
+  function makeFunction() {
+    var target = pickDifferent(FUNCTIONS, funcs, seed);
+    if (!target) { return null; }
+    var origFn = funcs.length > 0 ? funcs.join(' / ') : '（未标注）';
+    return {
+      type: 'function',
+      head: '换语用功能',
+      target: target,
+      askLabel: target + ' 功能',
+      text: '原句的语用功能偏向「**' + origFn + '**」；现在换一个功能，把它用来「**' + target + '**」：' +
+        '措辞可以相近，但说话的目的变了 —— 想想在什么情形下你会用同一句话来达成「' + target + '」，然后写出来。'
+    };
+  }
+
+  // 4) 提高难度（仅 difficulty ≤ 3）
+  function makeDifficulty() {
+    if (difficulty > 3) { return null; }
+    return {
+      type: 'difficulty',
+      head: '提高难度',
+      target: '加长·更自然',
+      askLabel: '加长后更自然',
+      text: '原句比较短（难度 ' + difficulty + '）。请把它 **加长**：加入合理的修饰、从句或前后铺垫，' +
+        '让它更像一段**真人连续说出的话**，但**必须保持自然** —— 不要为了长而长。'
+    };
+  }
+
+  // 按优先序排列的可用算子
+  var ordered = [];
+  var tone = makeTone();
+  if (tone) { ordered.push(tone); }
+  var scene = makeScene();
+  if (scene) { ordered.push(scene); }
+  var fn = makeFunction();
+  if (fn) { ordered.push(fn); }
+  var diff = makeDifficulty();
+  if (diff) { ordered.push(diff); }
+
+  // 兜底：万一（理论上不会）一个都没有，退回换语气
+  if (ordered.length === 0) { return tone || makeScene() || makeFunction() || makeDifficulty(); }
+
+  return ordered[seed % ordered.length];
+}
+
+/** 取某条短语的「真人自然变体」：isCanonical===false 且文本 ≠ 原句，去重后最多 3 条。 */
+function getExampleVariants(phrase) {
+  var base = normEn(phrase.en);
+  var seen = {};
+  var out = [];
+  var clips = Array.isArray(phrase.clips) ? phrase.clips : [];
+  for (var i = 0; i < clips.length; i++) {
+    var units = (clips[i] && Array.isArray(clips[i].units)) ? clips[i].units : [];
+    for (var j = 0; j < units.length; j++) {
+      var u = units[j];
+      if (!u || u.isCanonical !== false) { continue; }
+      var text = String(u.text || '').trim();
+      if (!text) { continue; }
+      var key = normEn(text);
+      if (key === base || seen[key]) { continue; }
+      seen[key] = true;
+      out.push(text);
+      if (out.length >= 3) { return out; }
+    }
+  }
+  return out;
+}
+
+/* ============================================================================
+ * 状态与 DOM 引用
+ * ========================================================================== */
+var state = {
+  phrases: [],
+  loaded: false,
+  current: null,
+  op: null,
+  storageOk: true,
+  savedThisQuestion: false
+};
+
+var el = {
+  progress: document.getElementById('progress'),
+  storage: document.getElementById('storage'),
+  diffFilter: document.getElementById('diffFilter'),
+  sceneFilter: document.getElementById('sceneFilter'),
+  drawBtn: document.getElementById('drawBtn'),
+  errorCard: document.getElementById('errorCard'),
+  errorText: document.getElementById('errorText'),
+  promptCard: document.getElementById('promptCard'),
+  meta: document.getElementById('meta'),
+  en: document.getElementById('en'),
+  zh: document.getElementById('zh'),
+  opHead: document.getElementById('opHead'),
+  opText: document.getElementById('opText'),
+  answer: document.getElementById('answer'),
+  answerStatus: document.getElementById('answerStatus'),
+  showExampleBtn: document.getElementById('showExampleBtn'),
+  example: document.getElementById('example'),
+  exampleBody: document.getElementById('exampleBody'),
+  gate: document.getElementById('gate'),
+  gateTitle: document.getElementById('gateTitle'),
+  gateDesc: document.getElementById('gateDesc'),
+  explain: document.getElementById('explain'),
+  saveBtn: document.getElementById('saveBtn'),
+  saveStatus: document.getElementById('saveStatus'),
+  exportBtn: document.getElementById('exportBtn'),
+  importBtn: document.getElementById('importBtn'),
+  importFile: document.getElementById('importFile'),
+  dataStatus: document.getElementById('dataStatus'),
+  toast: document.getElementById('toast')
+};
+
+/* ============================================================================
+ * UI 辅助
+ * ========================================================================== */
+var toastTimer = null;
+function toast(msg, kind) {
+  el.toast.textContent = msg;
+  el.toast.className = 'toast show' + (kind ? ' ' + kind : '');
+  if (toastTimer) { clearTimeout(toastTimer); }
+  toastTimer = setTimeout(function () {
+    el.toast.className = 'toast' + (kind ? ' ' + kind : '');
+  }, 2600);
+}
+
+function showError(html) {
+  el.errorText.innerHTML = html;
+  el.errorCard.classList.remove('hidden');
+  el.promptCard.classList.add('hidden');
+}
+
+function setStoragePill() {
+  if (state.storageOk) {
+    el.storage.textContent = '本地存储就绪';
+    el.storage.className = 'pill storage-ok';
+  } else {
+    el.storage.textContent = '本地存储不可用';
+    el.storage.className = 'pill storage-bad';
+  }
+}
+
+/* ============================================================================
+ * 进度（已练 N 条 = 去重后的 refId 数）
+ * ========================================================================== */
+function loadProgress() {
+  return getAll(RECORDS_STORE).then(function (all) {
+    var mine = (Array.isArray(all) ? all : []).filter(function (r) {
+      return r && r.toolId === TOOL_ID;
+    });
+    var distinct = {};
+    var count = 0;
+    for (var i = 0; i < mine.length; i++) {
+      var rid = mine[i].refId;
+      if (rid && !distinct[rid]) { distinct[rid] = true; count++; }
+    }
+    var total = state.phrases.length || 346;
+    el.progress.innerHTML = '已练 <b>' + count + '</b> / 共 ' + total + ' 条' +
+      (mine.length > count ? '（保存 ' + mine.length + ' 条）' : '');
+    return count;
+  });
+}
+
+/* ============================================================================
+ * 抽题 / 渲染
+ * ========================================================================== */
+function currentPool() {
+  var d = el.diffFilter.value;
+  var s = el.sceneFilter.value;
+  return state.phrases.filter(function (p) {
+    if (d && String(p.difficulty) !== d) { return false; }
+    if (s && !(Array.isArray(p.scene) && p.scene.indexOf(s) !== -1)) { return false; }
+    return true;
+  });
+}
+
+function drawQuestion() {
+  if (!state.loaded) { return; }
+  var pool = currentPool();
+  if (pool.length === 0) {
+    toast('当前筛选下没有短语，换一个筛选试试', 'err');
+    return;
+  }
+  var phrase = pool[Math.floor(Math.random() * pool.length)];
+  if (pool.length > 1 && state.current && phrase.id === state.current.id) {
+    phrase = pool[(pool.indexOf(phrase) + 1) % pool.length];
+  }
+  state.current = phrase;
+  state.op = buildOperator(phrase);
+
+  // 重置交互
+  el.promptCard.classList.remove('hidden');
+  el.errorCard.classList.add('hidden');
+  el.answer.value = '';
+  el.explain.value = '';
+  el.example.classList.add('hidden');
+  el.exampleBody.innerHTML = '';
+  el.gate.classList.add('hidden');
+  el.showExampleBtn.disabled = false;
+  el.showExampleBtn.textContent = '看示范（先自己写，再对照）';
+  el.saveBtn.disabled = true;
+  el.saveStatus.textContent = '';
+  el.saveStatus.className = 'status';
+  el.answerStatus.textContent = '';
+  state.savedThisQuestion = false;
+
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQuestion() {
+  var p = state.current;
+  var op = state.op;
+
+  // 元数据
+  var tags = [];
+  tags.push('<span class="tag">难度 <b>' + escapeHtml(p.difficulty) + '</b></span>');
+  tags.push('<span class="tag">语气 <b>' + escapeHtml((TONE_LABEL[p.tone] || p.tone) + ' ' + p.tone) + '</b></span>');
+  if (Array.isArray(p.scene) && p.scene.length) {
+    tags.push('<span class="tag">场景 <b>' + escapeHtml(p.scene.join(' · ')) + '</b></span>');
+  }
+  if (Array.isArray(p.function) && p.function.length) {
+    tags.push('<span class="tag">功能 <b>' + escapeHtml(p.function.join(' · ')) + '</b></span>');
+  }
+  el.meta.innerHTML = tags.join('');
+
+  el.en.textContent = p.en;
+  el.zh.textContent = p.zh;
+
+  el.opHead.textContent = '本轮的变换算子 · ' + op.head;
+  el.opText.innerHTML = renderBold(op.text);
+
+  // 自我解释的提问（看示范后才显示）
+  el.gateDesc.textContent = '你改了什么？为什么它更贴合「' + op.askLabel + '」？';
+}
+
+/* 看示范：优先展示真人自然变体；无则用原句说明对照；始终明示「不是标准答案」 */
+function revealExample() {
+  if (!state.current) { return; }
+  var variants = getExampleVariants(state.current);
+  var body = el.exampleBody;
+  body.innerHTML = '';
+
+  if (variants.length > 0) {
+    for (var i = 0; i < variants.length; i++) {
+      var div = document.createElement('div');
+      div.className = 'ex-item';
+      var span = document.createElement('span');
+      span.textContent = variants[i];
+      var who = document.createElement('span');
+      who.className = 'who';
+      who.textContent = '真人说法 · 自然变体 ' + (i + 1);
+      div.appendChild(span);
+      div.appendChild(who);
+      body.appendChild(div);
+    }
+  } else {
+    var p = state.current;
+    var note = document.createElement('div');
+    note.className = 'ex-item';
+    note.innerHTML = renderBold(
+      '本条数据里没有收录真人变体。作为对照：原句语气是「**' +
+      (TONE_LABEL[p.tone] || p.tone) + '（' + p.tone + '）**」，常见场景是「**' +
+      (Array.isArray(p.scene) ? p.scene.join(' / ') : '—') + '**」。你的变体应该在本轮的「' +
+      state.op.askLabel + '」这一点上，与原句明显不同。'
+    );
+    body.appendChild(note);
+  }
+
+  el.example.classList.remove('hidden');
+  // 展开门槛：显示自我解释区，并开启保存按钮（仍需填解释才能存）
+  el.gate.classList.remove('hidden');
+  el.showExampleBtn.disabled = true;
+  el.showExampleBtn.textContent = '已展开示范';
+  el.explain.focus();
+  updateSaveState();
+}
+
+/* 保存按钮可用性：必须有答案 + 已看示范 + 已填自我解释 */
+function updateSaveState() {
+  if (!state.current || state.savedThisQuestion) {
+    el.saveBtn.disabled = true;
+    return;
+  }
+  var hasAnswer = el.answer.value.trim().length > 0;
+  var revealed = !el.example.classList.contains('hidden');
+  var hasExplain = el.explain.value.trim().length > 0;
+  el.saveBtn.disabled = !(hasAnswer && revealed && hasExplain);
+
+  if (hasAnswer && !revealed) {
+    el.answerStatus.textContent = '写完了？点「看示范」再对照。';
+    el.answerStatus.className = 'status';
+  } else {
+    el.answerStatus.textContent = '';
+    el.answerStatus.className = 'status';
+  }
+}
+
+/* ============================================================================
+ * 保存（写入 IndexedDB · 一条练习 = 一条 LearnerRecord）
+ * ========================================================================== */
+function saveCurrent() {
+  if (!state.current || state.savedThisQuestion) { return; }
+  var answer = el.answer.value.trim();
+  var explanation = el.explain.value.trim();
+  if (!answer) { toast('请先写下你的变体', 'err'); el.answer.focus(); return; }
+  if (el.example.classList.contains('hidden')) { toast('先点「看示范」再对照一次', 'err'); return; }
+  if (!explanation) { toast('请先填「自我解释」——不填不能保存', 'err'); el.explain.focus(); return; }
+
+  var record = {
+    id: uuid(),
+    toolId: TOOL_ID,
+    kind: 'variant',
+    refId: state.current.id,
+    payload: {
+      operator: state.op.text,
+      answer: answer,
+      explanation: explanation,
+      phrase: {
+        en: state.current.en,
+        zh: state.current.zh,
+        tone: state.current.tone
+      }
+    },
+    createdAt: new Date().toISOString()
+  };
+
+  el.saveBtn.disabled = true;
+  el.saveStatus.textContent = '保存中…';
+  el.saveStatus.className = 'status';
+
+  put(RECORDS_STORE, record).then(function (ok) {
+    if (ok) {
+      state.savedThisQuestion = true;
+      el.saveBtn.disabled = true;
+      el.saveStatus.textContent = '✓ 已保存到本地（可继续抽下一题）';
+      el.saveStatus.className = 'status ok';
+      toast('已保存到本地 IndexedDB', 'ok');
+      loadProgress();
+    } else {
+      state.storageOk = false;
+      setStoragePill();
+      el.saveBtn.disabled = false;
+      el.saveStatus.textContent = '✗ 保存失败：本地存储不可用（隐私模式？）请先复制内容';
+      el.saveStatus.className = 'status err';
+      toast('保存失败：本地存储不可用', 'err');
+    }
+  });
+}
+
+/* ============================================================================
+ * 导出 / 导入（格式与主站一致：{ schema, version, exportedAt, records }）
+ * ========================================================================== */
+function exportAll() {
+  getAll(RECORDS_STORE).then(function (all) {
+    var mine = (Array.isArray(all) ? all : []).filter(function (r) {
+      return r && r.toolId === TOOL_ID;
+    });
+    var pkg = {
+      schema: RECORDS_SCHEMA,
+      version: RECORDS_SCHEMA_VERSION,
+      exportedAt: new Date().toISOString(),
+      records: mine
+    };
+    try {
+      var blob = new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'phrase-variant-builder-records.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      el.dataStatus.textContent = '已导出 ' + mine.length + ' 条记录';
+      el.dataStatus.className = 'status ok';
+      toast('已导出 ' + mine.length + ' 条记录', 'ok');
+    } catch (e) {
+      el.dataStatus.textContent = '导出失败：无法生成下载文件';
+      el.dataStatus.className = 'status err';
+      toast('导出失败', 'err');
+    }
+  });
+}
+
+/** 校验单条记录的最小结构（对齐主站 isValidRecordShape）。 */
+function isValidRecordShape(value) {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) { return false; }
+  return (
+    typeof value.id === 'string' && value.id.length > 0 &&
+    typeof value.toolId === 'string' &&
+    typeof value.kind === 'string' &&
+    typeof value.createdAt === 'string' &&
+    ('payload' in value)
+  );
+}
+
+/** 幂等导入（对齐主站 recordsStore.importAll）：同 id 覆盖、非法条目跳过、绝不抛异常。 */
+function importAllInline(data) {
+  try {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return Promise.resolve({ ok: false, imported: 0, skipped: 0, error: '导入数据格式非法：期望对象。' });
+    }
+    var recordsField = data.records;
+    if (!Array.isArray(recordsField)) {
+      return Promise.resolve({ ok: false, imported: 0, skipped: 0, error: '导入数据缺少 records 数组。' });
+    }
+    var merged = {};
+    var order = [];
+    var skipped = 0;
+    for (var i = 0; i < recordsField.length; i++) {
+      var item = recordsField[i];
+      if (!isValidRecordShape(item)) { skipped++; continue; }
+      if (!(item.id in merged)) { order.push(item.id); }
+      merged[item.id] = item;
+    }
+    var imported = 0;
+    var chain = Promise.resolve();
+    order.forEach(function (id) {
+      chain = chain.then(function () {
+        return put(RECORDS_STORE, merged[id]).then(function (success) {
+          if (success) { imported++; } else { skipped++; }
+        });
+      });
+    });
+    return chain.then(function () {
+      if (imported !== order.length) {
+        return { ok: false, imported: imported, skipped: skipped, error: '部分或全部记录未能写入本地存储。' };
+      }
+      return { ok: true, imported: imported, skipped: skipped };
+    });
+  } catch (e) {
+    return Promise.resolve({ ok: false, imported: 0, skipped: 0, error: '导入失败：未知错误。' });
+  }
+}
+
+function handleImportFile(file) {
+  if (!file) { return; }
+  var reader = new FileReader();
+  reader.onload = function () {
+    var data;
+    try {
+      data = JSON.parse(String(reader.result));
+    } catch (e) {
+      el.dataStatus.textContent = '导入失败：文件不是合法 JSON';
+      el.dataStatus.className = 'status err';
+      toast('导入失败：文件不是合法 JSON', 'err');
+      return;
+    }
+    importAllInline(data).then(function (res) {
+      if (res.ok) {
+        el.dataStatus.textContent = '导入成功：写入 ' + res.imported + ' 条' +
+          (res.skipped ? '，跳过 ' + res.skipped + ' 条' : '');
+        el.dataStatus.className = 'status ok';
+        toast('导入成功：' + res.imported + ' 条', 'ok');
+      } else {
+        el.dataStatus.textContent = '导入失败：' + (res.error || '格式不正确');
+        el.dataStatus.className = 'status err';
+        toast('导入失败：' + (res.error || '格式不正确'), 'err');
+      }
+      loadProgress();
+    });
+  };
+  reader.onerror = function () {
+    el.dataStatus.textContent = '导入失败：无法读取文件';
+    el.dataStatus.className = 'status err';
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================================
+ * 初始化
+ * ========================================================================== */
+function populateSceneFilter() {
+  for (var i = 0; i < SCENES.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = SCENES[i];
+    opt.textContent = SCENES[i];
+    el.sceneFilter.appendChild(opt);
+  }
+}
+
+function validatePayload(data) {
+  if (!data || typeof data !== 'object') { return null; }
+  if (!Array.isArray(data.phrases)) { return null; }
+  return data.phrases.filter(function (p) {
+    return p && typeof p.en === 'string' && p.en.length > 0;
+  });
+}
+
+function init() {
+  populateSceneFilter();
+
+  // 事件绑定
+  el.drawBtn.addEventListener('click', drawQuestion);
+  el.diffFilter.addEventListener('change', drawQuestion);
+  el.sceneFilter.addEventListener('change', drawQuestion);
+  el.showExampleBtn.addEventListener('click', revealExample);
+  el.saveBtn.addEventListener('click', saveCurrent);
+  el.answer.addEventListener('input', updateSaveState);
+  el.explain.addEventListener('input', updateSaveState);
+  el.exportBtn.addEventListener('click', exportAll);
+  el.importBtn.addEventListener('click', function () { el.importFile.click(); });
+  el.importFile.addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    handleImportFile(f);
+    e.target.value = '';
+  });
+
+  // 存储可用性检测
+  openDatabase().then(function (db) {
+    state.storageOk = !!db;
+    setStoragePill();
+    return loadProgress();
+  });
+
+  // 拉取短语数据（唯一的一次同源网络请求）
+  fetch(PHRASES_URL, { cache: 'no-cache' })
+    .then(function (res) {
+      if (!res.ok) { throw new Error('HTTP ' + res.status); }
+      return res.json();
+    })
+    .then(function (data) {
+      var phrases = validatePayload(data);
+      if (!phrases || phrases.length === 0) {
+        throw new Error('数据结构不符：未找到 phrases 数组');
+      }
+      state.phrases = phrases;
+      state.loaded = true;
+      el.drawBtn.disabled = false;
+      loadProgress();
+      drawQuestion();
+    })
+    .catch(function (err) {
+      el.drawBtn.disabled = true;
+      showError(
+        '<b>短语数据加载失败，题目暂时无法生成。</b><br><br>' +
+        '本工具需要同源拉取 <code>../moear/tool/phrases.json</code>（相对本页所在目录）。<br>' +
+        '请确认：① 你是在站点内正常打开本页（而非直接双击本地文件）；' +
+        '② 该路径下的 phrases.json 存在且可访问。<br><br>' +
+        '错误信息：<code>' + escapeHtml(err && err.message ? err.message : String(err)) + '</code>'
+      );
+      toast('短语数据加载失败', 'err');
+    });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
