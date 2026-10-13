@@ -11,7 +11,7 @@
  * 代理策略：显式 --proxy / 环境变量 SITE_PROXY 优先；未指定时先直连，
  *          失败再自动尝试本地常用代理 127.0.0.1:4780（国内访问 GitHub Pages 常用）。
  */
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -92,16 +92,32 @@ async function resolveRemote() {
   return null;
 }
 
-/** 本地相对线上落后多少提交（线上 commit 在本地存在时才有意义）。 */
-function commitsBehind(remoteCommit) {
+/**
+ * 线上 commit 落后本地 HEAD 多少提交。
+ *
+ * ⚠️ 两处必须坚持的写法：
+ *   1. **用 `execFileSync` 直接 exec git，不经 shell**。Windows 上 `execSync` 走 cmd.exe，
+ *      而 `^` 是 cmd 的转义字符 —— 若写成 `cat-file -e <hash>^{commit}`，cmd 会把 `^`
+ *      吃掉变成 `<hash>{commit}`，命令必然失败，于是本函数恒返回 null、
+ *      结论被误报成「线上 commit 在本地不存在」。（cmd 下 `%` 同样危险）
+ *   2. **先校验是十六进制 hash**，避免把外部字符串拼进命令。
+ *
+ * @param {string} remoteCommit 线上 version.json 里的 commit
+ * @returns {string|null} 提交数；线上 commit 不在本机历史里、或本机 git 不可用时为 null
+ */
+function commitsOnlineBehind(remoteCommit) {
+  if (!/^[0-9a-f]{4,40}$/i.test(remoteCommit)) {
+    return null;
+  }
   try {
-    execSync(`git cat-file -e ${remoteCommit}^{commit}`, {
+    execFileSync('git', ['cat-file', '-e', `${remoteCommit}^{commit}`], {
       cwd: rootDir,
       stdio: 'ignore',
     });
-    return execSync(`git rev-list --count ${remoteCommit}..HEAD`, { cwd: rootDir })
-      .toString()
-      .trim();
+    return execFileSync('git', ['rev-list', '--count', `${remoteCommit}..HEAD`], {
+      cwd: rootDir,
+      encoding: 'utf8',
+    }).trim();
   } catch {
     return null;
   }
@@ -152,14 +168,15 @@ if (remote && local) {
   if (remoteCommit === local.commit) {
     console.log('  ✅ 已同步：线上版本 = 本地 HEAD');
   } else {
-    const behind = remoteCommit ? commitsBehind(remoteCommit) : null;
+    const behind = remoteCommit ? commitsOnlineBehind(remoteCommit) : null;
     console.log(`  ⚠️  不一致：本地 ${local.commit} vs 线上 ${remoteCommit ?? '?'}`);
     if (behind && behind !== '0') {
       console.log(`     线上落后本地 ${behind} 个提交 —— 可能仍在部署中（Actions 约需 1-2 分钟）`);
     } else if (behind === '0') {
       console.log('     提交数一致但 hash 不同 —— 可能线上是不同分支构建的产物');
     } else {
-      console.log('     线上 commit 在本地不存在 —— 检查是否来自其他分支/环境');
+      console.log('     ⚠️ 无法判定落后几个提交 —— 线上 commit 不在本机历史里，或本机执行 git 失败');
+      console.log('        （这是「本机查不到」，不是「线上有问题」；可自行核对 git log --all）');
     }
   }
 }
