@@ -4,7 +4,7 @@ import type { Tool } from '@/types';
  * 影视台词磨耳朵（channel: english）。
  *
  * 多文件工具（index.html + tool/phrases.json + audio_norm/ + tool_phrase/voices/），
- * 由 `scripts/sync-tools.mjs` 依据 `scripts/sync/movie-line-listening.json`
+ * 由 `scripts/sync-tools.mjs` 依据 `scripts/sync/moear.json`
  * 从本地工作目录 `D:/workspaces/每日英语台词` 增量同步进 `public/`，
  * 站内目录刻意**镜像**本地层级，工具内部的相对路径才能原样成立。
  *
@@ -16,9 +16,14 @@ import type { Tool } from '@/types';
  *   - `audio_norm/**`（1900 条已响度归一化的真人原声 + 清单）
  *   - `tool_phrase/voices/**`（692 条短语级标准音 TTS）
  * `tool/voices/**`（unit 级回退候选）与原始层 `audio/` 实测不会被播放器命中，故不带走。
+ *
+ * **id 为什么是 `moear` 而不是 `movie-line-listening`**：老板 2026-10-13 拍板。
+ * 理由是与工具内部已定的 `localStorage` 前缀 `moear:` 对齐 ——
+ * 目录名、路由段、存储键前缀三处同名，排查时不用再做一次心算映射。
+ * 展示名仍是「影视台词磨耳朵」，用户看到的中文不受影响。
  */
 const tool: Tool = {
-  id: 'movie-line-listening',
+  id: 'moear',
   name: '影视台词磨耳朵',
   channel: 'english',
   description:
@@ -26,7 +31,7 @@ const tool: Tool = {
   tags: ['英语', '听力', '磨耳朵'],
   status: 'online',
   runtime: 'client-only',
-  entry: 'tools/english/movie-line-listening/index.html',
+  entry: 'tools/english/moear/index.html',
   cover: '👂',
   version: '0.1.0',
   createdAt: '2026-10-13',

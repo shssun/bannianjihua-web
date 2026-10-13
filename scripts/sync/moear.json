@@ -1,8 +1,8 @@
 {
-  "id": "movie-line-listening",
+  "id": "moear",
   "src": "D:/workspaces/每日英语台词",
-  "srcEnv": "MOVIE_LINE_LISTENING_SRC",
-  "dest": "public/tools/english/movie-line-listening",
+  "srcEnv": "MOEAR_SRC",
+  "dest": "public/tools/english/moear",
   "include": [
     "player.html",
     "tool/phrases.json",

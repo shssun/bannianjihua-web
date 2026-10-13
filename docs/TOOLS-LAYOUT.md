@@ -47,7 +47,7 @@ public/tools/                              ← L1 容器
 │   │       └── voices/                    （多说话人音轨）
 │   └── dict-reader/                       ← L3 工具 · 英文句读（单文件）
 │       └── index.html
-│   └── movie-line-listening/              ← L3 工具 · 影视台词磨耳朵（多文件）
+│   └── moear/                             ← L3 工具 · 影视台词磨耳朵（多文件）
 │       ├── index.html                     （源文件名 player.html，经 rename 映射而来）
 │       ├── tool/phrases.json
 │       ├── audio_norm/                    （1900 条响度归一真人原声 + 清单）
@@ -81,7 +81,7 @@ public/tools/                              ← L1 容器
 ```
 D:/workspaces/
 ├── 每日英语/                         ← 影视台词跟读（movie-line-shadowing）的数据工作区（保持现名，不动）
-├── 每日英语台词/                     ← 影视台词磨耳朵（movie-line-listening）的数据工作区（保持现名，不动）
+├── 每日英语台词/                     ← 影视台词磨耳朵（moear）的数据工作区（保持现名，不动）
 └── ...
 ```
 
@@ -149,7 +149,7 @@ src/data/
 │   ├── index.ts                 ← 汇总器，用 glob 自动收集，几乎不用改
 │   ├── english/
 │   │   ├── movie-line-shadowing.ts
-│   │   ├── movie-line-listening.ts
+│   │   ├── moear.ts
 │   │   └── dict-reader.ts
 │   ├── math/
 │   │   └── set-theory-cards.ts
@@ -365,7 +365,7 @@ export interface Tool {
 | `set-theory-cards` | 集合论卡片 | —（规划中） | `tools/math/set-theory-cards/index.html` | `math` |
 | `intuition-cards` | 直觉之卡 | —（规划中） | `tools/cognition/intuition-cards/index.html` | `cognition` |
 | `markdown-slide` | Markdown 幻灯 | —（规划中） | `tools/general/markdown-slide/index.html` | `general` |
-| `movie-line-listening` | 影视台词磨耳朵 | —（新增） | `tools/english/movie-line-listening/index.html` | `english` |
+| `moear` | 影视台词磨耳朵 | —（新增） | `tools/english/moear/index.html` | `english` |
 
 **id 变更**：`daily-english` → `movie-line-shadowing`；`english-dict-reader` → `dict-reader`；`intuition-zhika` → `intuition-cards`。
 **名称变更**：`每日英语跟读` → `影视台词跟读`（其余名称不变）。
