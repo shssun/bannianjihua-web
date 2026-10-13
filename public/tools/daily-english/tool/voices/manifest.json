@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-10-13T00:44:13+08:00",
+  "schemaVersion": 3,
+  "generatedAt": "2026-10-13T11:03:13+08:00",
   "engine": "edge-tts",
   "speakers": [
     {
@@ -8,32 +8,15 @@
       "label": "美·女"
     },
     {
-      "id": "en-US-GuyNeural",
-      "label": "美·男"
-    },
-    {
       "id": "en-GB-SoniaNeural",
       "label": "英·女"
-    },
-    {
-      "id": "en-AU-NatashaNeural",
-      "label": "澳·女"
-    },
-    {
-      "id": "en-US-BrianNeural",
-      "label": "美·男 2"
     }
   ],
   "rates": [
     {
-      "id": "clear",
-      "label": "清晰",
+      "id": "std",
+      "label": "标准",
       "rate": "+0%"
-    },
-    {
-      "id": "fast",
-      "label": "快速",
-      "rate": "+18%"
     }
   ],
   "items": {
@@ -41,157 +24,37 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/6d78e1bf77_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/6d78e1bf77_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/290c83372e_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/290c83372e_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/981f9fc7e0_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-just-in-time/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-just-in-time/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/981f9fc7e0_sonia.mp3"
         }
       ]
     ],
@@ -199,209 +62,49 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/7edd4a191f_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/7edd4a191f_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/dd0fdb05ab_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/dd0fdb05ab_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/8dce2314cb_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/8dce2314cb_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/8dce2314cb_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-are-way-of-line/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-are-way-of-line/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/8dce2314cb_sonia.mp3"
         }
       ]
     ],
@@ -409,209 +112,49 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/c5e1cab457_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/c5e1cab457_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/7aa30dc3aa_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/7aa30dc3aa_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/aeeca6abf9_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/aeeca6abf9_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/aeeca6abf9_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-attract-me/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-attract-me/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/aeeca6abf9_sonia.mp3"
         }
       ]
     ],
@@ -619,261 +162,61 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/1729e91288_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/1729e91288_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/b03dd96dea_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/b03dd96dea_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/db5671085d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/db5671085d_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/9833fc8304_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/9833fc8304_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s04_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s04_guy.mp3"
+          "rate": "std",
+          "file": "voices/9833fc8304_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s04_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s04_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-can-count-on-me/s04_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s04_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s04_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s04_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s04_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-can-count-on-me/s04_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/9833fc8304_sonia.mp3"
         }
       ]
     ],
@@ -881,261 +224,61 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s04_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s04_guy.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s04_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s04_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-gotta-be-kidding-me/s04_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s04_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s04_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s04_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s04_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-gotta-be-kidding-me/s04_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3b3bd29d5d_sonia.mp3"
         }
       ]
     ],
@@ -1143,261 +286,61 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s04_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s04_guy.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s04_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s04_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-have-my-word/s04_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s04_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s04_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s04_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s04_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-have-my-word/s04_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/0e454f5936_sonia.mp3"
         }
       ]
     ],
@@ -1405,313 +348,73 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/ffc806f673_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/ffc806f673_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/e6d771bfb1_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/e6d771bfb1_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s04_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s04_guy.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s04_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s04_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s04_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s04_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s04_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s04_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s04_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s04_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s05_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s05_guy.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s05_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s05_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-ll-get-used-to-it/s05_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s05_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s05_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s05_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s05_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-ll-get-used-to-it/s05_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/81c35837cc_sonia.mp3"
         }
       ]
     ],
@@ -1719,105 +422,25 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/615df732be_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/615df732be_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/99f9e4a415_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/you-re-in-my-heart/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/you-re-in-my-heart/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/99f9e4a415_sonia.mp3"
         }
       ]
     ],
@@ -1825,209 +448,49 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-8/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-8/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/af1761a15b_sonia.mp3"
         }
       ]
     ],
@@ -2035,469 +498,109 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s04_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s04_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s04_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s04_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s04_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s04_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s04_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s04_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s04_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s04_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s05_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s05_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s05_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s05_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s05_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s05_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s05_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s05_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s05_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s05_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s06_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s06_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s06_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s06_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s06_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s06_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s06_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s06_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s06_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s06_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s07_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s07_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s07_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s07_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s07_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s07_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s07_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s07_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s07_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s07_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s08_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s08_guy.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s08_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s08_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-9/s08_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s08_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s08_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s08_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s08_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-9/s08_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/3d1b5ad46c_sonia.mp3"
         }
       ]
     ],
@@ -2505,209 +608,49 @@
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s00_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s00_guy.mp3"
+          "rate": "std",
+          "file": "voices/7c5f3c731e_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s00_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s00_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s00_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s00_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s00_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s00_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s00_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s00_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/7c5f3c731e_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s01_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s01_guy.mp3"
+          "rate": "std",
+          "file": "voices/7c5f3c731e_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s01_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s01_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s01_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s01_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s01_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s01_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s01_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s01_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/7c5f3c731e_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s02_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s02_guy.mp3"
+          "rate": "std",
+          "file": "voices/653e00fa4e_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s02_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s02_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s02_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s02_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s02_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s02_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s02_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s02_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/653e00fa4e_sonia.mp3"
         }
       ],
       [
         {
           "speaker": "en-US-AriaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s03_aria.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s03_guy.mp3"
+          "rate": "std",
+          "file": "voices/653e00fa4e_aria.mp3"
         },
         {
           "speaker": "en-GB-SoniaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s03_sonia.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s03_natasha.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "clear",
-          "file": "voices/clip-10/s03_brian.mp3"
-        },
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s03_aria__fast.mp3"
-        },
-        {
-          "speaker": "en-US-GuyNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s03_guy__fast.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s03_sonia__fast.mp3"
-        },
-        {
-          "speaker": "en-AU-NatashaNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s03_natasha__fast.mp3"
-        },
-        {
-          "speaker": "en-US-BrianNeural",
-          "rate": "fast",
-          "file": "voices/clip-10/s03_brian__fast.mp3"
+          "rate": "std",
+          "file": "voices/653e00fa4e_sonia.mp3"
         }
       ]
     ]
