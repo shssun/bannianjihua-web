@@ -14,10 +14,18 @@ export type ToolRuntime = 'client-only' | 'light-backend';
 
 /** 工具注册表条目。 */
 export interface Tool {
-  /** 唯一标识，用作路由 /tools/:id */
+  /** 唯一标识，用作路由 /tools/:id；同时等于工具目录名 */
   id: string;
   /** 工具名 */
   name: string;
+  /**
+   * 所属频道 id（二级目录名），对应 src/data/channels.ts 的 Channel.id。
+   *
+   * **必须与工具注册表文件所在目录名、以及工具产物目录名一致。**
+   * 例：文件 `src/data/tools/english/dict-reader.ts` → `channel: 'english'`。
+   * 构建期 `scripts/check-tools.mjs` 会强制校验这一点。
+   */
+  channel: string;
   /** 一句话描述（卡片展示） */
   description: string;
   /** 标签，如 ['阅读器', '离线', 'Markdown'] */
@@ -26,7 +34,14 @@ export interface Tool {
   status: ToolStatus;
   /** 运行形态 */
   runtime: ToolRuntime;
-  /** 工具产物的静态路径（相对 public/ 的裸路径，不带前导斜杠），如 'tools/md-to-html-reader.html'（消费方用 getToolEntryUrl 加 base 前缀） */
+  /**
+   * 工具产物的静态路径（相对 `public/` 的裸路径，不带前导斜杠），
+   * 如 `'tools/general/md-to-html-reader/index.html'`。
+   *
+   * 消费方请用 `getToolEntryUrl()` 取得带部署 base 前缀的完整 URL。
+   * 该字段必须写**完整显式路径**，任何地方都不许用 channel/id 去「拼」路径 ——
+   * 这样目录层级变化对代码完全透明。
+   */
   entry?: string;
   /** 外部兜底跳转（新标签打开） */
   externalUrl?: string;

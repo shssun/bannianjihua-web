@@ -1,7 +1,9 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link as RouterLink } from 'react-router-dom';
 import type { Tool } from '@/types';
 import { TOOL_RUNTIME_LABEL, getToolEntryUrl } from '@/data/tools';
+import { getChannelById } from '@/data/channels';
 import StatusBadge from '@/components/common/StatusBadge';
 import TagChip from '@/components/common/TagChip';
 
@@ -18,6 +20,7 @@ interface ToolCardProps {
 export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
   const canOpen = tool.status === 'online';
   const toolUrl = getToolEntryUrl(tool);
+  const channel = getChannelById(tool.channel);
 
   return (
     <Box
@@ -61,8 +64,19 @@ export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
         </Typography>
       </Box>
 
-      {/* 元信息：runtime + 预计时间 */}
+      {/* 元信息：频道 + runtime + 预计时间 */}
       <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        {channel ? (
+          <Chip
+            label={`${channel.cover} ${channel.name}`}
+            size="small"
+            variant="outlined"
+            clickable
+            component={RouterLink}
+            to={`/tools/channel/${channel.id}`}
+            sx={{ borderColor: 'var(--border)' }}
+          />
+        ) : null}
         <Chip
           label={TOOL_RUNTIME_LABEL[tool.runtime]}
           size="small"

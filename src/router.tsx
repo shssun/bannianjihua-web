@@ -5,6 +5,7 @@ import BlogListPage from '@/pages/BlogListPage';
 import BlogPostPage from '@/pages/BlogPostPage';
 import ToolListPage from '@/pages/ToolListPage';
 import ToolViewPage from '@/pages/ToolViewPage';
+import ChannelPage from '@/pages/ChannelPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import MessageBoardPage from '@/pages/MessageBoardPage';
 import AboutPage from '@/pages/AboutPage';
@@ -38,6 +39,10 @@ const routes: RouteObject[] = [
       { path: 'blog', element: <BlogListPage /> },
       { path: 'blog/:slug', element: <BlogPostPage /> },
       { path: 'tools', element: <ToolListPage /> },
+      // 频道页：'tools/channel/:channel' 是 3 段、'tools/:id' 只匹配 2 段，互不冲突；
+      // 且静态段 'channel' 优先级高于动态段 ':id'，因此 `channel` 是保留字，不能作工具 id
+      // （由 scripts/check-tools.mjs 在构建期强制校验）。
+      { path: 'tools/channel/:channel', element: <ChannelPage /> },
       { path: 'tools/:id', element: <ToolViewPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'message', element: <MessageBoardPage /> },

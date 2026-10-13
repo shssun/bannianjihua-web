@@ -1,0 +1,22 @@
+{
+  "id": "movie-line-shadowing",
+  "src": "D:/workspaces/每日英语",
+  "srcEnv": "MOVIE_LINE_SRC",
+  "dest": "public/tools/english/movie-line-shadowing",
+  "include": [
+    "*.mp4",
+    "tool/index.html",
+    "tool/data.json",
+    "tool/zh.json",
+    "tool/voices/**"
+  ],
+  "exclude": [
+    "**/_qa/**",
+    "**/__pycache__/**",
+    "**/*.py",
+    "**/*.part",
+    "**/.*"
+  ],
+  "required": ["tool/index.html", "tool/data.json", "tool/zh.json"],
+  "optional": true
+}

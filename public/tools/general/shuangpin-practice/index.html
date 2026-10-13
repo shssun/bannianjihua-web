@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>搜狗双拼练习</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#0f1115;color:#e2e4e9;min-height:100dvh;display:flex;flex-direction:column;line-height:1.5}
+button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+select{font-family:inherit;color:inherit;background:none}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.05);position:sticky;top:0;z-index:50;background:rgba(15,17,21,.95);backdrop-filter:blur(4px)}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:28px;height:28px;border-radius:6px;background:rgba(245,158,11,.2);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+h1{font-size:14px;font-weight:600;letter-spacing:-.02em}
+.header-right{display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;padding:4px 8px;border-radius:6px;font-size:12px;background:rgba(255,255,255,.05);color:#9ca3af;transition:background .15s}
+.btn:hover{background:rgba(255,255,255,.1)}
+.btn.on{background:rgba(245,158,11,.2);color:#fbbf24}
+main{flex:1;width:920px;max-width:100%;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.stats-bar{display:flex;flex-wrap:wrap;align-items:center;gap:20px;font-size:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:10px 16px}
+.stats-bar>div{white-space:nowrap}
+.stats-bar .label{color:#6b7280}
+.stats-bar .val{color:#f59e0b;font-family:ui-monospace,monospace;margin-left:4px}
+.stats-bar .right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.stats-bar select{font-size:12px;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#d1d5db;cursor:pointer}
+.pbar{height:3px;background:#1f2937;border-radius:9px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);transition:width .15s;width:0%}
+.text-area{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px 20px;min-height:140px;position:relative;line-height:2.5;font-size:22px;letter-spacing:.03em;word-break:break-all;cursor:pointer}
+.text-area .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:14px;pointer-events:none}
+.co{color:#34d399}.nu{color:rgba(107,114,128,.7)}.ce{color:#ef4444;text-decoration:underline wavy #ef4444}
+.cc{color:#fbbf24;border-bottom:2.5px solid #f59e0b;animation:blinker .9s infinite}.cw{color:#4b5563}
+@keyframes blinker{0%,49%{border-color:#f59e0b}50%,100%{border-color:transparent}}
+.hint-row{display:flex;align-items:center;justify-content:center;gap:12px;min-height:48px;user-select:none}
+.hint-row .ch{font-size:24px;font-weight:700;color:#fff}
+.hint-row .arrow{color:#4b5563}
+.hint-row .pinyin{color:#9ca3af;font-family:ui-monospace,monospace;font-size:14px}
+.hint-row .keys{display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:6px 12px}
+.key-box{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;font-weight:700;font-size:14px}
+.key-box.now{background:#f59e0b;color:#0f1115}.key-box.next{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.hint-row .phase{font-size:10px;color:rgba(245,158,11,.5);margin-left:4px}
+.keyboard{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:8px}
+.kb-row{display:flex;gap:6px}
+.kb-key{width:40px;height:40px;border-radius:6px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.05);color:#9ca3af;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .1s;user-select:none;cursor:default}
+.kb-key .k{font-size:12px;font-weight:600;color:#e5e7eb}.kb-key .v{font-size:9px;color:rgba(245,158,11,.7);line-height:1.2}
+.kb-key.kn{background:#f59e0b !important;color:#0f1115 !important;border-color:#f59e0b !important;box-shadow:0 0 14px rgba(245,158,11,.4);transform:scale(1.08);z-index:2}
+.kb-key.kx{background:rgba(245,158,11,.15) !important;color:#fbbf24 !important;border-color:rgba(245,158,11,.3) !important}
+.kb-key.kb{background:#ef4444 !important;color:#fff !important;animation:shake .25s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.ref-section{display:none;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px 20px}
+.ref-section.on{display:block}
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,70px);gap:4px}
+.ref-cell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:6px 4px;text-align:center}
+.ref-cell .rk{font-size:13px;font-weight:600;color:#e5e7eb}.ref-cell .rv{font-size:9px;color:#f59e0b}
+.ref-note{font-size:10px;color:#6b7280;margin-top:12px}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:50;padding:16px}
+.modal.on{display:flex}
+.modal-box{background:#1a1d23;border:1px solid rgba(255,255,255,.1);border-radius:12px;width:100%;max-width:512px;padding:20px}
+.modal-box h3{font-size:14px;font-weight:600;margin-bottom:8px}
+.modal-box textarea{width:100%;background:rgba(255,255,255,.05);color:#e5e7eb;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;min-height:120px}
+.modal-box textarea:focus{border-color:rgba(245,158,11,.5)}
+.modal-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.result{background:#1a1d23;border:1px solid rgba(255,255,255,.1);border-radius:12px;width:100%;max-width:384px;padding:24px;text-align:center}
+.result .title{font-size:18px;font-weight:700;color:#f59e0b;margin-bottom:20px}
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.r-cell{background:rgba(255,255,255,.05);border-radius:8px;padding:8px}
+.r-cell .num{font-size:20px;font-weight:700}.r-cell .lbl{font-size:10px;color:#6b7280;margin-top:4px}
+footer{border-top:1px solid rgba(255,255,255,.05);padding:10px 16px;text-align:center;font-size:10px;color:#6b7280}
+</style>
+</head>
+<body>
+
+<header>
+<div class="header-left"><div class="logo">双</div><h1>搜狗双拼练习</h1></div>
+<div class="header-right">
+<span id="sL" style="color:#6b7280;margin-right:4px;font-size:12px">准备就绪</span>
+<button onclick="toggleTheme()" id="tB" class="btn" title="切换明暗">☀️</button>
+<button onclick="toggleFuzzy()" id="fB" class="btn" title="zh→z ch→c sh→s">模糊音</button>
+<button onclick="resetGame()" class="btn">重来</button>
+<button onclick="toggleRef()" class="btn">键位表</button>
+<button onclick="openNewTab()" class="btn" title="在新标签打开">↗ 新标签</button>
+</div>
+</header>
+
+<main>
+<div class="stats-bar">
+<div><span class="label">用时</span><span id="sT" class="val">0:00</span></div>
+<div><span class="label">正确率</span><span id="sA" class="val">--</span></div>
+<div><span class="label">字/分</span><span id="sW" class="val">0</span></div>
+<div><span class="label">击键/分</span><span id="sK" class="val">0</span></div>
+<div class="right">
+<select id="sN" onchange="resetGame()"><option value="30">短篇</option><option value="80" selected>中篇</option><option value="160">长篇</option></select>
+<button onclick="openModal()" class="btn">粘贴文字</button>
+</div>
+</div>
+
+<div class="pbar"><div id="pB" class="pfill" style="width:0%"></div></div>
+
+<div class="text-area" id="tA">
+<div id="tH" class="hint">点击这里并开始按键练习</div>
+<div id="tD"></div>
+</div>
+
+<div id="sH" class="hint-row" style="display:none;">
+<span id="sC" class="ch"></span>
+<span class="arrow">→</span><span id="sP" class="pinyin"></span>
+<span class="arrow">→</span>
+<div class="keys">
+  <span id="s1" class="key-box now"></span>
+  <span style="color:#6b7280;font-size:12px">+</span>
+  <span id="s2" class="key-box next"></span>
+</div>
+<span id="sPh" class="phase"></span>
+</div>
+
+<div class="keyboard" id="kW"></div>
+
+<div class="ref-section" id="rS">
+<h3 style="font-size:14px;font-weight:600;margin-bottom:12px;color:#d1d5db">搜狗双拼键位对照表</h3>
+<div class="ref-grid" id="rG"></div>
+<p class="ref-note">无声母=O+韵母&nbsp;&nbsp;zh=V(z)&nbsp;&nbsp;ch=I(c)&nbsp;&nbsp;sh=U(s)&nbsp;&nbsp;ing=;</p>
+</div>
+</main>
+
+<div id="md" class="modal">
+<div class="modal-box">
+<h3>粘贴练习文字</h3>
+<textarea id="cT" rows="5" placeholder="粘贴你想练习的小说段落..."></textarea>
+<div class="modal-btns">
+  <button onclick="closeModal()" class="btn">取消</button>
+  <button onclick="confirmCustom()" class="btn on">开始练习</button>
+</div>
+</div>
+</div>
+
+<div id="rM" class="modal">
+<div class="result">
+<div style="font-size:28px;margin-bottom:12px">🎉</div>
+<div class="title">练习完成</div>
+<div class="r-grid">
+  <div class="r-cell"><div class="num" id="rW">0</div><div class="lbl">字/分</div></div>
+  <div class="r-cell"><div class="num" id="rA">0%</div><div class="lbl">正确率</div></div>
+  <div class="r-cell"><div class="num" id="rK">0</div><div class="lbl">击键/分</div></div>
+  <div class="r-cell"><div class="num" id="rT">0:00</div><div class="lbl">用时</div></div>
+</div>
+<button onclick="closeRes();resetGame()" class="btn on">再来一遍</button>
+</div>
+</div>
+
+<footer>搜狗双拼 · sh=U/s ch=I/c zh=V/z · 无声母=O+韵母 · ing=;</footer>
+
+<script>
+const SM={zh:'v',ch:'i',sh:'u'};
+const YM={a:'a',o:'o',e:'e',i:'i',u:'u',v:'y',ai:'l',ei:'z',ui:'v',ao:'k',ou:'b',iu:'q',ie:'x',ve:'t',ue:'t',er:'r',an:'j',en:'f',in:'n',un:'p',vn:'p',ang:'h',eng:'g',ing:';',ong:'s',ia:'w',ian:'m',iang:'d',iao:'c',iong:'s',ua:'w',uai:'y',uan:'r',uang:'d',uo:'o',van:'r'};
+const KL={q:'iu',w:'ia·ua',e:'e',r:'uan·er',t:'ve·ue',y:'ü·uai',u:'sh',i:'ch',o:'uo·o',p:'un·ün',a:'a',s:'ong·iong',d:'iang·uang',f:'en',g:'eng',h:'ang',j:'an',k:'ao',l:'ai',';':'ing',z:'ei',x:'ie',c:'iao',v:'zh·ui',b:'ou',n:'in',m:'ian'};
+const KR=[['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l',';'],['z','x','c','v','b','n','m']];
+
+function py2sp(p){p=p.toLowerCase().replace(/\u00fc/g,'v').trim();let s='',y='';if(/^[aeo]/.test(p)){y=p}else if(p.startsWith('zh')||p.startsWith('ch')||p.startsWith('sh')){s=p.slice(0,2);y=p.slice(2)}else if(p[0]==='y'){s='y';let r=p.slice(1);if(r==='u')y='v';else if(r==='uan')y='van';else if(r==='ue')y='ve';else if(r==='un')y='vn';else y=r}else if(p[0]==='w'){s='w';y=p.slice(1)||'u'}else{s=p[0];y=p.slice(1)}if(!y)y='i';const k1=s===''?'o':(SM[s]||s),k2=YM[y];let fk1=[k1],fk2=[k2];if(s==='zh'&&k1==='v')fk1.push('z');if(s==='ch'&&k1==='i')fk1.push('c');if(s==='sh'&&k1==='u')fk1.push('s');fk1=Array.from(new Set(fk1));return k2?{k1,k2,c:k1+k2,fk1,fk2,s,y,p}:null}
+
+const P={"的":"de","一":"yi","了":"le","是":"shi","不":"bu","在":"zai","人":"ren","有":"you","我":"wo","他":"ta","这":"zhe","个":"ge","们":"men","中":"zhong","来":"lai","上":"shang","大":"da","为":"wei","和":"he","国":"guo","到":"dao","以":"yi","说":"shuo","要":"yao","就":"jiu","出":"chu","会":"hui","可":"ke","也":"ye","你":"ni","对":"dui","生":"sheng","能":"neng","而":"er","子":"zi","那":"na","得":"de","于":"yu","着":"zhe","下":"xia","自":"zi","之":"zhi","年":"nian","过":"guo","发":"fa","后":"hou","作":"zuo","里":"li","用":"yong","道":"dao","行":"xing","所":"suo","然":"ran","家":"jia","种":"zhong","事":"shi","成":"cheng","方":"fang","多":"duo","经":"jing","么":"me","去":"qu","法":"fa","学":"xue","如":"ru","都":"dou","同":"tong","现":"xian","当":"dang","没":"mei","动":"dong","面":"mian","起":"qi","看":"kan","定":"ding","天":"tian","分":"fen","还":"hai","进":"jin","小":"xiao","其":"qi","些":"xie","主":"zhu","样":"yang","理":"li","心":"xin","她":"ta","本":"ben","前":"qian","开":"kai","但":"dan","因":"yin","只":"zhi","从":"cong","想":"xiang","实":"shi","日":"ri","者":"zhe","意":"yi","无":"wu","力":"li","与":"yu","长":"chang","把":"ba","机":"ji","十":"shi","民":"min","第":"di","公":"gong","此":"ci","已":"yi","工":"gong","使":"shi","情":"qing","明":"ming","性":"xing","知":"zhi","全":"quan","三":"san","又":"you","关":"guan","点":"dian","正":"zheng","业":"ye","外":"wai","将":"jiang","两":"liang","高":"gao","间":"jian","问":"wen","很":"hen","重":"zhong","并":"bing","物":"wu","手":"shou","应":"ying","向":"xiang","头":"tou","文":"wen","体":"ti","美":"mei","相":"xiang","见":"jian","被":"bei","利":"li","什":"shen","二":"er","等":"deng","新":"xin","己":"ji","身":"shen","果":"guo","加":"jia","西":"xi","月":"yue","话":"hua","合":"he","回":"hui","特":"te","代":"dai","内":"nei","信":"xin","表":"biao","化":"hua","老":"lao","给":"gei","世":"shi","位":"wei","次":"ci","度":"du","门":"men","任":"ren","常":"chang","先":"xian","海":"hai","通":"tong","教":"jiao","儿":"er","原":"yuan","东":"dong","声":"sheng","提":"ti","立":"li","及":"ji","比":"bi","员":"yuan","解":"jie","水":"shui","名":"ming","真":"zhen","走":"zou","义":"yi","各":"ge","入":"ru","几":"ji","口":"kou","认":"ren","条":"tiao","平":"ping","气":"qi","题":"ti","活":"huo","更":"geng","别":"bie","打":"da","女":"nv","变":"bian","四":"si","神":"shen","总":"zong","何":"he","电":"dian","数":"shu","安":"an","少":"shao","报":"bao","才":"cai","结":"jie","反":"fan","受":"shou","目":"mu","太":"tai","再":"zai","感":"gan","建":"jian","务":"wu","做":"zuo","接":"jie","必":"bi","场":"chang","件":"jian","计":"ji","期":"qi","市":"shi","直":"zhi","资":"zi","持":"chi","指":"zhi","士":"shi","据":"ju","极":"ji","确":"que","青":"qing","取":"qu","许":"xu","技":"ji","连":"lian","深":"shen","色":"se","准":"zhun","近":"jin","花":"hua","细":"xi","视":"shi","越":"yue","观":"guan","写":"xie","轻":"qing","言":"yan","难":"nan","听":"ting","香":"xiang","友":"you","双":"shuang","飞":"fei","影":"ying","白":"bai","离":"li","落":"luo","黑":"hei","举":"ju","客":"ke","照":"zhao","热":"re","脚":"jiao","北":"bei","达":"da","院":"yuan","完":"wan","读":"du","往":"wang","请":"qing","亮":"liang","错":"cuo","苦":"ku","夜":"ye","伤":"shang","晚":"wan","停":"ting","底":"di","破":"po","乐":"le","左":"zuo","岛":"dao","怕":"pa","游":"you","练":"lian","忘":"wang","喝":"he","跳":"tiao","灯":"deng","雪":"xue","蓝":"lan","冬":"dong","树":"shu","跑":"pao","笑":"xiao","风":"feng","吃":"chi","云":"yun","鱼":"yu","猫":"mao","狗":"gou","鸟":"niao","马":"ma","车":"che","路":"lu","山":"shan","田":"tian","土":"tu","星":"xing","火":"huo","木":"mu","金":"jin","雨":"yu","刀":"dao","箭":"jian","衣":"yi","食":"shi","住":"zhu","礼":"li","智":"zhi","勇":"yong","宽":"kuan","温":"wen","让":"rang","思":"si","念":"nian","爱":"ai","喜":"xi","悲":"bei","甜":"tian","酸":"suan","红":"hong","黄":"huang","绿":"lv","紫":"zi","南":"nan","旁":"pang","春":"chun","夏":"xia","秋":"qiu","江":"jiang","湖":"hu","流":"liu","岸":"an","谷":"gu","牛":"niu","羊":"yang","鸡":"ji","鸭":"ya","窗":"chuang","茶":"cha","酒":"jiu","笔":"bi","纸":"zhi","画":"hua","诗":"shi","歌":"ge","琴":"qin","强":"qiang","弱":"ruo","刚":"gang","柔":"rou","静":"jing","快":"kuai","慢":"man","远":"yuan","空":"kong","虚":"xu","暗":"an","光":"guang","晨":"chen","昏":"hun","寒":"han","暖":"nuan","凉":"liang","霜":"shuang","露":"lu","雾":"wu","雷":"lei","潮":"chao","沙":"sha","石":"shi","峰":"feng","野":"ye","村":"cun","城":"cheng","街":"jie","桥":"qiao","塔":"ta","楼":"lou","亭":"ting","台":"tai","卷":"juan","篇":"pian","章":"zhang","句":"ju","曲":"qu","音":"yin","律":"lv","韵":"yun","节":"jie","笛":"di","箫":"xiao","鼓":"gu","钟":"zhong","铃":"ling","鸣":"ming","响":"xiang","吹":"chui","弹":"tan","唱":"chang","讲":"jiang","谈":"tan","哭":"ku","叫":"jiao","梦":"meng","醒":"xing","睡":"shui","眠":"mian","困":"kun","劳":"lao","逸":"yi","忙":"mang","闲":"xian","忧":"you","恐":"kong","慌":"huang","急":"ji","缓":"huan","速":"su","迟":"chi","早":"zao","昼":"zhou","夕":"xi","刻":"ke","秒":"miao","宇":"yu","宙":"zhou","洪":"hong","荒":"huang","古":"gu","今":"jin","低":"di","浅":"qian","短":"duan","窄":"zhai","薄":"bao","软":"ruan","硬":"ying","粗":"cu","尖":"jian","钝":"dun","冷":"leng","干":"gan","湿":"shi","净":"jing","好":"hao","坏":"huai","丑":"chou","善":"shan","恶":"e","假":"jia","死":"si","聚":"ju","散":"san","连":"lian","断":"duan","升":"sheng","降":"jiang","败":"bai","失":"shi","舍":"she","减":"jian","乘":"cheng","半":"ban","单":"dan","奇":"ji","偶":"ou","阴":"yang","胜":"sheng","辱":"ru","贵":"gui","贫":"pin","危":"wei","治":"zhi","乱":"luan","兴":"xing","衰":"shuai","盛":"sheng","简":"jian","巧":"qiao","拙":"zhuo","敏":"min","愚":"yu","诚":"cheng","诈":"zha","忠":"zhong","贪":"tan","歪":"wai","弯":"wan","横":"heng","竖":"shu","陡":"dou","偏":"pian","微":"wei","巨":"ju","渺":"miao","浩":"hao","博":"bo","丰":"feng","盈":"ying","缺":"que","熟":"shou","稳":"wen","坚":"jian","孤":"gu","独":"du","艺":"yi","术":"shu","每":"mei","字":"zi","张":"zhang","悄":"qiao","触":"chu","碰":"peng","键":"jian","盘":"pan","界":"jie","便":"bian","剩":"sheng","淌":"tang","故":"gu","河":"he","涌":"yong","奔":"ben","板":"ban","岁":"sui","磨":"mo","滑":"hua","玉":"yu","梧":"wu","桐":"tong","斜":"xie","铺":"pu","墙":"qiang","尔":"er","叶":"ye","像":"xiang","诉":"su","遥":"yao","秘":"mi","密":"mi","角":"jiao","馆":"guan","棋":"qi","时":"shi","飘":"piao","层":"ceng","纱":"sha","处":"chu","峦":"luan","若":"ruo","隐":"yin","仿":"fang","佛":"fo","幅":"fu","墨":"mo","徐":"xu","展":"zhan","渔":"yu","夫":"fu","撑":"cheng","竹":"zhu","篙":"gao","划":"hua","留":"liu","波":"bo","纹":"wen","芦":"lu","苇":"wei","脆":"cui","悦":"yue","耳":"er","图":"tu","架":"jia","弥":"mi","漫":"man","旧":"jiu","息":"xi","阳":"yang","射":"she","尘":"chen","柱":"zhu","舞":"wu","翻":"fan","泛":"fan","藏":"cang","慧":"hui","阅":"yue","灵":"ling","魂":"hun","整":"zheng","午":"wu","滴":"di","顺":"shun","玻":"bo","璃":"li","蜿":"wan","蜒":"yan","痕":"hen","迹":"ji","某":"mou","懂":"dong","屋":"wu","袅":"niao","记":"ji","最":"zui","陪":"pei","伴":"ban","味":"wei","霓":"ni","虹":"hong","伞":"san","朵":"duo","般":"ban","绽":"zhan","放":"fang","咖":"ka","啡":"fei","店":"dian","传":"chuan","凝":"ning","珠":"zhu","带":"dai","松":"song","脂":"zhi","染":"ran","织":"zhi","鸟":"niao","溪":"xi","映":"ying","缕":"lv","坐":"zuo","觉":"jue","唯":"wei","万":"wan","默":"mo","覆":"fu","盖":"gai","枝":"zhi","挂":"gua","晶":"jing","莹":"ying","冰":"bing","棱":"leng","顶":"ding","孩":"hai","堆":"dui","透":"tou","炉":"lu","噼":"pi","啪":"pa","冒":"mao","虽":"sui","却":"que","书":"shu","地":"de","清":"qing","未":"wei","穿":"chuan","埃":"ai","交":"jiao","归":"gui","巢":"chao","切":"qie","厚":"hou"};
+
+const ARTS=["写作是一门孤独的艺术，每一个字都是作者与纸张之间的悄悄话。当指尖触碰键盘的那一刻，世界便安静下来，只剩下思想在流淌。书中的故事如同河流，从心底涌出，奔向远方。","古老的街道上，青石板被岁月打磨得光滑如玉。梧桐树的影子斜斜地铺在墙上，偶尔有风吹过，叶子便沙沙作响，像是在诉说一个遥远的秘密。街角的茶馆里，老人们正下着棋，时光在茶香中慢慢流过。","清晨的雾气还未散去，湖面上飘着一层薄薄的白纱。远处的山峦若隐若现，仿佛一幅水墨画徐徐展开。渔夫撑着竹篙，缓缓划过水面，留下一条细长的波纹。鸟儿在芦苇间穿行，叫声清脆悦耳。","图书馆里的时光总是过得特别慢。书架之间弥漫着旧纸张和木头的气息，阳光从高窗斜射进来，尘埃在光柱中轻盈地飞舞。翻开一本泛黄的旧书，字里行间藏着前人的智慧与温情。阅读，是与远方的灵魂对话。","窗外的雨已经下了整整一个下午。雨滴顺着玻璃缓缓滑下，留下蜿蜒的痕迹，像是某种无法读懂的文字。屋内灯光昏黄，茶香袅袅。她翻开日记本，写下今天的心情，文字是最忠实的陪伴。","夜晚的城市别有一种韵味。霓虹灯照亮了潮湿的街道，行人的伞在雨中如花朵般绽放。咖啡店里传来轻柔的琴声，玻璃窗上凝结着细密的水珠。有人在等一个人，有人在读一本书，时光在此刻变得温柔。","山间的晚风带着松脂的清香。夕阳将天空染成深红与金色交织的画卷，飞鸟归巢，溪水映着最后一缕光。他坐在石上，觉得天地之间，唯有此刻最为真实。万物静默，唯有心跳声与流水声交织在一起。","冬天的北方，大雪覆盖了一切。树枝上挂着晶莹的冰棱，屋顶上铺着厚厚的白雪。孩子们在院子里堆雪人，笑声穿透了寒冷的空气。屋内的火炉噼啪作响，热茶冒着白气。冬天虽冷，心却是暖的。"];
+
+let txt='',idx=0,phase=0,errs=0,strokes=0,t0=null,tiv=null,active=false,done=false,fuzzy=false;
+const $=id=>document.getElementById(id);
+
+function getP(ch){return P[ch]||''}
+function getSP(ch){const py=getP(ch);if(!py)return null;return py2sp(py)}
+function cArr(t){return [...t].filter(c=>/[\u4e00-\u9fa5]/.test(c))}
+function ccountText(t){return cArr(t).length}
+function genText(n){let r='';while(ccountText(r)<n){r+=ARTS[Math.floor(Math.random()*ARTS.length)]}let c=[...r],cnt=0;for(let i=c.length-1;i>=0;i--){if(/[\u4e00-\u9fa5]/.test(c[i])){cnt++;if(cnt>n)c.splice(i,1)}}return c.join('')}
+
+function buildKB(){const w=$('kW');w.innerHTML='';const ml=[0,4,8];KR.forEach((row,ri)=>{const d=document.createElement('div');d.className='kb-row';if(ml[ri])d.style.marginLeft=ml[ri]*4+'px';row.forEach(k=>{const b=document.createElement('div');b.className='kb-key';b.dataset.k=k;const label=k===';'?';':k.toUpperCase();b.innerHTML='<span class="k">'+label+'</span><span class="v">'+(KL[k]||'')+'</span>';d.appendChild(b)});w.appendChild(d)})}
+
+function buildRef(){const g=$('rG');g.innerHTML='';Object.entries(KL).forEach(([k,v])=>{const d=document.createElement('div');d.className='ref-cell';const label=k===';'?';':k.toUpperCase();d.innerHTML='<div class="rk">'+label+'</div><div class="rv">'+v+'</div>';g.appendChild(d)})}
+
+function render(){const d=$('tD');d.innerHTML='';let chi=0;[...txt].forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;if(/[\u4e00-\u9fa5]/.test(ch)){s.className=chi<idx?'co':chi===idx?'cc':'cw';chi++}else{s.className='nu'}d.appendChild(s)})}
+
+function clrKB(){document.querySelectorAll('.kb-key').forEach(e=>e.classList.remove('kn','kx','kb'))}
+function hlKey(k,cls){const el=document.querySelector('[data-k="'+k+'"]');if(el)el.classList.add(cls)}
+
+function updHint(){if(idx>=ccountText(txt)){$('sH').style.display='none';clrKB();return}$('sH').style.display='flex';const ch=cArr(txt)[idx];const sp=getSP(ch);if(!sp){$('sC').textContent=ch;$('sP').textContent='?';$('s1').textContent='?';$('s2').textContent='?';$('sPh').textContent='';return}$('sC').textContent=ch;$('sP').textContent=sp.p;if(fuzzy&&sp.fk1&&sp.fk1.length>1){$('s1').textContent=sp.fk1.map(k=>k.toUpperCase()===';'?';':k.toUpperCase()).join('/')}else{$('s1').textContent=sp.k1.toUpperCase()===';'?';':sp.k1.toUpperCase()}if(fuzzy&&sp.fk2&&sp.fk2.length>1){$('s2').textContent=sp.fk2.map(k=>k.toUpperCase()===';'?';':k.toUpperCase()).join('/')}else{$('s2').textContent=sp.k2.toUpperCase()===';'?';':sp.k2.toUpperCase()}if(phase===0){$('s1').className='key-box now';$('s2').className='key-box next';$('sPh').textContent='按第1键'}else{$('s1').className='key-box next';$('s2').className='key-box now';$('sPh').textContent='按第2键'}clrKB();if(fuzzy&&sp.fk1){sp.fk1.forEach((k,i)=>hlKey(k,phase===0&&i===0?'kn':'kx'))}else{hlKey(sp.k1,phase===0?'kn':'kx')}if(fuzzy&&sp.fk2){sp.fk2.forEach((k,i)=>hlKey(k,phase===1&&i===0?'kn':'kx'))}else{hlKey(sp.k2,phase===1?'kn':'kx')}}
+
+function startT(){t0=Date.now();tiv=setInterval(updS,500)}
+function stopT(){if(tiv){clearInterval(tiv);tiv=null}}
+function updS(){if(!t0)return;const el=Math.floor((Date.now()-t0)/1000),m=Math.floor(el/60),s=el%60;$('sT').textContent=m+':'+String(s).padStart(2,'0');const mins=el/60||1,typed=Math.max(1,idx),acc=Math.round((1-errs/typed)*100);$('sA').textContent=acc+'%';$('sW').textContent=Math.round(typed/mins);$('sK').textContent=Math.round(strokes/mins);const total=ccountText(txt);$('pB').style.width=Math.round(idx/total*100)+'%'}
+
+function resetGame(){const n=parseInt($('sN').value)||80;txt=genText(n);idx=0;phase=0;errs=0;strokes=0;t0=null;active=true;done=false;stopT();$('sL').textContent='练习中...';$('sL').style.color='#fbbf24';$('tH').style.display='none';$('sT').textContent='0:00';$('sA').textContent='--';$('sW').textContent='0';$('sK').textContent='0';$('pB').style.width='0%';render();updHint();$('tA').focus()}
+
+function toggleFuzzy(){fuzzy=!fuzzy;const b=$('fB');if(fuzzy){b.classList.add('on')}else{b.classList.remove('on')}updHint()}
+
+function toggleTheme(){document.body.classList.toggle('light');const b=$('tB');if(document.body.classList.contains('light')){b.textContent='🌙';document.body.style.background='#f5f5f7';document.body.style.color='#1a1a2e'}else{b.textContent='☀️';document.body.style.background='#0f1115';document.body.style.color='#e2e4e9'}}
+
+function toggleRef(){$('rS').classList.toggle('on')}
+
+document.addEventListener('keydown',function(e){if(e.key==='Shift'||e.key==='Control'||e.key==='Alt'||e.key==='Meta'||e.key==='Escape')return;if(e.key==='Backspace'){phase=0;updHint();return}const k=e.key.toLowerCase();if(!/^[a-z;]$/.test(k))return;if(!active||done)return;if(idx>=ccountText(txt))return;if(!t0)startT();const ch=cArr(txt)[idx];const sp=getSP(ch);if(!sp){idx++;phase=0;render();updHint();return}strokes++;const ok1=fuzzy&&sp.fk1?sp.fk1.includes(k):k===sp.k1;const ok2=fuzzy&&sp.fk2?sp.fk2.includes(k):k===sp.k2;if(phase===0){if(ok1){phase=1;clrKB();hlKey(sp.k1,'kx');hlKey(sp.k2,'kn')}else{errs++;badKey(k);goodKey(sp.k1)}}else{if(ok2){idx++;phase=0}else{errs++;badKey(k);goodKey(sp.k2)}}render();updHint();updS();if(idx>=ccountText(txt)){done=true;active=false;stopT();showRes()}});
+
+function badKey(k){const el=document.querySelector('[data-k="'+k+'"]');if(el){el.classList.add('kb');setTimeout(()=>el.classList.remove('kb'),300)}}
+function goodKey(k){const el=document.querySelector('[data-k="'+k+'"]');if(el){el.style.background='rgba(16,185,129,.3)';setTimeout(()=>{el.style.background=''},400)}}
+
+function openModal(){$('md').classList.add('on');$('cT').focus()}
+function closeModal(){$('md').classList.remove('on')}
+function confirmCustom(){const t=$('cT').value.trim();if(t){txt=t.slice(0,500);idx=0;phase=0;errs=0;strokes=0;t0=null;active=true;done=false;stopT();$('sL').textContent='练习中...';$('sL').style.color='#fbbf24';$('tH').style.display='none';$('sT').textContent='0:00';$('sA').textContent='--';$('sW').textContent='0';$('sK').textContent='0';$('pB').style.width='0%';render();updHint();closeModal();$('tA').focus()}}
+
+function showRes(){const el=Math.max(1,Math.floor((Date.now()-t0)/1000)),mins=el/60;$('rW').textContent=Math.round(idx/mins);$('rA').textContent=Math.round((1-errs/idx)*100)+'%';$('rK').textContent=Math.round(strokes/mins);$('rT').textContent=$('sT').textContent;$('rM').classList.add('on')}
+function closeRes(){$('rM').classList.remove('on')}
+
+$('tA').addEventListener('click',()=>{if(!active&&!done){resetGame()}$('tA').focus()});
+
+buildKB();buildRef();resetGame();
+
+// ===== 与主站的 postMessage 协议 =====
+// 工具 → 主站：上报真实高度（供主站 iframe 自适应）
+function reportHeight() {
+  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  window.parent.postMessage({ type: 'resize', height: h }, '*');
+}
+
+// 主站 → 工具：接收主题消息
+// 本工具为深色专用设计，暂不响应该消息（浅色适配需重写配色方案）
+window.addEventListener('message', function (event) {
+  var data = event.data;
+  if (data && data.type === 'theme') {
+    // no-op：见上方注释，保持深色配色不变
+  }
+});
+
+// 「在新标签打开」按钮：独立窗口打开本工具
+function openNewTab() {
+  window.open(window.location.href, '_blank', 'noopener');
+}
+
+// 高度上报：初始化 + 窗口尺寸变化 + 内容变化（做题进度条/题目切换会导致高度变化）
+window.addEventListener('resize', reportHeight);
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(reportHeight).observe(document.body);
+}
+reportHeight();
+</script>
+</body>
+</html>
+
+
