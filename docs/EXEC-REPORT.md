@@ -130,8 +130,8 @@ evidence: commit=b658185,efed21b,22ac675 | files=src/data/tools/english/dragon-e
 
 ## T-021 · 3 个新工具的移动端与深色主题适配核查（我方调研发现）
 
-status: doing
-evidence: （执行方填写，初始留空）
+status: done
+evidence: commit=b01d7ed | files=docs/t021-qa/T-021-QA-REPORT.md,docs/t021-qa/dragon-english-reader-desktop.png,docs/t021-qa/dragon-english-reader-mobile.png,docs/t021-qa/movie-line-quotecards-desktop.png,docs/t021-qa/movie-line-quotecards-mobile.png,docs/t021-qa/lockscreen-sentence-drill-desktop.png,docs/t021-qa/lockscreen-sentence-drill-mobile.png,docs/t021-qa/lockscreen-mic-denied.png | checks=check-tools:pass(exit0,18工具4频道4集合),backlog-check:pass(exit0,BACKLOG23项EXEC20项),cdp-browser:pass(Chrome155 headless=new CDP 实测线上 fe5df3d 三工具逐一加载,0 exception,工具资源0个404,唯一console错误为GET /favicon.ico 404,均非白屏;精编桌面scrollW2708/client1239整页横滚,移动2310/375且fixed顶栏1500px致搜索框与主题钮移出可视区目录钮可用;语音卡移动569/375由507px表格撑宽顶栏主题钮出界;锁屏双端scrollW=clientW零越界零遮罩),mic:pass(isSecureContext=true且start()真触发,CDP Browser.setPermission显式deny后98ms内onerror报not-allowed指引手动输入,手动区常驻,输入8词实判LCS86%漏1容错1结论通过并解锁7词表),screenshots:pass(7张PNG存docs/t021-qa/,尺寸1254x700与750x1624即375x812@DPR2,按验收只存路径未读入上下文) | deviation=acceptance#2 浏览器原生授权弹窗属chrome UI,headless无法截弹窗本体,改用CDP显式deny对拒绝路径做意图验证;视觉一致性以计算样式与几何探针量化,未肉眼读截图;被测版本为团队扫描期间新推送的fe5df3d(==本地HEAD),三工具HTML自上线提交起未变 | note=结论阻塞0项打磨5项:移动/桌面长code与宽table横向溢出撑歪fixed顶栏、精编与语音卡默认浅色不跟随prefers-color-scheme且共用localStorage键reader-theme跨工具串扰(锁屏深色与站点一致)、favicon 404、锁屏onerror指引被同刻onend文案覆盖;严格按spec未改任何工具HTML,修复建议(同源模板code/table断行+顶栏约束)见报告§4待另开任务;一次性CDP探针脚本与临时profile均在node_modules(gitignored)已清理
 
 ## T-022 · 3 个新工具上线后补齐「源料库可重建性」文档
 
