@@ -210,6 +210,7 @@ acceptance:
 
 ## T-012 · 实现方案 C3：互评走廊（复用 Supabase）
 
+verdict: verified
 priority: P3
 area: src/services/, src/pages/, src/router.tsx, supabase/migrations/
 depends: T-004
@@ -220,6 +221,7 @@ acceptance:
 - 迁移与 service 都到位：`grep -rq "corridor" supabase/migrations/` 且 `test -f src/services/corridorService.ts`
 - 路由已注册：`grep -q "path: 'corridor'" src/router.tsx`
 - `npm run check:tools` 退出码 0
+  - verify 2026-10-14T22:09:23+08:00 | by=team-lead | 4/4 acceptance 通过：`npx tsc -b` exit 0；`supabase/migrations/20261014130000_corridor.sql` 含 corridor 且 `src/services/corridorService.ts` 存在；`src/router.tsx:57` 注册 `path: 'corridor'`；`node scripts/check-tools.mjs` exit 0（4 频道/4 集合/18 工具/2 路径）。另做（超出 acceptance）：通读 corridorService.ts —— APIResult 约定、绝不抛异常、复用 isSupabaseConfigured 降级、防滥用三件套（蜜罐 + 60s 限流 + 与 DB CHECK 对齐的长度校验）齐备；`npx vite build --outDir ../_buildcheck` exit 0（8.16s）。📌 附注（不构成打回）：实际改动比 area 多 3 个文件（`Navbar.tsx` 加入口 / `lib/errors.ts` / `types/index.ts`），属必要偏离且执行方已在 deviation 中申报；未配置 Supabase 时**返回空数组并标 fallback、不造演示数据**（与留言板"跑演示数据"不同，更诚实）
 ## T-013 · 复核音频/素材侧遗留（标签偏差 / 帧 OCR / 隔离片段 / whisper 幻觉 / 错别字文件名）
 
 priority: P3
@@ -343,6 +345,7 @@ acceptance:
 
 ## T-021 · 3 个新工具的移动端与深色主题适配核查（我方调研发现）
 
+verdict: verified
 priority: P2
 area: docs/, public/tools/english/{dragon-english-reader,movie-line-quotecards,lockscreen-sentence-drill}/index.html
 depends: T-017, T-018, T-019
@@ -356,6 +359,7 @@ acceptance:
 - `锁屏背句` 必须实测**麦克风权限流程**：点击开始后是否弹出授权、拒绝后是否给出可用的手动输入降级路径（把实际观察到的行为写进 evidence）
 - 三个工具在**移动端视口**（如 375×812）下各截一张图存盘（**只存路径，不要读进上下文**），确认无横向溢出、无遮挡
 - 报告须明确列出：**哪些问题属于「可上线但需打磨」、哪些属于「阻塞上线」**
+  - verify 2026-10-14T22:09:23+08:00 | by=team-lead | 4/4 acceptance 通过：① 三工具线上 URL 真实浏览器逐一打开并记录（非白屏，给出 body.innerText 字符数；console 唯一 error 是**域根** `/favicon.ico` 404，工具自身资源零 404、子路径安全）② 锁屏麦克风流程用 CDP `Browser.setPermission(denied)` 对同 origin 显式拒绝后真点按钮、以 MutationObserver 实录状态序列（98ms 内 3 条），并实测**手动降级链路完整可用**（输入复述 → LCS 命中 6/7 → 「通过·解锁」）③ 7 张截图均落盘 `docs/t021-qa/`（我方 Glob 确认存在，尺寸合理）④ 报告明确区分「阻塞 0 项 / 可上线但需打磨 5 项」。独立抽查证实其两项关键断言（非只信报告）：精编与语音卡均为 `data-theme="light"` 默认浅色、两者 `prefers-color-scheme` 均出现 **0 次**（不跟随系统偏好）、且**各含 `reader-theme` 2 次**（同 origin 共用同一 localStorage 键 → 跨工具主题串扰属实）；锁屏工具无独立主题键、自带深色。⚠️ 附注（不影响 acceptance）：报告 §1 观察到的 `h1=15 / h2=232` 与磁盘实测**不符** —— 站内产物与源 HTML 均为 `h1=30 / h2=464 / h3=1762 / h4=38`，它用的是**浏览器 DOM 计数**这一代理指标；本轮据此再次践行「判据必须指向内容本身」。
 ## T-022 · 3 个新工具上线后补齐「源料库可重建性」文档
 
 verdict: verified
