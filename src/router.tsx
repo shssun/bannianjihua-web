@@ -9,6 +9,7 @@ import ChannelPage from '@/pages/ChannelPage';
 import CollectionPage from '@/pages/CollectionPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import MessageBoardPage from '@/pages/MessageBoardPage';
+import DataPage from '@/pages/DataPage';
 import AboutPage from '@/pages/AboutPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import { BASE_PREFIX } from '@/lib/paths';
@@ -51,6 +52,8 @@ const routes: RouteObject[] = [
       { path: 'tools/:id', element: <ToolViewPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'message', element: <MessageBoardPage /> },
+      // 数据页：本地学习记录的导出/导入（换 origin 前置，见 docs/DATABASE.md §4.1）
+      { path: 'data', element: <DataPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

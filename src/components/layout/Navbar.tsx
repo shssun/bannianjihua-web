@@ -29,11 +29,12 @@ const NAV_ITEMS: NavItem[] = [
   { label: '工具箱', to: '/tools' },
   { label: '研发计划', to: '/roadmap' },
   { label: '留言板', to: '/message' },
+  { label: '我的数据', to: '/data' },
   { label: '关于', to: '/about' },
 ];
 
 /**
- * 顶部固定导航栏：Logo + 6 项导航 + 深浅色切换。
+ * 顶部固定导航栏：Logo + 7 项导航 + 深浅色切换。
  * 移动端折叠为抽屉菜单。
  */
 export default function Navbar(): JSX.Element {
