@@ -520,6 +520,12 @@ function ensureValidOrExit(tasks, opts, absFile) {
 
 /**
  * 子命令 scan：列出所有 done 且未 verified 的项。
+ *
+ * 另报「疑似漏改状态」：`status=doing` 但 `evidence` 主行**已填写**的项。
+ * 为什么需要（2026-10-14 实测踩到、一次踩了两例 T-004/T-017）：
+ *   执行方做完活、填了 evidence，但**忘记把 status 从 doing 改成 done**。
+ *   此时若扫描器只认 `status=done`，这两项就**永远不会被扫到** —— 制品明明已提交、
+ *   工作区也干净，却卡在 doing 无人过问。故此处显式暴露这种不一致，供人工判定。
  * @param {Array<object>} tasks 任务数组
  * @param {object} opts 选项
  * @param {string} absFile 绝对路径
@@ -528,17 +534,29 @@ function ensureValidOrExit(tasks, opts, absFile) {
 function cmdScan(tasks, opts, absFile) {
   ensureValidOrExit(tasks, opts, absFile);
 
+  const brief = (task) => ({
+    id: task.id,
+    priority: task.fields.priority ? task.fields.priority.value : '',
+    area: task.fields.area ? task.fields.area.value : '',
+    title: task.title,
+  });
+
   const pending = tasks
     .filter((task) => task.fields.status && task.fields.status.value === 'done')
-    .map((task) => ({
-      id: task.id,
-      priority: task.fields.priority ? task.fields.priority.value : '',
-      area: task.fields.area ? task.fields.area.value : '',
-      title: task.title,
-    }));
+    .map(brief);
+
+  // doing 但 evidence 已填 = 极可能「做完了忘改状态」
+  const staleDoing = tasks
+    .filter(
+      (task) =>
+        task.fields.status &&
+        task.fields.status.value === 'doing' &&
+        !isEvidenceEmpty(task.fields.evidence ? task.fields.evidence.value : undefined)
+    )
+    .map(brief);
 
   if (opts.json) {
-    console.log(JSON.stringify({ pending }, null, 2));
+    console.log(JSON.stringify({ pending, staleDoing }, null, 2));
     return;
   }
 
@@ -548,6 +566,15 @@ function cmdScan(tasks, opts, absFile) {
     for (const item of pending) {
       console.log(`  ${item.id}  ${item.priority}  ${item.area.padEnd(areaWidth)}  ${item.title}`);
     }
+  }
+
+  if (staleDoing.length > 0) {
+    console.log(`\n⚠️  疑似漏改状态（doing 但 evidence 已填，可能已完成）：${staleDoing.length} 项`);
+    const areaWidth = Math.max(...staleDoing.map((item) => item.area.length));
+    for (const item of staleDoing) {
+      console.log(`  ${item.id}  ${item.priority}  ${item.area.padEnd(areaWidth)}  ${item.title}`);
+    }
+    console.log('   → 请核对该项制品是否已提交；若已完成，可补正 status 为 done 后验证。');
   }
 }
 

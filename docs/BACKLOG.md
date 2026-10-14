@@ -53,7 +53,7 @@ evidence: commit=73a0ee7 | files=scripts/lib/git-info.mjs | checks=manual:3条ac
 
 ## T-004 · 补 supabase/migrations 可重放迁移（表结构 + RLS）
 
-status: doing
+status: verified
 priority: P1
 area: supabase/migrations/
 depends: —
@@ -65,6 +65,7 @@ acceptance:
 - 长度约束已写：`grep -rq "char_length(content) between 1 and 500" supabase/migrations/`
 - `test -f supabase/README.md`
 evidence: commit=42f1699 | files=supabase/migrations/20261014000000_init.sql,supabase/README.md | checks=ls-migrations:pass(1个sql),grep-rls:pass(posts/tools/messages各命中enable row level security与create table),grep-char_length:pass | note=幂等风格（create table if not exists + drop policy if exists）；字段与 messagesService.ts 对齐；README 含 CLI/本地/dashboard 三种重建方式
+  - verify 2026-10-14T20:17:30+08:00 | by=team-lead | 4/4 acceptance 通过：migrations/20261014000000_init.sql 存在，posts/tools/messages 三表与 enable row level security 均命中，char_length(content) between 1 and 500 命中，README.md 存在；另查幂等风格 "if not exists / drop policy if exists" 共 9 处（可重放）| 注：执行方漏改 status（doing 未→done），由我方补正后验证
 
 ## T-005 · 新增本地学习记录的导出/导入 UI（换 origin 前置）
 
@@ -248,7 +249,7 @@ evidence: 结论=三件**全部上线**（老板 2026-10-14 决策原话「上�
 
 ## T-017 · 上线「英文学习精编」阅读器（源 2.3MB 自包含单文件）
 
-status: doing
+status: verified
 priority: P2
 area: public/tools/english/dragon-english-reader/, src/data/tools/english/dragon-english-reader.ts
 depends: —
@@ -261,6 +262,7 @@ acceptance:
 - `npx tsc -b` 退出码 0
 - **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 evidence: commit=b658185 | files=public/tools/english/dragon-english-reader/index.html,src/data/tools/english/dragon-english-reader.ts | checks=sha1:pass(源与站内均419f083371146a81b855361c9f9e31de53f1778c,逐字节一致无需CRLF修正),check-tools:pass(0,工具14个),tsc:pass(0),vite-build:pass(outDir=node_modules/.bc-t017,exit 0,50.62s) | deviation=构建验证用仓库内 gitignored 空目录替代 ../_buildcheck（沙箱只可写仓库内，行为等价）；spec 给的 collections 'dragon-english' 不存在（实测集合仅 books/movie-lines/dragon-english-basic100/dragon-english-grammar100），按 spec 指示只写 ['books']；order=15（english 频道现占用 1,2,3,11,12,13,14，取顺延下一值） | note=T-020 诚实性要求已随注册文件落实：description 写明全书精编 30 篇文档/464 章节/目录树/检索/深浅色；只新建 2 个文件未改任何既有文件
+  - verify 2026-10-14T20:17:30+08:00 | by=team-lead | 5/5 acceptance 通过：站内 index.html 与源 英文学习精编.html sha1 逐字节一致 419f083371146a81b855361c9f9e31de53f1778c（2386840 字节）；注册表 id 命中；check-tools exit 0；tsc -b exit 0 | 注：执行方漏改 status（doing 未→done），由我方补正后验证；制品已提交 b658185
 
 
 ## T-018 · 上线「台词语音卡 v0.2」背句工具

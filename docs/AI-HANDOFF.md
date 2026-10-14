@@ -319,7 +319,12 @@ T-007 · 集合注册表结构化解析 + ICAP 层级
 6. **本机沙箱不要跑 `npm run build` / `npm run ship`**（清空输出目录会触发删除配额而杀进程）；验证构建用 `npx vite build --outDir ../_buildcheck`。
 7. **提交信息用中文**，格式与仓库历史一致：`feat|fix|chore|docs(scope): 描述`。
 8. 完成一个任务后，把它在 `docs/BACKLOG.md` 里 `status: done` 并填 `evidence`（§3），**不得写 `verified`**。
-9. **`_src-tmp/` 是只读参考区，禁止写入**（详见 §6.1）。
+   ⚠️ **填完 `evidence` 必须同步把 `status` 从 `doing` 改成 `done`** —— 实测发生过「两例做完活、填了
+   `evidence`，却忘了改 `status`」的情况（T-004 / T-017），结果制品明明已提交却卡在 `doing` 无人过问。
+   `status` 与 `evidence` 是**同一个动作的两半，必须一起改**。
+9. **改完 `docs/BACKLOG.md` 后必须 `git push`** —— 你的状态标记只有推上远端，我方才能扫到。
+   只 commit 不 push 等于**没有交接**（实测发生过：提交留在本地，远端仍停在旧版本）。
+10. **`_src-tmp/` 是只读参考区，禁止写入**（详见 §6.1）。
 
 ---
 
