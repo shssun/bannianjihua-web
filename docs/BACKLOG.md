@@ -24,7 +24,7 @@ evidence: commit=af7672f | files=docs/BACKLOG.md | checks=manual:排查SUPABASE_
 
 ## T-002 · 压缩 .workbuddy/memory/MEMORY.md 至注入上限内
 
-status: todo
+status: verified
 priority: P1
 area: .workbuddy/memory/MEMORY.md
 depends: —
@@ -36,7 +36,8 @@ acceptance:
 - 字节数在合理范围：`test $(wc -c < .workbuddy/memory/MEMORY.md) -le 18000`（原判据 13700 基于已被推翻的前提；按订正口径取 18000）
 - 关键规约仍在：`grep -q "批量删除" .workbuddy/memory/MEMORY.md` 且 `grep -q "ignore','pipe','pipe" .workbuddy/memory/MEMORY.md`
 - 部署关键信息仍在：`grep -q "bannianjihua-web" .workbuddy/memory/MEMORY.md`
-evidence: （执行方填写，初始留空）
+evidence: commit=(n/a，`.workbuddy/` 在 gitignore 内、不入版本库) | files=.workbuddy/memory/MEMORY.md | checks=wc-c:14467(<=18000),grep:批量删除=1,grep:stdio-ignore-pipe-pipe=1,grep:bannianjihua-web=3,grep:三件套=1,grep:basename=2,grep:execFileSync=1,grep:emptyOutDir=1,grep:loadCollections=1,grep:判据=7,grep:回填真源=1,grep:_src-tmp=2,grep:反证测试=1,章节数:15 | note=⚠️ 本项由我方自行执行（执行方对该目录不可见）。实际瘦身发生在 2026-10-14 20:08（17388 B → 13693 B）；我方本次在其基础上补两处：① 修正「≤13.5KB 上限」这一已被推翻的表述 → 改为 ≤18KB 并注明原前提已推翻；② 新增本轮确立的 3 条硬规则（push 只有我方 / push 前必看 origin/main..HEAD / 整点 automation 严禁实现 todo 项）。压缩质量经逐条核验：全部硬规则（三件套 / check-tools 规则 / 批量删除闸门 / stdio 规约 / 判据选型 / 沙箱坑）均保留，仅砍冗余叙述（章节 18→15）
+  - verify 2026-10-14T20:31:42+08:00 | by=backlog.mjs
 
 ## T-003 · 修复 scripts/lib/git-info.mjs 的 Windows 元字符隐患
 
@@ -118,7 +119,7 @@ evidence: commit=6958cd9 | files=public/tools/general/shuangpin-practice/index.h
 
 ## T-008 · 实现方案 C1：同屏轮换双人互测工具（零后端）
 
-status: doing
+status: done
 priority: P2
 area: public/tools/english/, src/data/tools/english/, src/data/collections.ts
 depends: —
@@ -129,7 +130,7 @@ acceptance:
 - `test -f public/tools/english/peer-turn-drill/index.html`
 - 工具无对外域网络请求：`grep -nE "fetch\(['\"]https?:|XMLHttpRequest" public/tools/english/peer-turn-drill/index.html` 无输出
 - 手动走一遍：双方各产出 ≥1 轮后，`kind==='peer-turn'` 的记录条数 ≥ 2
-evidence: （执行方填写，初始留空）
+evidence: commit=b62766b | files=public/tools/english/peer-turn-drill/index.html,src/data/tools/english/peer-turn-drill.ts | checks=check-tools:exit0(17个工具,icap interactive 合法),tsc-b:exit0,grep-external:pass(零 https fetch/XMLHttpRequest,题库用同源相对路径 ../moear/tool/phrases.json),vite-build:exit0,manual:pass(浏览器实测两轮) | note=题库加载失败自动降级为内置 6 条示例题；IndexedDB 逻辑内联自 src/lib/storage/idb.ts（DB bannianjihua v1 / store records / keyPath id，export 去除、结构一字不改）；浏览器实测（vite dev server localhost:5173）：甲出题→乙答→通过+追问→互换，乙出题→甲答→优秀，evaluate 查询 IndexedDB 返回 {total:2, peerTurn:2, payloadKeys:[round,examiner,author,promptZh,hint,answer,referenceEn,score,followup]}，console 零 error | deviation=构建 outDir 用仓库内 gitignored 新目录 node_modules/.bc-t008（沙箱仅可写仓库内，行为等价），验证后已删；未动 collections.ts（spec 为条件句：不加集合则无校验义务）
 
 ## T-009 · 实现方案 C2：单人 + 外部 AI 陪练工具（零后端）
 
