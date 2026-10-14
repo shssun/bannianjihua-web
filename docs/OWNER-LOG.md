@@ -25,3 +25,4 @@
 2026-10-14T14:20:00Z | T-023 | claim | note=我方自办：按需镜像「每日英语」源料进 _src-tmp/（执行方请跳过）
 2026-10-14T14:21:00Z | - | note | kind=cutover | detail=沟通通道由 BACKLOG.md/EXEC-REPORT.md 切换为 TASKS.md/OWNER-LOG.md/EXEC-LOG.md
 2026-10-14T14:23:00Z | T-025 | dispatch | priority=P1 | depends=T-024 | title=参数实验室第二期：补齐 6 个跨章场景，升级为「高中数学参数实验室」
+2026-10-14T15:02:41Z | T-024 | verify | result=pass | commit=1b5441e | files=public/tools/math/function-param-lab/index.html,src/data/tools/math/function-param-lab.ts,src/data/collections.ts | checks=check-tools:0,tsc:0,vite-build:0,probe:pass | note=独立复验 10/10 通过。真跑用子路径计数法：y=k/x 曲线绘为 2 个独立子路径（左支 x∈[0,394]、右支 x∈[396,790]），y 轴像素列 x0=395 无曲线落笔，即 x=0 处断开且无穿屏竖线；判别器经阳性对照（正确 2 支）与阴性对照（人为穿屏连线 1 支）双向自证有效；二次场景同法测得子路径数=1，证明判据有区分度。另：a=0 图象退化为直线且带 warn 文案、a 取负开口与值域同步翻转、控制台零异常
