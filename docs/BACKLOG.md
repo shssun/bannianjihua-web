@@ -8,7 +8,7 @@
 
 ## T-001 · 补 GitHub Actions 定时探活（防 Supabase 免费版被暂停）
 
-status: todo
+status: blocked
 priority: P1
 area: .github/workflows/, docs/DATABASE.md
 depends: —
@@ -20,7 +20,7 @@ acceptance:
 - cron 周期 < 7 天：`grep -o "cron: .*" .github/workflows/keepalive.yml` 输出确认（如 `cron: '0 3 */2 * *'`）
 - 仓库内无明文密钥：`grep -rInE "supabase\\.co|eyJ" .github/workflows/keepalive.yml` 无输出
 - `grep -q "已实现" docs/DATABASE.md`
-evidence: （执行方填写，初始留空）
+evidence: commit=af7672f | files=docs/BACKLOG.md | checks=manual:排查SUPABASE_URL全部来源未果 | note=blocked：执行方拿不到 SUPABASE_URL，acceptance#1 探活实测无法执行。已穷尽排查，仓库全文无该 URL、无 .env（仅空模板）、.workbuddy 记忆无、生产 bundle 未内联该 env（线上实际处于未配置降级态）、git 全历史 -S 搜索无、GitHub Secrets 无权读取。commit 值为当前 HEAD 占位，本任务未产生提交。解除条件：我方在仓库 Secrets 配好 SUPABASE_URL 与 SUPABASE_ANON_KEY 并告知项目存活，或直接提供 URL 供实测。另发现线上部署从未注入 Supabase env，留言板目前跑的是 fallback 演示数据（超出本项范围，仅登记）
 
 ## T-002 · 压缩 .workbuddy/memory/MEMORY.md 至注入上限内
 
@@ -227,7 +227,7 @@ evidence: （执行方填写，初始留空）
 
 ## T-016 · 决策 3 个已产出未上线成品的去留（待决策，非实现）
 
-status: todo
+status: verified
 priority: P3
 area: docs/
 depends: —
@@ -237,4 +237,54 @@ acceptance:
 - 确认三件成品存在：`ls -la "C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html" "C:/Users/ZhuanZ1/Documents/WS/英文学习/台词语音卡_v0.2.html" "C:/Users/ZhuanZ1/Documents/WS/英文学习/工具/锁屏背句_demo.html"`
 - evidence 中记录每件的处置结论（上线 / 归档 / 删除）及理由
 - 若结论为「上线」，已另建实现项并在本项 evidence 注明其 id
+evidence: 结论=三件**全部上线**（老板 2026-10-14 决策原话「上线，使用过程中我们再打磨」）| files=— | checks=三件均实测存在且**真自包含**（`grep -c 'src="https?://'` = 0、`fetch(` = 0、根绝对路径 = 0）| note=已另开实现项 **T-017 / T-018 / T-019**，分别对应精编 / 台词语音卡 / 锁屏背句；本项仅作决策登记，实现走那三项
+  - verify 2026-10-14T19:05:00+08:00 | by=team-lead | 3/3 acceptance 通过（三件存在性已 ls 确认；结论已记录；三个新项 id 已注明）
+
+## T-017 · 上线「英文学习精编」阅读器（源 2.3MB 自包含单文件）
+
+status: todo
+priority: P2
+area: public/tools/english/dragon-english-reader/, src/data/tools/english/dragon-english-reader.ts
+depends: —
+size: S
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html`（2,386,840 字节 / 12058 行，`<title>` = 「ドラゴン・イングリッシュ　中文精编」）**原样**落进站点成为工具。该文件**已实测真自包含**（零 `http(s)://` 外部引用、零 `fetch(`、零根绝对路径引用），属本项目「自包含单文件 → 原样拷、无同步清单」那一类，因此：(1) `mkdir -p public/tools/english/dragon-english-reader && cp` 该文件为 `public/tools/english/dragon-english-reader/index.html`（**内容不得做任何修改、压缩或美化**）；(2) 新建注册表 `src/data/tools/english/dragon-english-reader.ts`，**严格照抄** `src/data/tools/english/basic100-sentence-reader.ts` 的结构（import 类型 + 顶部注释说明内容源与重建方式 + `const tool: Tool` + `export default tool`），字段取值：`id: 'dragon-english-reader'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/dragon-english-reader/index.html'`、`createdAt: '2026-10-14'`；`name` 写「英文学习精编 · Dragon English」；`description` 说明它是竹冈广信《Dragon English》的中文精编阅读器（左侧目录树 + 全文检索 + 深浅色切换 + 阅读进度）；`tags` 含 '英语'、'阅读'、'离线'；`collections: ['books', 'dragon-english']`（**若 `dragon-english` 集合不存在则只写 `['books']`，不要新建集合**）；`icap: ['passive']`；`order` 取当前 english 频道未被占用的下一个值（先 `grep -h "order:" src/data/tools/english/*.ts` 查重）。**只新建这 2 个文件，不改任何既有文件**（注册表靠 `import.meta.glob` 自动收集，这是本项目已过 QA 的约定）。
+acceptance:
+- `test -f public/tools/english/dragon-english-reader/index.html` 且其 sha1 与源文件**逐字节相同**：源 `sha1sum "C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html"` 与站内 `sha1sum public/tools/english/dragon-english-reader/index.html` 输出一致（若因 `core.autocrlf` 导致差异，比对前两边都先 `tr -d '\r'` 再算 sha1）
+- `test -f src/data/tools/english/dragon-english-reader.ts` 且 `grep -n "id: 'dragon-english-reader'"` 命中
+- `node scripts/check-tools.mjs` 退出码 0（会校验 id 唯一 / 目录名==channel / 文件名==id / `public/<entry>` 存在 / collections id 存在 / icap 合法 / order 无重复）
+- `npx tsc -b` 退出码 0
+- **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 evidence: （执行方填写，初始留空）
+
+## T-018 · 上线「台词语音卡 v0.2」背句工具
+
+status: todo
+priority: P2
+area: public/tools/english/movie-line-quotecards/, src/data/tools/english/movie-line-quotecards.ts
+depends: —
+size: S
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/台词语音卡_v0.2.html`（139,227 字节，`<title>` = 「台词语音卡 v0.2 ｜ 背句优先版」）**原样**落进站点。该文件**已实测真自包含**（零外部引用 / 零 `fetch(` / 零根绝对路径），处理方式与 T-017 完全相同：(1) `mkdir -p public/tools/english/movie-line-quotecards && cp` 为 `index.html`（**内容零修改**）；(2) 新建 `src/data/tools/english/movie-line-quotecards.ts`，照抄 `basic100-sentence-reader.ts` 结构：`id: 'movie-line-quotecards'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/movie-line-quotecards/index.html'`、`createdAt: '2026-10-14'`；`name` 写「台词语音卡 · 背句优先」；`description` 说明它按「背句优先」组织影视台词，先记整句再定位片段；`collections` 填 `['books', 'movie-lines', 'dragon-english']` 中**实际存在**的项（先 `grep -n "id:" src/data/collections.ts` 确认，不存在的**不要写**）；`icap: ['active']`（读句跟读属 active 层）；`order` 查重后取值。**只新建 2 个文件，不改既有文件。**
+acceptance:
+- `test -f public/tools/english/movie-line-quotecards/index.html` 且与源文件 sha1 一致（比对方法同 T-017，注意 CRLF）
+- `test -f src/data/tools/english/movie-line-quotecards.ts` 且 `grep -n "id: 'movie-line-quotecards'"` 命中
+- `node scripts/check-tools.mjs` 退出码 0
+- `npx tsc -b` 退出码 0
+- **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
+evidence: （执行方填写，初始留空）
+
+## T-019 · 上线「锁屏背句」原型（demo，需标注原型性质）
+
+status: todo
+priority: P3
+area: public/tools/english/lockscreen-sentence-drill/, src/data/tools/english/lockscreen-sentence-drill.ts
+depends: —
+size: S
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/工具/锁屏背句_demo.html`（18,633 字节，`<title>` = 「锁屏背句 · 可行性原型 v0.1」）**原样**落进站点。该文件**已实测真自包含**，处理方式同 T-017：(1) `mkdir -p public/tools/english/lockscreen-sentence-drill && cp` 为 `index.html`（**内容零修改**）；(2) 新建注册表 `lockscreen-sentence-drill.ts`：`id: 'lockscreen-sentence-drill'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/lockscreen-sentence-drill/index.html'`、`createdAt: '2026-10-14'`；`name` 写「锁屏背句 · 可行性原型」；`description` **必须诚实标注这是可行性原型（demo）而非完成品**，说明它验证「锁屏状态下背句」这一交互形态；`icap: ['active']`；`order` 查重后取值。⚠️ 本项被老板明确为「上线后在使用过程中再打磨」，属**未打磨的原型**，因此 `version` 建议写 `'0.1.0'`（区别于正式工具的 `1.0.0`）。**只新建 2 个文件，不改既有文件。**
+acceptance:
+- `test -f public/tools/english/lockscreen-sentence-drill/index.html` 且与源文件 sha1 一致（比对方法同 T-017，注意 CRLF）
+- `test -f src/data/tools/english/lockscreen-sentence-drill.ts` 且 `grep -n "id: 'lockscreen-sentence-drill'"` 命中，且 `grep -n "version: '0.1.0'"` 命中
+- `node scripts/check-tools.mjs` 退出码 0
+- `npx tsc -b` 退出码 0
+- **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
+evidence: （执行方填写，初始留空）
+
