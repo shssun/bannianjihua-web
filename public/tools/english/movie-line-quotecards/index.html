@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台词语音卡 v0.2 ｜ 背句优先版</title>
+<style>
+:root{
+  --top-h:56px; --side-w:308px;
+  --bg:#ffffff; --bg-soft:#f7f7f4; --bg-hover:#eeeeea;
+  --text:#1e1f24; --text-2:#5d6068; --text-3:#8b8e96;
+  --border:#e5e5e0; --border-2:#cfcfc8;
+  --accent:#3d5bd9; --accent-soft:#eceffd;
+  --code-bg:#f1f2f4; --code-text:#b0355a; --quote-bg:#f7f8ff;
+  --bad:#c0392b; --bad-bg:rgba(192,57,43,.09);
+  --warn:#b07d12; --warn-bg:rgba(176,125,18,.10);
+}
+html[data-theme="dark"]{
+  --bg:#191918; --bg-soft:#212120; --bg-hover:#2c2c2a;
+  --text:#e9e7e1; --text-2:#a5a39b; --text-3:#78766f;
+  --border:#32322e; --border-2:#45453f;
+  --accent:#8fa4ff; --accent-soft:#232840;
+  --code-bg:#262624; --code-text:#f0a3bd; --quote-bg:#1f2029;
+  --bad:#f08a7f; --bad-bg:rgba(240,138,127,.12);
+  --warn:#e5bd63; --warn-bg:rgba(229,189,99,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  font-size:16px;-webkit-font-smoothing:antialiased}
+
+#progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:60;transition:width .1s}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--top-h);z-index:50;
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border)}
+.brand{font-size:14px;font-weight:500;letter-spacing:.02em;white-space:nowrap}
+.brand small{display:block;font-size:11px;font-weight:400;color:var(--text-3);letter-spacing:0}
+.spacer{flex:1}
+.btn{font:inherit;font-size:12.5px;color:var(--text-2);background:var(--bg-soft);
+  border:1px solid var(--border);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--bg-hover);color:var(--text)}
+#search{font:inherit;font-size:13px;color:var(--text);background:var(--bg-soft);
+  border:1px solid var(--border);border-radius:9px;padding:7px 12px;width:280px;outline:none}
+#search:focus{border-color:var(--accent);background:var(--bg)}
+#search::placeholder{color:var(--text-3)}
+
+.sidebar{position:fixed;top:var(--top-h);left:0;bottom:0;width:var(--side-w);z-index:40;
+  overflow-y:auto;background:var(--bg-soft);border-right:1px solid var(--border);
+  padding:10px 0 60px}
+.sidebar::-webkit-scrollbar{width:8px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+.nav-doc{display:block;padding:12px 18px 6px;font-size:12px;font-weight:500;color:var(--text-3);
+  letter-spacing:.04em;cursor:pointer;line-height:1.5}
+.nav-doc:hover{color:var(--accent)}
+.nav-sec{padding:6px 18px 6px 26px;font-size:13px;line-height:1.5;color:var(--text-2);
+  cursor:pointer;border-left:2px solid transparent;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nav-sec:hover{color:var(--text);background:var(--bg-hover)}
+.nav-sec.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:500}
+.nav-empty{padding:20px 18px;font-size:13px;color:var(--text-3)}
+
+.res{padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer}
+.res:hover{background:var(--bg-hover)}
+.res-t{font-size:13px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:3px}
+.res-d{font-size:11px;color:var(--text-3);margin-bottom:4px}
+.res-s{font-size:12px;color:var(--text-2);line-height:1.6}
+.res-s mark{background:var(--accent-soft);color:var(--accent);border-radius:2px;padding:0 2px}
+.res-count{padding:12px 18px 6px;font-size:11px;color:var(--text-3);letter-spacing:.04em}
+
+main{margin-left:var(--side-w);padding-top:var(--top-h)}
+.doc{max-width:800px;margin:0 auto;padding:40px 44px 140px;border-bottom:1px solid var(--border)}
+
+.doc h1{font-size:25px;font-weight:500;line-height:1.4;margin:8px 0 22px;letter-spacing:.01em}
+.doc h2{font-size:19px;font-weight:500;line-height:1.5;margin:52px 0 16px;padding-left:13px;
+  border-left:4px solid var(--accent);scroll-margin-top:calc(var(--top-h) + 16px)}
+.doc h3{font-size:14px;font-weight:500;color:var(--text-2);letter-spacing:.05em;
+  margin:30px 0 12px;scroll-margin-top:calc(var(--top-h) + 16px)}
+.doc h4{font-size:14px;font-weight:500;margin:22px 0 10px}
+.doc p{margin:13px 0;line-height:1.92}
+.doc strong{font-weight:500;color:var(--text)}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px;line-height:1.9}
+.doc li{margin:5px 0}
+.doc li>p{margin:5px 0}
+.doc hr{border:0;border-top:1px dashed var(--border-2);margin:44px 0}
+.doc a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+.doc code{font-family:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace;
+  font-size:.9em;background:var(--code-bg);color:var(--code-text);
+  padding:1.5px 5px;border-radius:4px;white-space:nowrap}
+.doc pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;overflow-x:auto;line-height:1.7}
+.doc pre code{background:none;color:var(--text);padding:0;white-space:pre}
+
+.doc blockquote{margin:16px 0;padding:11px 18px;background:var(--quote-bg);
+  border-left:3px solid var(--border-2);border-radius:0 8px 8px 0;color:var(--text-2)}
+.doc blockquote p{margin:7px 0;line-height:1.85}
+.doc blockquote p:first-child{margin-top:0}
+.doc blockquote p:last-child{margin-bottom:0}
+.doc blockquote strong{color:var(--text)}
+
+.doc table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px;line-height:1.7}
+.doc th,.doc td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top}
+.doc th{background:var(--bg-soft);font-weight:500;white-space:nowrap}
+.doc tr:nth-child(even) td{background:color-mix(in srgb,var(--bg-soft) 45%,transparent)}
+
+.bad{color:var(--bad);background:var(--bad-bg);border-radius:4px;padding:0 2px}
+.warn{color:var(--warn);background:var(--warn-bg);border-radius:4px;padding:0 2px}
+
+/* ---- 台词卡专用：句子优先 + 折叠讲解（v0.2 起） ---- */
+.doc .qline{font-size:22px;font-weight:600;line-height:1.6;letter-spacing:.005em;
+  margin:20px 0 10px;padding:18px 22px;border-radius:12px;
+  background:var(--accent-soft);border-left:4px solid var(--accent);color:var(--text)}
+.doc .qsub{font-size:16px;font-weight:500;line-height:1.65;
+  margin:0 0 18px;padding:13px 22px;border-radius:12px;
+  background:var(--bg-soft);border-left:4px solid var(--border-2);color:var(--text-2)}
+.doc .locate{margin:16px 0;padding:14px 18px;border:1px solid var(--border);
+  border-radius:10px;background:var(--bg-soft);font-size:14px;line-height:2}
+.doc .locate p{margin:2px 0;line-height:1.95}
+.doc .mem{margin:16px 0;padding:15px 20px;border-radius:10px;
+  background:var(--quote-bg);border-left:3px solid var(--accent);font-size:15px;line-height:1.95}
+.doc .mem p{margin:4px 0}
+.doc details{margin:14px 0;border:1px solid var(--border);border-radius:10px;background:var(--bg-soft)}
+.doc details>summary{cursor:pointer;padding:12px 16px;font-size:14px;font-weight:500;
+  color:var(--accent);list-style:none;user-select:none}
+.doc details>summary::-webkit-details-marker{display:none}
+.doc details>summary::before{content:"▸　"}
+.doc details[open]>summary::before{content:"▾　"}
+.doc details[open]>summary{border-bottom:1px solid var(--border);margin-bottom:14px}
+.doc details[open]{padding-bottom:10px}
+.doc details>*:not(summary){margin-left:18px;margin-right:18px}
+.doc details>*:not(summary):last-child{margin-bottom:12px}
+@media print{.doc details:not([open])>*:not(summary){display:block}}
+
+#topBtn{position:fixed;right:22px;bottom:26px;z-index:45;display:none;
+  font:inherit;font-size:12.5px;color:var(--text-2);background:var(--bg-soft);
+  border:1px solid var(--border-2);border-radius:9px;padding:8px 13px;cursor:pointer}
+#topBtn:hover{color:var(--text);background:var(--bg-hover)}
+
+@media(max-width:900px){
+  :root{--side-w:0px}
+  .sidebar{transform:translateX(-104%);transition:transform .22s;width:300px;box-shadow:0 0 30px rgba(0,0,0,.14)}
+  .sidebar.open{transform:none}
+  .doc{padding:28px 20px 120px}
+  #search{width:150px}
+  .brand small{display:none}
+}
+@media print{
+  .topbar,.sidebar,#topBtn,#progress{display:none}
+  main{margin:0;padding:0}
+  .doc{border:0;max-width:none}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="topbar">
+  <button class="btn" id="menuBtn">目录</button>
+  <div class="brand">台词语音卡 v0.2 ｜ 背句优先版<small>2026-10-01 19:07 构建 ｜ 1 个文档 ｜ 13 个章节</small></div>
+  <div class="spacer"></div>
+  <input id="search" type="search" placeholder="检索章节、关键词、原文…（Ctrl+K）" autocomplete="off">
+  <button class="btn" id="themeBtn">深色</button>
+</header>
+
+<aside class="sidebar" id="sidebar"><nav id="nav"></nav></aside>
+
+<main id="main">
+<section class="doc" id="doc0" data-src="台词语音卡_v0.2.md">
+<h1 id="d0-台词语音卡-v0-2-10-句电影台词-背句优先版">台词语音卡 v0.2 ｜ 10 句电影台词（背句优先版）</h1>
+<blockquote>
+<p><strong>体例依据</strong>：<code>05_台词金句方案.md</code>（三层架构 ＋ 6 道闸筛选器）<br>
+<strong>相对 v0.1 的两处改动</strong>：① 讲解<strong>从卡片开头挪到句子之后</strong>——先背、再懂、后调；② 每张卡新增<strong>「片段定位」</strong>。理由见 <code>06_背句优先与片段定位.md</code>。<br>
+<strong>定位</strong>：这是 <strong>L2 语境层 ＋ L3 语音层</strong>的试点样张，<strong>不替代</strong> L1 骨架层（原《基本英文100》100 句）。<br>
+<strong>版权提示</strong>：本卡为个人学习用的语音分析笔记，台词版权归各影片权利人；<strong>仅供个人学习，请勿公开发布或商业使用</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="d0-使用说明">使用说明</h2>
+<h3 id="d0-一张卡的三步节奏-先背-再懂-后调">一张卡的三步节奏：先背 → 再懂 → 后调</h3>
+<p><strong>不要一上来就读讲解。</strong> v0.1 的失败就在这里：把「结构 / 出处 / 权威状态 / 直译 / 用法」五块解释全堆在台词前面，初学者翻了两页说明还没见到句子，人已经走了。</p>
+<p>正确的顺序是：</p>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>做什么</th>
+<th>位置</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 先背</strong></td>
+<td>看大字台词，出声念 3 遍 → 合眼再念 2 遍</td>
+<td>卡片最上方</td>
+<td><strong>记忆优先</strong>：先让句子变成「能脱口而出的一块声音」</td>
+</tr>
+<tr>
+<td><strong>② 再懂</strong></td>
+<td>点开折叠，看结构 / 原书对应 / 直译 / 怎么用</td>
+<td>折叠区 1</td>
+<td>句子已进嘴，此时讲解是「解密」而非「负担」</td>
+</tr>
+<tr>
+<td><strong>③ 后调</strong></td>
+<td>点开折叠，抠连读 / 弱读 / 吞音</td>
+<td>折叠区 2</td>
+<td>语音要在<strong>念顺了之后</strong>才微调，否则越抠越乱</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>用「折叠」是<strong>故意的</strong>——讲解默认<strong>不展开</strong>，逼你先和句子独处一分钟。手点开，就说明你准备好了。</p>
+</blockquote>
+<h3 id="d0-怎么找到这个片段-四种办法-从省事到最准">怎么找到这个片段——四种办法，从省事到最准</h3>
+<table>
+<thead>
+<tr>
+<th>办法</th>
+<th>精度</th>
+<th>怎么做</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 场景描述</strong></td>
+<td>认得出即可</td>
+<td>看卡上「🎞 哪一幕」，凭画面找</td>
+<td>最快，<strong>推荐先做这个</strong></td>
+</tr>
+<tr>
+<td><strong>② 字幕秒级定位</strong></td>
+<td><strong>精确到秒</strong></td>
+<td>拿<strong>你自己片源</strong>的 <code>.srt / .ass / .vtt</code> 字幕，喂给 <code>工具/find_quote.py</code></td>
+<td><strong>唯一精确的办法</strong>，见下</td>
+</tr>
+<tr>
+<td><strong>③ 在线搜索词</strong></td>
+<td>找到视频片段</td>
+<td>把卡上「🔍 在线找」那行直接粘进 B站 / YouTube</td>
+<td>想直接看视频</td>
+</tr>
+<tr>
+<td><strong>④ 死时间戳</strong></td>
+<td>❌ 不可靠</td>
+<td>——</td>
+<td><strong>本卡故意不给</strong>，原因见下</td>
+</tr>
+</tbody>
+</table>
+<h4 id="d0-为什么卡上-不写死-时间戳">为什么卡上「不写死」时间戳</h4>
+<p>同一个「几点几分几秒」，<strong>换个片源就错</strong>：影院版 / 加长版 / 不同压制组的字幕时间轴都会平移。写下 <code>01:23:45</code>，在你手上的版本里可能是别的地方——<strong>那是假精确</strong>。</p>
+<p><strong>正确做法是自己量。</strong> 项目里附了一个本地工具：</p>
+<pre><code>python 工具/find_quote.py 我的字幕.srt &quot;some birds aren't meant to be caged&quot;
+</code></pre>
+<p>它会输出<strong>你这版片源的精确时间戳</strong>，外加前后几句对白。字幕文件从哪来：下载的 <code>.srt</code> 字幕包，或用播放器（PotPlayer / VLC）导出。</p>
+<blockquote>
+<p>例：<code>02 角斗士</code> 那句，某来源标注为「开场字幕起算 00:07:09–00:07:12」——可作参考，但<strong>以你自己的字幕定位为准</strong>。</p>
+</blockquote>
+<h3 id="d0-一条铁律">一条铁律</h3>
+<p><strong>凡是「权威状态」标了警告的句子，只能当听说素材，不能当写作模板。</strong> 原因见 <code>05_台词金句方案.md</code> §2.4：<strong>电影台词没有「卷末定本」，同一句话在不同字幕 / 配音 / 剧本间会漂移。</strong></p>
+<hr>
+<h2 id="d0-总表-10-句过闸结果">总表：10 句过闸结果</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>结构</th>
+<th>台词</th>
+<th>出处</th>
+<th>权威状态</th>
+<th>定级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td><code>be meant to be V-ed</code></td>
+<td>Some birds aren't meant to be caged.</td>
+<td>肖申克的救赎 1994</td>
+<td>✅ 多源一致</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>02</td>
+<td><strong>what 主语从句</strong></td>
+<td>…what we do in life, echoes in eternity.</td>
+<td>角斗士 2000</td>
+<td>✅ 多源一致</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>03</td>
+<td><strong>it 强调句 + not…but…</strong></td>
+<td>It's not who I am underneath, but what I do that defines me.</td>
+<td>蝙蝠侠：侠影之谜 2005</td>
+<td>✅ 一致（同片另有变体）</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>04</td>
+<td><strong>现在分词后置修饰</strong></td>
+<td>I'm also just a girl, standing…, asking…</td>
+<td>诺丁山 1999</td>
+<td>✅ 一致（流传版漏 also）</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>05</td>
+<td><strong>what 宾语从句</strong> + <code>gonna</code></td>
+<td>Life is like a box of chocolates. You never know what you're gonna get.</td>
+<td>阿甘正传 1994</td>
+<td>⚠️ is / was 有分歧</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>06</td>
+<td><strong>as … as 同级比较</strong></td>
+<td>Stupid is as stupid does.</td>
+<td>阿甘正传 1994</td>
+<td>✅ 一致</td>
+<td><strong>仅 L3</strong>（俗谚语域）</td>
+</tr>
+<tr>
+<td>07</td>
+<td><strong>最高级</strong> + just before</td>
+<td>The night is darkest just before the dawn.</td>
+<td>黑暗骑士 2008</td>
+<td>✅ 一致（个别源省略 just）</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>08</td>
+<td><strong>定语从句（省略关系代词）</strong></td>
+<td>I'm gonna make him an offer he can't refuse.</td>
+<td>教父 1972</td>
+<td>⚠️ 多版本</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>09</td>
+<td><strong>选择疑问 + when 从句</strong></td>
+<td>Is life always this hard, or is it just when you're a kid?</td>
+<td>这个杀手不太冷 1994</td>
+<td>✅ 多源一致</td>
+<td>L2 + L3</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>前置状语 + 全部倒装</strong></td>
+<td>With great power comes great responsibility.</td>
+<td>蜘蛛侠 2002</td>
+<td>⚠️⚠️ <strong>流传版 ≠ 原文</strong></td>
+<td><strong>仅 L3</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>试点统计</strong>：10 句中，<strong>7 句多源一致、3 句查出版本问题</strong>（05 / 08 / 10），其中 10 号最严重。另有 2 句因<strong>语域</strong>不合格而降级为「仅 L3」。<br>
+<strong>结论</strong>：6 道闸<strong>确实在筛掉东西</strong>——不是走过场。</p>
+</blockquote>
+<hr>
+<h2 id="d0-01-some-birds-aren-t-meant-to-be-caged-l2-l3">01 ｜ some birds aren't meant to be caged 　【L2 + L3】</h2>
+<div class="qline">Some birds aren't meant to be caged.</div>
+<div class="qsub">Their feathers are just too bright.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《肖申克的救赎》The Shawshank Redemption（1994）<br>
+🗣 <strong>谁说的</strong>　Red（摩根·弗里曼 旁白）<br>
+🎞 <strong>哪一幕</strong>　Andy 越狱之后。Red <strong>还关在狱里</strong>，旁白回忆 Andy。画面是监狱操场、食堂、墓地干活这些日常。<br>
+⏱ <strong>大概位置</strong>　中后段（越狱之后、结尾之前）。<strong>注意</strong>：它<strong>不是</strong>结尾那段旁白，很多人记错。<br>
+🔍 <strong>在线找</strong>　搜 <code>Shawshank "some birds aren't meant to be caged" clip</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　some-BIRDS ｜ aren't-MEANT-to-be ｜ CAGED<br>
+<strong>重音</strong>　BIRDS / MEANT / CAGED 三下落地，其余一带而过<br>
+<strong>大意</strong>　有些鸟天生就不该关着<br>
+<strong>动作</strong>　看大字出声念 3 遍 → 合眼再念 2 遍。念不顺，别往下走。</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<code>be meant to be V-ed</code> —— 「（被设计 / 注定）要…」<br>
+<strong>原书对应</strong>　《必修英文法100》PART 2（被动语态 ＋ to 不定式）<br>
+<strong>直译</strong>　有些鸟不是被设计来关在笼子里的。它们的羽毛就是太鲜亮了。<br>
+<strong>怎么用</strong>　<code>X is not meant to be Y-ed</code> 可整块搬用（把 X 当 Y 对待是不对的）——这个结构本身<strong>可迁移</strong>，是它过闸的关键。<br>
+<strong>提醒</strong>　⚠️ 中文流传版不可信：「有些鸟儿是关不住的，因为它们的每一片羽翼上都沾满了自由的光辉」——对照原文 <code>Their feathers are just too bright.</code>，这是<strong>意译</strong>，不是原文。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>some‿birds</td>
+<td>连读</td>
+<td>/sʌm‿bɜːrdz/</td>
+</tr>
+<tr>
+<td>aren't</td>
+<td><strong>吞音</strong></td>
+<td>/ɑːrnt/ → /ɑːrnʔ/，词尾 t 常吞</td>
+</tr>
+<tr>
+<td>meant‿to</td>
+<td>连读 ＋ <strong>弱读</strong></td>
+<td>/ment‿tə/（to 弱读 /tə/）</td>
+</tr>
+<tr>
+<td>to be</td>
+<td>弱读</td>
+<td>be 弱读 /bi/</td>
+</tr>
+<tr>
+<td>feathers‿are</td>
+<td>连读</td>
+<td>/ˈfeðərz‿ɑːr/</td>
+</tr>
+<tr>
+<td>just too</td>
+<td><strong>不完全爆破</strong></td>
+<td>/dʒʌsʔ tuː/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 <code>be meant to</code> 造 2 句</p>
+<hr>
+<h2 id="d0-02-what-we-do-in-life-echoes-in-eternity-l2-l3">02 ｜ what we do in life, echoes in eternity 　【L2 + L3】</h2>
+<div class="qline">Brothers, what we do in life, echoes in eternity.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《角斗士》Gladiator（2000）<br>
+🗣 <strong>谁说的</strong>　Maximus（罗素·克劳），对麾下骑兵的战前演说<br>
+🎞 <strong>哪一幕</strong>　<strong>开场第一场戏</strong>——罗马军团在日耳曼森林列阵，Maximus 骑马巡行、给士兵打气，说完这句便下令冲锋。<br>
+⏱ <strong>大概位置</strong>　开场约 7 分钟（某来源标注开场字幕起算 00:07:09–00:07:12）<br>
+🔍 <strong>在线找</strong>　搜 <code>Gladiator "what we do in life echoes in eternity"</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_1">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　Brothers ｜ what-we-DO-in-LIFE ｜ ECHOES-in-e-TER-nity<br>
+<strong>重音</strong>　DO / LIFE / ECHOES 三处用力；<code>what we do in life</code> 一口气带过<br>
+<strong>大意</strong>　弟兄们，我们一生所做之事，会在永恒里回响<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_1">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>what 引导的主语从句</strong>（<code>what we do in life</code> 整个作主语）<br>
+<strong>原书对应</strong>　《必修英文法100》PART 3（从句）；原书 100 句 <strong>025</strong> <code>Humans learn to express what they think…</code>（what 宾语从句）<br>
+<strong>直译</strong>　弟兄们，我们一生所做之事，会在永恒中回响。<br>
+<strong>怎么用</strong>　<code>what</code> 从句作主语时，谓语用<strong>单数</strong>——<code>What we do **echoes**</code>。这是高考 / 四六级高频考点，而这句话把它放进了一个记得住的场景。<br>
+<strong>提醒</strong>　片中是 <code>what we do in life**,** echoes…</code>（中间有停顿）；海报标语版作 <code>What We Do In Life Echoes In Eternity.</code></p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_1">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>what‿we</td>
+<td><strong>喉塞</strong></td>
+<td>/wɒʔ wi/</td>
+</tr>
+<tr>
+<td>we do‿in</td>
+<td>连读</td>
+<td>/wi duː‿ɪn/</td>
+</tr>
+<tr>
+<td>life‿echoes</td>
+<td>连读（浊化）</td>
+<td>/laɪf‿ˈekəʊz/，f 受浊音影响近于 /v/</td>
+</tr>
+<tr>
+<td>echoes‿in</td>
+<td>连读</td>
+<td>/ˈekəʊz‿ɪn/</td>
+</tr>
+<tr>
+<td>in‿eternity</td>
+<td>连读</td>
+<td>/ɪn‿ɪˈtɜːrnəti/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_1">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 <code>what</code> 主语从句造 2 句</p>
+<hr>
+<h2 id="d0-03-it-s-not-who-i-am-underneath-but-what-i-do-that-defines-me-l2-l3">03 ｜ it's not who I am underneath, but what I do that defines me 　【L2 + L3】</h2>
+<div class="qline">It's not who I am underneath, but what I do that defines me.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《蝙蝠侠：侠影之谜》Batman Begins（2005）<br>
+🗣 <strong>谁说的</strong>　Batman（Bruce Wayne），对 Rachel Dawes<br>
+🎞 <strong>哪一幕</strong>　<strong>高潮段</strong>——城市被稻草人 / 刺客联盟投放毒气，Batman 救下 Rachel 和一个孩子后，正要再冲进战场，Rachel 拦住他问「面具下的你到底是谁」，Batman 转身说了这句，随后跃下屋顶。<br>
+⏱ <strong>大概位置</strong>　接近结尾（单轨列车决战之前）<br>
+🔍 <strong>在线找</strong>　搜 <code>Batman Begins "what I do that defines me" Rachel rooftop</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_2">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　It's-not ｜ who-I-am-underneath ｜ but-what-I-DO ｜ that-de-FINES-me<br>
+<strong>重音</strong>　<strong>DO</strong> 和 <strong>DEFINES</strong> 两处最重，<code>underneath</code> 拖一下<br>
+<strong>大意</strong>　定义我的不是我内在是谁，而是我做了什么<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。这句节奏感强，念顺了很好听。</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_2">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>it 强调句（it…that…）</strong> ＋ <strong>not … but …</strong><br>
+<strong>原书对应</strong>　《必修英文法100》PART 3（特殊句式）；原书 100 句 <strong>076</strong> <code>It is not until you go abroad that you realize…</code>——<strong>同为 it…that 强调句</strong>，可直接互参<br>
+<strong>直译</strong>　定义我的不是我内在是谁，而是我做了什么。<br>
+<strong>怎么用</strong>　把强调句「去强调」还原成普通句：<code>What I do defines me, not who I am underneath.</code> 反复互转，这个考点就拿下了。<br>
+<strong>提醒</strong>　⚠️ <strong>同片另有一版，结构不同</strong>（Rachel 在早段的台词）：<code>It's not who you are underneath, it's what you do that defines you.</code> —— 后半用的是 <code>it's</code>，<strong>不是 <code>that</code></strong>。两句<strong>不可混用</strong>，混用就丢掉了强调句。<strong>本卡取 Batman 版。</strong></p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_2">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>It's not</td>
+<td>喉塞</td>
+<td>/ɪts nɒʔ/</td>
+</tr>
+<tr>
+<td>not‿who</td>
+<td>连读</td>
+<td>/nɒʔ huː/</td>
+</tr>
+<tr>
+<td>who‿I</td>
+<td>滑音连读</td>
+<td>/huː‿waɪ/</td>
+</tr>
+<tr>
+<td>I‿am</td>
+<td>滑音连读</td>
+<td>/aɪ‿jæm/</td>
+</tr>
+<tr>
+<td>but</td>
+<td>弱读</td>
+<td>/bət/</td>
+</tr>
+<tr>
+<td>that</td>
+<td><strong>弱读</strong></td>
+<td>/ðət/（关系代词弱读）</td>
+</tr>
+<tr>
+<td>do that</td>
+<td>不完全爆破</td>
+<td>/duː ðət/，t ＋ ð 相接</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_2">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　注意这句<strong>在片中出现两次</strong>，本卡要的是<strong>结尾前 Batman 版</strong>（<code>…but what I do that defines me</code>），不是早段 Rachel 版<br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把它还原成普通语序</p>
+<hr>
+<h2 id="d0-04-i-m-also-just-a-girl-standing-in-front-of-a-boy-l2-l3">04 ｜ I'm also just a girl, standing in front of a boy 　【L2 + L3】</h2>
+<div class="qline">I'm also just a girl, standing in front of a boy, asking him to love her.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《诺丁山》Notting Hill（1999）<br>
+🗣 <strong>谁说的</strong>　Anna Scott（茱莉亚·罗伯茨），对书店老板 Will<br>
+🎞 <strong>哪一幕</strong>　<strong>后段</strong>——Anna 第二次到 Will 的书店，想复合，被 Will 拒绝；临走前说了这句（手里还拿着名画《La Mariée》当礼物）。<br>
+⏱ <strong>大概位置</strong>　接近结尾。<strong>结尾</strong>是 Savoy 酒店记者会，不要找错。<br>
+🔍 <strong>在线找</strong>　搜 <code>Notting Hill "just a girl standing in front of a boy"</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_3">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　I'm-AL-so-just-a-GIRL ｜ STAND-ing-in-front-of-a-BOY ｜ ASK-ing-him-to-LOVE-her<br>
+<strong>重音</strong>　GIRL / BOY / LOVE 三个名词落地；<code>standing</code>、<code>asking</code> 两个分词轻快带过<br>
+<strong>大意</strong>　我也不过是个女孩，站在一个男孩面前，求他爱她<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。这句长，分队念就好背。</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_3">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>现在分词短语作后置修饰</strong>（standing… / asking…）<br>
+<strong>原书对应</strong>　《必修英文法100》PART 2（分词）；原书 100 句 <strong>003</strong> <code>…listening to birds sing.</code>、<strong>038</strong> <code>Some students coming to the library act as if…</code>（现在分词作定语）<br>
+<strong>直译</strong>　我也只是个女孩，站在一个男孩面前，请求他爱她。<br>
+<strong>怎么用</strong>　「<strong>分词替代定语从句</strong>」的活标本——补全即 <code>a girl who is standing in front of a boy, who is asking him to love her</code>。写作用它，句式立刻升一档。<br>
+<strong>提醒</strong>　⚠️ <strong>流传版漏字</strong>：广传版本作 <code>I'm just a girl…</code>，<strong>漏掉了 <code>also</code></strong>；多个来源原文均可查到 <code>I'm **also** just a girl…</code>。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_3">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>just‿a</td>
+<td><strong>闪音 / 浊化</strong></td>
+<td>/dʒʌs‿ə/，t 在元音前浊化</td>
+</tr>
+<tr>
+<td>standing‿in</td>
+<td>连读</td>
+<td>/ˈstændɪŋ‿ɪn/</td>
+</tr>
+<tr>
+<td>front‿of</td>
+<td>连读 ＋ <strong>弱读</strong></td>
+<td>/frʌnt‿əv/，of 弱读 /əv/</td>
+</tr>
+<tr>
+<td>of‿a</td>
+<td>连读</td>
+<td>/əv‿ə/</td>
+</tr>
+<tr>
+<td>asking‿him</td>
+<td><strong>h 脱落</strong></td>
+<td>/ˈæskɪŋ‿ɪm/</td>
+</tr>
+<tr>
+<td>to love</td>
+<td>弱读</td>
+<td>to /tə/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_3">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找（书店内景）；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把两个分词还原成定语从句</p>
+<hr>
+<h2 id="d0-05-life-is-like-a-box-of-chocolates-l2-l3">05 ｜ life is like a box of chocolates 　【L2 + L3】</h2>
+<div class="qline">Life is like a box of chocolates.</div>
+<div class="qsub">You never know what you're gonna get.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《阿甘正传》Forrest Gump（1994）<br>
+🗣 <strong>谁说的</strong>　Forrest（汤姆·汉克斯 旁白 / 对白）<br>
+🎞 <strong>哪一幕</strong>　<strong>前段</strong>——Forrest 坐在公交站的长椅上，对旁边的陌生人讲自己的妈妈，说到这句。<br>
+⏱ <strong>大概位置</strong>　开场后不久（约前 15 分钟）<br>
+🔍 <strong>在线找</strong>　搜 <code>Forrest Gump "life is like a box of chocolates" bus stop</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_4">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　LIFE-is-like-a-BOX-of-CHOColates ｜ you-NEV-er-KNOW ｜ what-you're-GONna-GET<br>
+<strong>重音</strong>　LIFE / BOX / KNOW / GET；<code>gonna</code> 一定要读成一块 /ˈɡənə/，别读成 going to<br>
+<strong>大意</strong>　生活就像一盒巧克力，你永远不知道会拿到哪颗<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_4">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 两个提醒</summary>
+<p><strong>结构</strong>　<strong>what 引导的宾语从句</strong> ＋ <code>gonna</code>（going to 的口语弱化）<br>
+<strong>原书对应</strong>　原书 100 句 <strong>025</strong> <code>…express what they think…</code>（what 宾语从句）<br>
+<strong>直译</strong>　生活就像一盒巧克力。你还不知道你会拿到什么。<br>
+<strong>怎么用</strong>　<code>what you're gonna get</code> 是<strong>宾语从句</strong>，作 <code>know</code> 的宾语。<br>
+<strong>提醒一</strong>　⚠️ <strong>有版本分歧</strong>：<code>is</code> 与 <code>was</code> 两种写法均见于不同来源（维基语录作 <code>is</code>；部分来源作 <code>was</code>）。→ 本卡<strong>采用 <code>is</code></strong>。<br>
+<strong>提醒二</strong>　⚠️ <strong><code>gonna</code> 只能用于口语</strong>——书面作文必须写回 <code>going to</code>。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_4">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>life‿is</td>
+<td>连读</td>
+<td>/laɪf‿ɪz/</td>
+</tr>
+<tr>
+<td>like‿a</td>
+<td>连读</td>
+<td>/laɪk‿ə/</td>
+</tr>
+<tr>
+<td>box‿of</td>
+<td>连读 ＋ <strong>弱读</strong></td>
+<td>/bɒks‿əv/</td>
+</tr>
+<tr>
+<td>what‿you're</td>
+<td><strong>同化</strong></td>
+<td>/wɒtʃə/，t ＋ j → tʃ</td>
+</tr>
+<tr>
+<td>gonna</td>
+<td>弱化</td>
+<td>/ˈɡənə/（＝ going to）</td>
+</tr>
+<tr>
+<td>you're</td>
+<td>弱读</td>
+<td>/jər/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_4">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找（长椅）；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把 <code>gonna</code> 写回 <code>going to</code> 再念一遍</p>
+<hr>
+<h2 id="d0-06-stupid-is-as-stupid-does-仅-l3">06 ｜ stupid is as stupid does 　【仅 L3】</h2>
+<div class="qline">Stupid is as stupid does.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《阿甘正传》Forrest Gump（1994）<br>
+🗣 <strong>谁说的</strong>　Forrest<br>
+🎞 <strong>哪一幕</strong>　<strong>前段</strong>——<strong>同一段长椅戏</strong>里，旁边的人问 Forrest「Are you stupid?（你是不是傻）」，Forrest 用这句回敬。<br>
+⏱ <strong>大概位置</strong>　开场后不久，与第 05 句同一段<br>
+🔍 <strong>在线找</strong>　搜 <code>Forrest Gump "stupid is as stupid does"</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_5">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　STU-pid ｜ is-as ｜ STU-pid ｜ DOES<br>
+<strong>重音</strong>　两个 <strong>STUpid</strong>、一个 <strong>DOES</strong>，三下；中间的 <code>is as</code> 极轻<br>
+<strong>大意</strong>　蠢就是蠢人所为（看行为就知道人蠢不蠢）<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。短句，5 秒就能记住。</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_5">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 为什么它被降级</summary>
+<p><strong>结构</strong>　<strong>as … as 同级比较</strong>（以「平行省略」形式出现）<br>
+<strong>原书对应</strong>　《必修英文法100》PART 5（比较）；原书 100 句 <strong>062</strong> <code>about twice as expensive in the U.K. as in Japan</code><br>
+<strong>直译</strong>　蠢就是蠢人所为。<br>
+<strong>怎么用</strong>　听说是好素材；写作请回到 062 的 <code>as … as …</code> 常规句式。<br>
+<strong>为什么降级</strong>　⚠️ <strong>语域不合格 → 仅作 L3</strong>：这是<strong>俗谚 / 口语体</strong>（<code>stupid does</code> 是省略表达），与 <code>as…as</code> 的书面常规用法不同，<strong>不能当 <code>as...as</code> 的写作模板</strong>。这正是第 4 道闸（语域）在起作用。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_5">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stupid‿is</td>
+<td>连读</td>
+<td>/ˈstjuːpɪd‿ɪz/</td>
+</tr>
+<tr>
+<td>is‿as</td>
+<td>连读</td>
+<td>/ɪz‿əz/</td>
+</tr>
+<tr>
+<td>as stupid</td>
+<td>不完全爆破</td>
+<td>/əz‿ˈstjuːpɪd/</td>
+</tr>
+<tr>
+<td>重音对比</td>
+<td><strong>第一个 as /əz/ 弱读，第二个 as 重读 /æz/</strong></td>
+<td>平行结构的重音示范</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_5">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　与第 05 句<strong>同一段长椅戏</strong>，连在一起看更省事<br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词（本句<strong>不作</strong>写作练习）</p>
+<hr>
+<h2 id="d0-07-the-night-is-darkest-just-before-the-dawn-l2-l3">07 ｜ the night is darkest just before the dawn 　【L2 + L3】</h2>
+<div class="qline">The night is darkest just before the dawn.</div>
+<div class="qsub">And I promise you, the dawn is coming.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《黑暗骑士》The Dark Knight（2008）<br>
+🗣 <strong>谁说的</strong>　Harvey Dent（地方检察官）<br>
+🎞 <strong>哪一幕</strong>　<strong>中段</strong>——记者会上，Harvey 回应小丑造成的恐慌，先说「情况确实更糟了」，接着说这句安抚民众；<strong>紧接着当场宣布「我就是蝙蝠侠」</strong>（替 Batman 顶罪）。<br>
+⏱ <strong>大概位置</strong>　中段<br>
+🔍 <strong>在线找</strong>　搜 <code>Dark Knight "night is darkest just before the dawn" press conference</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_6">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　The-NIGHT-is-DARK-est ｜ just-be-FORE-the-DAWN ｜ and-I-PROM-ise-you ｜ the-DAWN-is-COM-ing<br>
+<strong>重音</strong>　NIGHT / DARKest / DAWN / PROMise / COMing<br>
+<strong>大意</strong>　黎明之前，夜最黑——而我向你保证，黎明就要来了<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_6">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>最高级 the darkest</strong> ＋ <code>just before</code> 时间状语<br>
+<strong>原书对应</strong>　《必修英文法100》PART 5（比较）；原书 100 句 <strong>017</strong> <code>The best thing about my stay…</code><br>
+<strong>直译</strong>　黎明之前，夜最黑。我向你保证，黎明就要来了。<br>
+<strong>怎么用</strong>　<strong>一句覆盖两个考点</strong>：前句 → 最高级 <code>the darkest</code>；后句 → <strong>插入语</strong>（I promise you）＋ <strong>现在进行表将来</strong>（is coming）。<br>
+<strong>提醒</strong>　个别来源省略 <code>just</code>（<code>The night is darkest before the dawn.</code>）→ 本卡以<strong>含 just</strong> 为主。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_6">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>night‿is</td>
+<td>连读</td>
+<td>/naɪt‿ɪz/</td>
+</tr>
+<tr>
+<td>darkest‿just</td>
+<td><strong>不完全爆破</strong></td>
+<td>/ˈdɑːrkɪst‿dʒʌst/</td>
+</tr>
+<tr>
+<td>just‿before</td>
+<td><strong>不完全爆破</strong></td>
+<td>/dʒʌsʔ bɪˈfɔːr/</td>
+</tr>
+<tr>
+<td>before the</td>
+<td>弱读</td>
+<td>the /ðə/</td>
+</tr>
+<tr>
+<td>is coming</td>
+<td>弱读</td>
+<td>is /ɪz/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_6">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找（记者会）；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 用最高级造句</p>
+<hr>
+<h2 id="d0-08-i-m-gonna-make-him-an-offer-he-can-t-refuse-l2-l3">08 ｜ I'm gonna make him an offer he can't refuse 　【L2 + L3】</h2>
+<div class="qline">I'm gonna make him an offer he can't refuse.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《教父》The Godfather（1972）<br>
+🗣 <strong>谁说的</strong>　Vito Corleone（马龙·白兰度）<br>
+🎞 <strong>哪一幕</strong>　<strong>前段</strong>——教子 Johnny Fontane 来求助（想拿到电影角色，制片人 Jack Woltz 不松口），Vito 应下这桩事、说了这句。<strong>紧接着就是「床上马头」那场戏</strong>——这句和那个画面是连着的，找到马头就找到它。<br>
+⏱ <strong>大概位置</strong>　前段（开场约前 25–30 分钟）<br>
+🔍 <strong>在线找</strong>　搜 <code>Godfather "an offer he can't refuse" horse head scene</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_7">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　I'm-GONna ｜ MAKE-him ｜ an-OF-fer ｜ he-CAN'T-re-FUSE<br>
+<strong>重音</strong>　MAKE / OFfer / FUSE；<code>gonna</code> 读成 /ˈɡənə/，<code>him</code> 几乎吞掉<br>
+<strong>大意</strong>　我要给他一个他没法拒绝的条件<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_7">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>定语从句（关系代词作宾语被省略）</strong><br>
+<strong>原书对应</strong>　《必修英文法100》PART 3（关系词）；原书 100 句 <strong>031</strong> <code>the novel I borrowed from the library yesterday</code>——<strong>同样省略了关系代词</strong>，与本句结构完全对应<br>
+<strong>直译</strong>　我要给他一个他无法拒绝的条件。<br>
+<strong>怎么用</strong>　考点：<code>an offer **he can't refuse**</code>——<strong>关系代词作宾语时被省略</strong>。补全即 <code>an offer **that** he can't refuse</code>。这个「省略」正是高考 / 专八改错的高频点。<br>
+<strong>提醒</strong>　⚠️ <strong>有版本分歧</strong>：原著小说（Puzo）作 <code>I'll make him…</code>；片中白兰度发音<strong>近于</strong> <code>I wanna make him…</code>；同片不同角色另有变体。→ 本卡以 <code>I'm gonna make him an offer he can't refuse.</code> 为准。</p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_7">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gonna</td>
+<td>弱化</td>
+<td>/ˈɡənə/（＝ going to）</td>
+</tr>
+<tr>
+<td>make‿him</td>
+<td><strong>h 脱落</strong></td>
+<td>/meɪk‿ɪm/</td>
+</tr>
+<tr>
+<td>him‿an</td>
+<td>连读 ＋ 弱读</td>
+<td>/ɪm‿ən/</td>
+</tr>
+<tr>
+<td>an‿offer</td>
+<td>连读</td>
+<td>/ən‿ˈɔːfər/</td>
+</tr>
+<tr>
+<td>offer‿he</td>
+<td><strong>h 脱落</strong></td>
+<td>/ˈɔːfər‿i/</td>
+</tr>
+<tr>
+<td>can't</td>
+<td>吞音</td>
+<td>/kænʔ/，t 吞</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_7">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　这句与「床上马头」前后相连，找到马头那场戏即可<br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把省略的关系代词补回去</p>
+<hr>
+<h2 id="d0-09-is-life-always-this-hard-or-is-it-just-when-you-re-a-kid-l2-l3">09 ｜ is life always this hard, or is it just when you're a kid 　【L2 + L3】</h2>
+<div class="qline">Is life always this hard, or is it just when you're a kid?</div>
+<div class="qsub">Always like this.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《这个杀手不太冷》Léon: The Professional（1994）<br>
+🗣 <strong>谁说的</strong>　Mathilda 问，Léon 答<br>
+🎞 <strong>哪一幕</strong>　<strong>早段</strong>——公寓楼道里，Mathilda 被父亲打得流鼻血坐在楼梯口，Léon 经过、递给她一块手帕，她抬头问了这句。（此时她的家人<strong>还没</strong>被杀。）<br>
+⏱ <strong>大概位置</strong>　早段<br>
+🔍 <strong>在线找</strong>　搜 <code>Leon The Professional "is life always this hard" hallway</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_8">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　Is-LIFE-always-this-HARD ｜ or-is-it-just ｜ when-you're-a-KID<br>
+<strong>重音</strong>　LIFE / HARD / KID；<code>or is it just</code> 一句带过；答句 <code>AL-ways-like-THIS</code> 三下<br>
+<strong>大意</strong>　人生总是这么苦吗，还是只有小时候才这样？——一直如此。<br>
+<strong>动作</strong>　一问一答连着念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_8">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>
+<p><strong>结构</strong>　<strong>选择疑问句</strong> ＋ <strong>when 引导的时间状语从句</strong> ＋ <strong>省略答语</strong><br>
+<strong>原书对应</strong>　《必修英文法100》PART 3（连词）；原书 100 句 <strong>005</strong> <code>When waiting for the elevator to come…</code><br>
+<strong>直译</strong>　人生总是这么苦吗，还是只有小时候才这样？—— 一直如此。<br>
+<strong>怎么用</strong>　⚠️ 答语 <code>Always like this.</code> 是<strong>省略句</strong>（省略了 It is）。写作中<strong>必须补全</strong>为 <code>It is always like this.</code>，<strong>不可照抄</strong>。<br>
+<strong>提醒</strong>　<strong>一个漂亮的对照</strong>：同一部片里，反派 Stansfield 那句 <code>I like these calm/quiet little moments before the storm</code> <strong>有版本分歧</strong>（见 <code>05_台词金句方案.md</code>），而这一句<strong>有定本</strong>。→ <strong>「可信度」是逐句判定的，不是按影片整体判定的。</strong></p>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_8">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Is‿life</td>
+<td>连读</td>
+<td>/ɪz‿laɪf/</td>
+</tr>
+<tr>
+<td>life‿always</td>
+<td>连读</td>
+<td>/laɪf‿ˈɔːlweɪz/</td>
+</tr>
+<tr>
+<td>or‿is‿it</td>
+<td><strong>连续连读</strong></td>
+<td>/ɔːr‿ɪz‿ɪt/</td>
+</tr>
+<tr>
+<td>just</td>
+<td><strong>喉塞</strong></td>
+<td>/dʒʌsʔ/</td>
+</tr>
+<tr>
+<td>when‿you're</td>
+<td>连读 ＋ 弱读</td>
+<td>/wen‿jər/</td>
+</tr>
+<tr>
+<td>a kid</td>
+<td>弱读</td>
+<td>/ə kɪd/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_8">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找（公寓楼道楼梯口）；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说这一问一答 + 把答语补全</p>
+<hr>
+<h2 id="d0-10-with-great-power-comes-great-responsibility-仅-l3">10 ｜ with great power comes great responsibility 　【仅 L3】</h2>
+<div class="qline">With great power comes great responsibility.</div>
+
+<div class="locate">
+<p>🎬 <strong>电影</strong>　《蜘蛛侠》Spider-Man（2002）<br>
+🗣 <strong>谁说的</strong>　Uncle Ben（本叔叔），对 Peter<br>
+🎞 <strong>哪一幕</strong>　<strong>前段</strong>——Uncle Ben 开车送 Peter 去（他谎称的）图书馆，路上语重心长地讲「你正在变成你将来要成为的那个人」，末了说了这句。Peter 顶撞他「你别装我爸」，<strong>这是两人最后一次对话</strong>；当晚 Ben 便遭劫车枪杀。<br>
+⏱ <strong>大概位置</strong>　前段（Ben 遇害之前）<br>
+🔍 <strong>在线找</strong>　搜 <code>Spider-Man 2002 Uncle Ben "with great power comes great responsibility" car</code></p>
+</div>
+<h3 id="d0-①-先背-先别管语法_9">① 先背 · 先别管语法</h3>
+<div class="mem">
+<p><strong>按块念</strong>　With-GREAT-POWer ｜ COMES ｜ great-re-SPON-si-BIL-i-ty<br>
+<strong>重音</strong>　GREAT / POWer / COMES / SPON；<code>comes</code> 处停半拍——它是倒装的支点<br>
+<strong>大意</strong>　能力越大，责任越大<br>
+<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>
+</div>
+<h3 id="d0-②-再懂-这句话里装了什么-先自己猜-再点开_9">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>
+<details>
+<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一处必须知道的源流</summary>
+<p><strong>结构</strong>　<strong>介词短语前置引起的全部倒装</strong>（状语前置 → 谓语 comes 跑到主语之前）<br>
+<strong>原书对应</strong>　《必修英文法100》PART 3（特殊句式）<br>
+<strong>直译</strong>　能力越大，责任越大。<br>
+<strong>怎么用</strong>　还原为正常语序即：<code>Great responsibility comes with great power.</code>——这是<strong>倒装的正体</strong>。考点：<strong>状语前置 → 完全倒装</strong>（谓语在主语前，且不用 do 支持）。<br>
+<strong>源流提醒</strong>　⚠️⚠️ <strong>流传版 ≠ 1962 年漫画原文，这是本批最严重的一条。</strong></p>
+<blockquote>
+<p>1962 年《Amazing Fantasy》#15，<strong>原文是旁白（narration caption），并非角色台词</strong>：<br>
+<code>And a lean, silent figure slowly fades in the gathering darkness, aware at last that in this world, with great power there must also come — great responsibility!</code><br>
+① 措辞不同：原文是 <code>there must also come — great responsibility</code>，流传版被<strong>简化</strong>为 <code>comes great responsibility</code>；<br>
+② 归属是<strong>后期追认</strong>：原著中 Uncle Ben 只有两句台词，把此话算作他的教诲，<strong>1987 年漫画起才明确</strong>。<br>
+→ <strong>本卡只把「倒装结构」当教学点</strong>，措辞一律标注为「简化流传版」，<strong>不得作为权威引文使用</strong>。（注：2002 年电影里确由 Uncle Ben 在车中说出，本卡的定位描述以<strong>电影</strong>为准，措辞仍属简化版。）</p>
+</blockquote>
+</details>
+<h3 id="d0-③-后调-背顺了再来抠发音_9">③ 后调 · 背顺了再来抠发音</h3>
+<details>
+<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>现象</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>With great</td>
+<td>不完全爆破</td>
+<td>/wɪð ɡreɪt/，great 的 t 与 comes 的 k 相接</td>
+</tr>
+<tr>
+<td>power comes great</td>
+<td>不完全爆破</td>
+<td>/ˈpaʊər kʌmz ɡreɪt/</td>
+</tr>
+<tr>
+<td>comes great</td>
+<td>省音倾向</td>
+<td>/kʌmz ɡreɪt/，z ＋ ɡ 相接</td>
+</tr>
+<tr>
+<td>（原文版）there must also</td>
+<td>弱读</td>
+<td>there /ðər/、must /məst/</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="d0-④-去练-找到片段-作业_9">④ 去练 · 找到片段 + 作业</h3>
+<p><strong>找片段</strong>　按「🎞 哪一幕」找（车内）；要精确到秒，用 <code>工具/find_quote.py</code><br>
+<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 还原成正常语序（本句<strong>仅作听说</strong>，措辞不作权威引用）</p>
+<hr>
+<h2 id="d0-下一步">下一步</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>内容</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>挑 10 个最高频结构</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2</td>
+<td>配 1 句过闸台词</td>
+<td>✅（8 句 L2，2 句降级）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>改「先背 → 再懂 → 后调」顺序</td>
+<td>✅ 本版</td>
+</tr>
+<tr>
+<td>4</td>
+<td>加「片段定位」（场景 ＋ 搜索词 ＋ 定位工具）</td>
+<td>✅ 本版（<code>工具/find_quote.py</code>）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>接入 10 段 10–30 秒音频 / 视频片段</td>
+<td>⏳ <strong>待补</strong>（需人工剪辑定位）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>自测验收（脱稿复述 ＋ 听出连读点）</td>
+<td>⏳ 待做</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>片段补充说明</strong>：本版已完成「文本 ＋ 语音标注 ＋ 定位信息」，但 10 段<strong>音频 / 视频片段尚未接入</strong>——需要人工按定位信息剪辑。这是 v0.3 的工作。</p>
+</blockquote>
+<hr>
+<p><em>版本 v0.2 ｜ 2026-10-01 ｜ 依据 <code>05_台词金句方案.md</code> 的三层架构与 6 道闸筛选器；定位信息经检索核实</em></p>
+</section>
+</main>
+
+<button id="topBtn">顶部</button>
+
+<script>
+const DOCS = [{"id": "doc0", "title": "台词语音卡 v0.2 ｜ 10 句电影台词（背句优先版）", "rel": "台词语音卡_v0.2.md", "html": "<h1 id=\"d0-台词语音卡-v0-2-10-句电影台词-背句优先版\">台词语音卡 v0.2 ｜ 10 句电影台词（背句优先版）</h1>\n<blockquote>\n<p><strong>体例依据</strong>：<code>05_台词金句方案.md</code>（三层架构 ＋ 6 道闸筛选器）<br>\n<strong>相对 v0.1 的两处改动</strong>：① 讲解<strong>从卡片开头挪到句子之后</strong>——先背、再懂、后调；② 每张卡新增<strong>「片段定位」</strong>。理由见 <code>06_背句优先与片段定位.md</code>。<br>\n<strong>定位</strong>：这是 <strong>L2 语境层 ＋ L3 语音层</strong>的试点样张，<strong>不替代</strong> L1 骨架层（原《基本英文100》100 句）。<br>\n<strong>版权提示</strong>：本卡为个人学习用的语音分析笔记，台词版权归各影片权利人；<strong>仅供个人学习，请勿公开发布或商业使用</strong>。</p>\n</blockquote>\n<hr>\n<h2 id=\"d0-使用说明\">使用说明</h2>\n<h3 id=\"d0-一张卡的三步节奏-先背-再懂-后调\">一张卡的三步节奏：先背 → 再懂 → 后调</h3>\n<p><strong>不要一上来就读讲解。</strong> v0.1 的失败就在这里：把「结构 / 出处 / 权威状态 / 直译 / 用法」五块解释全堆在台词前面，初学者翻了两页说明还没见到句子，人已经走了。</p>\n<p>正确的顺序是：</p>\n<table>\n<thead>\n<tr>\n<th>步</th>\n<th>做什么</th>\n<th>位置</th>\n<th>为什么</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>① 先背</strong></td>\n<td>看大字台词，出声念 3 遍 → 合眼再念 2 遍</td>\n<td>卡片最上方</td>\n<td><strong>记忆优先</strong>：先让句子变成「能脱口而出的一块声音」</td>\n</tr>\n<tr>\n<td><strong>② 再懂</strong></td>\n<td>点开折叠，看结构 / 原书对应 / 直译 / 怎么用</td>\n<td>折叠区 1</td>\n<td>句子已进嘴，此时讲解是「解密」而非「负担」</td>\n</tr>\n<tr>\n<td><strong>③ 后调</strong></td>\n<td>点开折叠，抠连读 / 弱读 / 吞音</td>\n<td>折叠区 2</td>\n<td>语音要在<strong>念顺了之后</strong>才微调，否则越抠越乱</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>用「折叠」是<strong>故意的</strong>——讲解默认<strong>不展开</strong>，逼你先和句子独处一分钟。手点开，就说明你准备好了。</p>\n</blockquote>\n<h3 id=\"d0-怎么找到这个片段-四种办法-从省事到最准\">怎么找到这个片段——四种办法，从省事到最准</h3>\n<table>\n<thead>\n<tr>\n<th>办法</th>\n<th>精度</th>\n<th>怎么做</th>\n<th>适用</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>① 场景描述</strong></td>\n<td>认得出即可</td>\n<td>看卡上「🎞 哪一幕」，凭画面找</td>\n<td>最快，<strong>推荐先做这个</strong></td>\n</tr>\n<tr>\n<td><strong>② 字幕秒级定位</strong></td>\n<td><strong>精确到秒</strong></td>\n<td>拿<strong>你自己片源</strong>的 <code>.srt / .ass / .vtt</code> 字幕，喂给 <code>工具/find_quote.py</code></td>\n<td><strong>唯一精确的办法</strong>，见下</td>\n</tr>\n<tr>\n<td><strong>③ 在线搜索词</strong></td>\n<td>找到视频片段</td>\n<td>把卡上「🔍 在线找」那行直接粘进 B站 / YouTube</td>\n<td>想直接看视频</td>\n</tr>\n<tr>\n<td><strong>④ 死时间戳</strong></td>\n<td>❌ 不可靠</td>\n<td>——</td>\n<td><strong>本卡故意不给</strong>，原因见下</td>\n</tr>\n</tbody>\n</table>\n<h4 id=\"d0-为什么卡上-不写死-时间戳\">为什么卡上「不写死」时间戳</h4>\n<p>同一个「几点几分几秒」，<strong>换个片源就错</strong>：影院版 / 加长版 / 不同压制组的字幕时间轴都会平移。写下 <code>01:23:45</code>，在你手上的版本里可能是别的地方——<strong>那是假精确</strong>。</p>\n<p><strong>正确做法是自己量。</strong> 项目里附了一个本地工具：</p>\n<pre><code>python 工具/find_quote.py 我的字幕.srt &quot;some birds aren't meant to be caged&quot;\n</code></pre>\n<p>它会输出<strong>你这版片源的精确时间戳</strong>，外加前后几句对白。字幕文件从哪来：下载的 <code>.srt</code> 字幕包，或用播放器（PotPlayer / VLC）导出。</p>\n<blockquote>\n<p>例：<code>02 角斗士</code> 那句，某来源标注为「开场字幕起算 00:07:09–00:07:12」——可作参考，但<strong>以你自己的字幕定位为准</strong>。</p>\n</blockquote>\n<h3 id=\"d0-一条铁律\">一条铁律</h3>\n<p><strong>凡是「权威状态」标了警告的句子，只能当听说素材，不能当写作模板。</strong> 原因见 <code>05_台词金句方案.md</code> §2.4：<strong>电影台词没有「卷末定本」，同一句话在不同字幕 / 配音 / 剧本间会漂移。</strong></p>\n<hr>\n<h2 id=\"d0-总表-10-句过闸结果\">总表：10 句过闸结果</h2>\n<table>\n<thead>\n<tr>\n<th>#</th>\n<th>结构</th>\n<th>台词</th>\n<th>出处</th>\n<th>权威状态</th>\n<th>定级</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>01</td>\n<td><code>be meant to be V-ed</code></td>\n<td>Some birds aren't meant to be caged.</td>\n<td>肖申克的救赎 1994</td>\n<td>✅ 多源一致</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>02</td>\n<td><strong>what 主语从句</strong></td>\n<td>…what we do in life, echoes in eternity.</td>\n<td>角斗士 2000</td>\n<td>✅ 多源一致</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>03</td>\n<td><strong>it 强调句 + not…but…</strong></td>\n<td>It's not who I am underneath, but what I do that defines me.</td>\n<td>蝙蝠侠：侠影之谜 2005</td>\n<td>✅ 一致（同片另有变体）</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>04</td>\n<td><strong>现在分词后置修饰</strong></td>\n<td>I'm also just a girl, standing…, asking…</td>\n<td>诺丁山 1999</td>\n<td>✅ 一致（流传版漏 also）</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>05</td>\n<td><strong>what 宾语从句</strong> + <code>gonna</code></td>\n<td>Life is like a box of chocolates. You never know what you're gonna get.</td>\n<td>阿甘正传 1994</td>\n<td>⚠️ is / was 有分歧</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>06</td>\n<td><strong>as … as 同级比较</strong></td>\n<td>Stupid is as stupid does.</td>\n<td>阿甘正传 1994</td>\n<td>✅ 一致</td>\n<td><strong>仅 L3</strong>（俗谚语域）</td>\n</tr>\n<tr>\n<td>07</td>\n<td><strong>最高级</strong> + just before</td>\n<td>The night is darkest just before the dawn.</td>\n<td>黑暗骑士 2008</td>\n<td>✅ 一致（个别源省略 just）</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>08</td>\n<td><strong>定语从句（省略关系代词）</strong></td>\n<td>I'm gonna make him an offer he can't refuse.</td>\n<td>教父 1972</td>\n<td>⚠️ 多版本</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>09</td>\n<td><strong>选择疑问 + when 从句</strong></td>\n<td>Is life always this hard, or is it just when you're a kid?</td>\n<td>这个杀手不太冷 1994</td>\n<td>✅ 多源一致</td>\n<td>L2 + L3</td>\n</tr>\n<tr>\n<td>10</td>\n<td><strong>前置状语 + 全部倒装</strong></td>\n<td>With great power comes great responsibility.</td>\n<td>蜘蛛侠 2002</td>\n<td>⚠️⚠️ <strong>流传版 ≠ 原文</strong></td>\n<td><strong>仅 L3</strong></td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p><strong>试点统计</strong>：10 句中，<strong>7 句多源一致、3 句查出版本问题</strong>（05 / 08 / 10），其中 10 号最严重。另有 2 句因<strong>语域</strong>不合格而降级为「仅 L3」。<br>\n<strong>结论</strong>：6 道闸<strong>确实在筛掉东西</strong>——不是走过场。</p>\n</blockquote>\n<hr>\n<h2 id=\"d0-01-some-birds-aren-t-meant-to-be-caged-l2-l3\">01 ｜ some birds aren't meant to be caged 　【L2 + L3】</h2>\n<div class=\"qline\">Some birds aren't meant to be caged.</div>\n<div class=\"qsub\">Their feathers are just too bright.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《肖申克的救赎》The Shawshank Redemption（1994）<br>\n🗣 <strong>谁说的</strong>　Red（摩根·弗里曼 旁白）<br>\n🎞 <strong>哪一幕</strong>　Andy 越狱之后。Red <strong>还关在狱里</strong>，旁白回忆 Andy。画面是监狱操场、食堂、墓地干活这些日常。<br>\n⏱ <strong>大概位置</strong>　中后段（越狱之后、结尾之前）。<strong>注意</strong>：它<strong>不是</strong>结尾那段旁白，很多人记错。<br>\n🔍 <strong>在线找</strong>　搜 <code>Shawshank \"some birds aren't meant to be caged\" clip</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　some-BIRDS ｜ aren't-MEANT-to-be ｜ CAGED<br>\n<strong>重音</strong>　BIRDS / MEANT / CAGED 三下落地，其余一带而过<br>\n<strong>大意</strong>　有些鸟天生就不该关着<br>\n<strong>动作</strong>　看大字出声念 3 遍 → 合眼再念 2 遍。念不顺，别往下走。</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<code>be meant to be V-ed</code> —— 「（被设计 / 注定）要…」<br>\n<strong>原书对应</strong>　《必修英文法100》PART 2（被动语态 ＋ to 不定式）<br>\n<strong>直译</strong>　有些鸟不是被设计来关在笼子里的。它们的羽毛就是太鲜亮了。<br>\n<strong>怎么用</strong>　<code>X is not meant to be Y-ed</code> 可整块搬用（把 X 当 Y 对待是不对的）——这个结构本身<strong>可迁移</strong>，是它过闸的关键。<br>\n<strong>提醒</strong>　⚠️ 中文流传版不可信：「有些鸟儿是关不住的，因为它们的每一片羽翼上都沾满了自由的光辉」——对照原文 <code>Their feathers are just too bright.</code>，这是<strong>意译</strong>，不是原文。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>some‿birds</td>\n<td>连读</td>\n<td>/sʌm‿bɜːrdz/</td>\n</tr>\n<tr>\n<td>aren't</td>\n<td><strong>吞音</strong></td>\n<td>/ɑːrnt/ → /ɑːrnʔ/，词尾 t 常吞</td>\n</tr>\n<tr>\n<td>meant‿to</td>\n<td>连读 ＋ <strong>弱读</strong></td>\n<td>/ment‿tə/（to 弱读 /tə/）</td>\n</tr>\n<tr>\n<td>to be</td>\n<td>弱读</td>\n<td>be 弱读 /bi/</td>\n</tr>\n<tr>\n<td>feathers‿are</td>\n<td>连读</td>\n<td>/ˈfeðərz‿ɑːr/</td>\n</tr>\n<tr>\n<td>just too</td>\n<td><strong>不完全爆破</strong></td>\n<td>/dʒʌsʔ tuː/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 <code>be meant to</code> 造 2 句</p>\n<hr>\n<h2 id=\"d0-02-what-we-do-in-life-echoes-in-eternity-l2-l3\">02 ｜ what we do in life, echoes in eternity 　【L2 + L3】</h2>\n<div class=\"qline\">Brothers, what we do in life, echoes in eternity.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《角斗士》Gladiator（2000）<br>\n🗣 <strong>谁说的</strong>　Maximus（罗素·克劳），对麾下骑兵的战前演说<br>\n🎞 <strong>哪一幕</strong>　<strong>开场第一场戏</strong>——罗马军团在日耳曼森林列阵，Maximus 骑马巡行、给士兵打气，说完这句便下令冲锋。<br>\n⏱ <strong>大概位置</strong>　开场约 7 分钟（某来源标注开场字幕起算 00:07:09–00:07:12）<br>\n🔍 <strong>在线找</strong>　搜 <code>Gladiator \"what we do in life echoes in eternity\"</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_1\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　Brothers ｜ what-we-DO-in-LIFE ｜ ECHOES-in-e-TER-nity<br>\n<strong>重音</strong>　DO / LIFE / ECHOES 三处用力；<code>what we do in life</code> 一口气带过<br>\n<strong>大意</strong>　弟兄们，我们一生所做之事，会在永恒里回响<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_1\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>what 引导的主语从句</strong>（<code>what we do in life</code> 整个作主语）<br>\n<strong>原书对应</strong>　《必修英文法100》PART 3（从句）；原书 100 句 <strong>025</strong> <code>Humans learn to express what they think…</code>（what 宾语从句）<br>\n<strong>直译</strong>　弟兄们，我们一生所做之事，会在永恒中回响。<br>\n<strong>怎么用</strong>　<code>what</code> 从句作主语时，谓语用<strong>单数</strong>——<code>What we do **echoes**</code>。这是高考 / 四六级高频考点，而这句话把它放进了一个记得住的场景。<br>\n<strong>提醒</strong>　片中是 <code>what we do in life**,** echoes…</code>（中间有停顿）；海报标语版作 <code>What We Do In Life Echoes In Eternity.</code></p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_1\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>what‿we</td>\n<td><strong>喉塞</strong></td>\n<td>/wɒʔ wi/</td>\n</tr>\n<tr>\n<td>we do‿in</td>\n<td>连读</td>\n<td>/wi duː‿ɪn/</td>\n</tr>\n<tr>\n<td>life‿echoes</td>\n<td>连读（浊化）</td>\n<td>/laɪf‿ˈekəʊz/，f 受浊音影响近于 /v/</td>\n</tr>\n<tr>\n<td>echoes‿in</td>\n<td>连读</td>\n<td>/ˈekəʊz‿ɪn/</td>\n</tr>\n<tr>\n<td>in‿eternity</td>\n<td>连读</td>\n<td>/ɪn‿ɪˈtɜːrnəti/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_1\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 <code>what</code> 主语从句造 2 句</p>\n<hr>\n<h2 id=\"d0-03-it-s-not-who-i-am-underneath-but-what-i-do-that-defines-me-l2-l3\">03 ｜ it's not who I am underneath, but what I do that defines me 　【L2 + L3】</h2>\n<div class=\"qline\">It's not who I am underneath, but what I do that defines me.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《蝙蝠侠：侠影之谜》Batman Begins（2005）<br>\n🗣 <strong>谁说的</strong>　Batman（Bruce Wayne），对 Rachel Dawes<br>\n🎞 <strong>哪一幕</strong>　<strong>高潮段</strong>——城市被稻草人 / 刺客联盟投放毒气，Batman 救下 Rachel 和一个孩子后，正要再冲进战场，Rachel 拦住他问「面具下的你到底是谁」，Batman 转身说了这句，随后跃下屋顶。<br>\n⏱ <strong>大概位置</strong>　接近结尾（单轨列车决战之前）<br>\n🔍 <strong>在线找</strong>　搜 <code>Batman Begins \"what I do that defines me\" Rachel rooftop</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_2\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　It's-not ｜ who-I-am-underneath ｜ but-what-I-DO ｜ that-de-FINES-me<br>\n<strong>重音</strong>　<strong>DO</strong> 和 <strong>DEFINES</strong> 两处最重，<code>underneath</code> 拖一下<br>\n<strong>大意</strong>　定义我的不是我内在是谁，而是我做了什么<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。这句节奏感强，念顺了很好听。</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_2\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>it 强调句（it…that…）</strong> ＋ <strong>not … but …</strong><br>\n<strong>原书对应</strong>　《必修英文法100》PART 3（特殊句式）；原书 100 句 <strong>076</strong> <code>It is not until you go abroad that you realize…</code>——<strong>同为 it…that 强调句</strong>，可直接互参<br>\n<strong>直译</strong>　定义我的不是我内在是谁，而是我做了什么。<br>\n<strong>怎么用</strong>　把强调句「去强调」还原成普通句：<code>What I do defines me, not who I am underneath.</code> 反复互转，这个考点就拿下了。<br>\n<strong>提醒</strong>　⚠️ <strong>同片另有一版，结构不同</strong>（Rachel 在早段的台词）：<code>It's not who you are underneath, it's what you do that defines you.</code> —— 后半用的是 <code>it's</code>，<strong>不是 <code>that</code></strong>。两句<strong>不可混用</strong>，混用就丢掉了强调句。<strong>本卡取 Batman 版。</strong></p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_2\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>It's not</td>\n<td>喉塞</td>\n<td>/ɪts nɒʔ/</td>\n</tr>\n<tr>\n<td>not‿who</td>\n<td>连读</td>\n<td>/nɒʔ huː/</td>\n</tr>\n<tr>\n<td>who‿I</td>\n<td>滑音连读</td>\n<td>/huː‿waɪ/</td>\n</tr>\n<tr>\n<td>I‿am</td>\n<td>滑音连读</td>\n<td>/aɪ‿jæm/</td>\n</tr>\n<tr>\n<td>but</td>\n<td>弱读</td>\n<td>/bət/</td>\n</tr>\n<tr>\n<td>that</td>\n<td><strong>弱读</strong></td>\n<td>/ðət/（关系代词弱读）</td>\n</tr>\n<tr>\n<td>do that</td>\n<td>不完全爆破</td>\n<td>/duː ðət/，t ＋ ð 相接</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_2\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　注意这句<strong>在片中出现两次</strong>，本卡要的是<strong>结尾前 Batman 版</strong>（<code>…but what I do that defines me</code>），不是早段 Rachel 版<br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把它还原成普通语序</p>\n<hr>\n<h2 id=\"d0-04-i-m-also-just-a-girl-standing-in-front-of-a-boy-l2-l3\">04 ｜ I'm also just a girl, standing in front of a boy 　【L2 + L3】</h2>\n<div class=\"qline\">I'm also just a girl, standing in front of a boy, asking him to love her.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《诺丁山》Notting Hill（1999）<br>\n🗣 <strong>谁说的</strong>　Anna Scott（茱莉亚·罗伯茨），对书店老板 Will<br>\n🎞 <strong>哪一幕</strong>　<strong>后段</strong>——Anna 第二次到 Will 的书店，想复合，被 Will 拒绝；临走前说了这句（手里还拿着名画《La Mariée》当礼物）。<br>\n⏱ <strong>大概位置</strong>　接近结尾。<strong>结尾</strong>是 Savoy 酒店记者会，不要找错。<br>\n🔍 <strong>在线找</strong>　搜 <code>Notting Hill \"just a girl standing in front of a boy\"</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_3\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　I'm-AL-so-just-a-GIRL ｜ STAND-ing-in-front-of-a-BOY ｜ ASK-ing-him-to-LOVE-her<br>\n<strong>重音</strong>　GIRL / BOY / LOVE 三个名词落地；<code>standing</code>、<code>asking</code> 两个分词轻快带过<br>\n<strong>大意</strong>　我也不过是个女孩，站在一个男孩面前，求他爱她<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。这句长，分队念就好背。</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_3\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>现在分词短语作后置修饰</strong>（standing… / asking…）<br>\n<strong>原书对应</strong>　《必修英文法100》PART 2（分词）；原书 100 句 <strong>003</strong> <code>…listening to birds sing.</code>、<strong>038</strong> <code>Some students coming to the library act as if…</code>（现在分词作定语）<br>\n<strong>直译</strong>　我也只是个女孩，站在一个男孩面前，请求他爱她。<br>\n<strong>怎么用</strong>　「<strong>分词替代定语从句</strong>」的活标本——补全即 <code>a girl who is standing in front of a boy, who is asking him to love her</code>。写作用它，句式立刻升一档。<br>\n<strong>提醒</strong>　⚠️ <strong>流传版漏字</strong>：广传版本作 <code>I'm just a girl…</code>，<strong>漏掉了 <code>also</code></strong>；多个来源原文均可查到 <code>I'm **also** just a girl…</code>。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_3\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>just‿a</td>\n<td><strong>闪音 / 浊化</strong></td>\n<td>/dʒʌs‿ə/，t 在元音前浊化</td>\n</tr>\n<tr>\n<td>standing‿in</td>\n<td>连读</td>\n<td>/ˈstændɪŋ‿ɪn/</td>\n</tr>\n<tr>\n<td>front‿of</td>\n<td>连读 ＋ <strong>弱读</strong></td>\n<td>/frʌnt‿əv/，of 弱读 /əv/</td>\n</tr>\n<tr>\n<td>of‿a</td>\n<td>连读</td>\n<td>/əv‿ə/</td>\n</tr>\n<tr>\n<td>asking‿him</td>\n<td><strong>h 脱落</strong></td>\n<td>/ˈæskɪŋ‿ɪm/</td>\n</tr>\n<tr>\n<td>to love</td>\n<td>弱读</td>\n<td>to /tə/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_3\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找（书店内景）；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把两个分词还原成定语从句</p>\n<hr>\n<h2 id=\"d0-05-life-is-like-a-box-of-chocolates-l2-l3\">05 ｜ life is like a box of chocolates 　【L2 + L3】</h2>\n<div class=\"qline\">Life is like a box of chocolates.</div>\n<div class=\"qsub\">You never know what you're gonna get.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《阿甘正传》Forrest Gump（1994）<br>\n🗣 <strong>谁说的</strong>　Forrest（汤姆·汉克斯 旁白 / 对白）<br>\n🎞 <strong>哪一幕</strong>　<strong>前段</strong>——Forrest 坐在公交站的长椅上，对旁边的陌生人讲自己的妈妈，说到这句。<br>\n⏱ <strong>大概位置</strong>　开场后不久（约前 15 分钟）<br>\n🔍 <strong>在线找</strong>　搜 <code>Forrest Gump \"life is like a box of chocolates\" bus stop</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_4\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　LIFE-is-like-a-BOX-of-CHOColates ｜ you-NEV-er-KNOW ｜ what-you're-GONna-GET<br>\n<strong>重音</strong>　LIFE / BOX / KNOW / GET；<code>gonna</code> 一定要读成一块 /ˈɡənə/，别读成 going to<br>\n<strong>大意</strong>　生活就像一盒巧克力，你永远不知道会拿到哪颗<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_4\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 两个提醒</summary>\n<p><strong>结构</strong>　<strong>what 引导的宾语从句</strong> ＋ <code>gonna</code>（going to 的口语弱化）<br>\n<strong>原书对应</strong>　原书 100 句 <strong>025</strong> <code>…express what they think…</code>（what 宾语从句）<br>\n<strong>直译</strong>　生活就像一盒巧克力。你还不知道你会拿到什么。<br>\n<strong>怎么用</strong>　<code>what you're gonna get</code> 是<strong>宾语从句</strong>，作 <code>know</code> 的宾语。<br>\n<strong>提醒一</strong>　⚠️ <strong>有版本分歧</strong>：<code>is</code> 与 <code>was</code> 两种写法均见于不同来源（维基语录作 <code>is</code>；部分来源作 <code>was</code>）。→ 本卡<strong>采用 <code>is</code></strong>。<br>\n<strong>提醒二</strong>　⚠️ <strong><code>gonna</code> 只能用于口语</strong>——书面作文必须写回 <code>going to</code>。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_4\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>life‿is</td>\n<td>连读</td>\n<td>/laɪf‿ɪz/</td>\n</tr>\n<tr>\n<td>like‿a</td>\n<td>连读</td>\n<td>/laɪk‿ə/</td>\n</tr>\n<tr>\n<td>box‿of</td>\n<td>连读 ＋ <strong>弱读</strong></td>\n<td>/bɒks‿əv/</td>\n</tr>\n<tr>\n<td>what‿you're</td>\n<td><strong>同化</strong></td>\n<td>/wɒtʃə/，t ＋ j → tʃ</td>\n</tr>\n<tr>\n<td>gonna</td>\n<td>弱化</td>\n<td>/ˈɡənə/（＝ going to）</td>\n</tr>\n<tr>\n<td>you're</td>\n<td>弱读</td>\n<td>/jər/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_4\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找（长椅）；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把 <code>gonna</code> 写回 <code>going to</code> 再念一遍</p>\n<hr>\n<h2 id=\"d0-06-stupid-is-as-stupid-does-仅-l3\">06 ｜ stupid is as stupid does 　【仅 L3】</h2>\n<div class=\"qline\">Stupid is as stupid does.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《阿甘正传》Forrest Gump（1994）<br>\n🗣 <strong>谁说的</strong>　Forrest<br>\n🎞 <strong>哪一幕</strong>　<strong>前段</strong>——<strong>同一段长椅戏</strong>里，旁边的人问 Forrest「Are you stupid?（你是不是傻）」，Forrest 用这句回敬。<br>\n⏱ <strong>大概位置</strong>　开场后不久，与第 05 句同一段<br>\n🔍 <strong>在线找</strong>　搜 <code>Forrest Gump \"stupid is as stupid does\"</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_5\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　STU-pid ｜ is-as ｜ STU-pid ｜ DOES<br>\n<strong>重音</strong>　两个 <strong>STUpid</strong>、一个 <strong>DOES</strong>，三下；中间的 <code>is as</code> 极轻<br>\n<strong>大意</strong>　蠢就是蠢人所为（看行为就知道人蠢不蠢）<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍。短句，5 秒就能记住。</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_5\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 为什么它被降级</summary>\n<p><strong>结构</strong>　<strong>as … as 同级比较</strong>（以「平行省略」形式出现）<br>\n<strong>原书对应</strong>　《必修英文法100》PART 5（比较）；原书 100 句 <strong>062</strong> <code>about twice as expensive in the U.K. as in Japan</code><br>\n<strong>直译</strong>　蠢就是蠢人所为。<br>\n<strong>怎么用</strong>　听说是好素材；写作请回到 062 的 <code>as … as …</code> 常规句式。<br>\n<strong>为什么降级</strong>　⚠️ <strong>语域不合格 → 仅作 L3</strong>：这是<strong>俗谚 / 口语体</strong>（<code>stupid does</code> 是省略表达），与 <code>as…as</code> 的书面常规用法不同，<strong>不能当 <code>as...as</code> 的写作模板</strong>。这正是第 4 道闸（语域）在起作用。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_5\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>stupid‿is</td>\n<td>连读</td>\n<td>/ˈstjuːpɪd‿ɪz/</td>\n</tr>\n<tr>\n<td>is‿as</td>\n<td>连读</td>\n<td>/ɪz‿əz/</td>\n</tr>\n<tr>\n<td>as stupid</td>\n<td>不完全爆破</td>\n<td>/əz‿ˈstjuːpɪd/</td>\n</tr>\n<tr>\n<td>重音对比</td>\n<td><strong>第一个 as /əz/ 弱读，第二个 as 重读 /æz/</strong></td>\n<td>平行结构的重音示范</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_5\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　与第 05 句<strong>同一段长椅戏</strong>，连在一起看更省事<br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词（本句<strong>不作</strong>写作练习）</p>\n<hr>\n<h2 id=\"d0-07-the-night-is-darkest-just-before-the-dawn-l2-l3\">07 ｜ the night is darkest just before the dawn 　【L2 + L3】</h2>\n<div class=\"qline\">The night is darkest just before the dawn.</div>\n<div class=\"qsub\">And I promise you, the dawn is coming.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《黑暗骑士》The Dark Knight（2008）<br>\n🗣 <strong>谁说的</strong>　Harvey Dent（地方检察官）<br>\n🎞 <strong>哪一幕</strong>　<strong>中段</strong>——记者会上，Harvey 回应小丑造成的恐慌，先说「情况确实更糟了」，接着说这句安抚民众；<strong>紧接着当场宣布「我就是蝙蝠侠」</strong>（替 Batman 顶罪）。<br>\n⏱ <strong>大概位置</strong>　中段<br>\n🔍 <strong>在线找</strong>　搜 <code>Dark Knight \"night is darkest just before the dawn\" press conference</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_6\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　The-NIGHT-is-DARK-est ｜ just-be-FORE-the-DAWN ｜ and-I-PROM-ise-you ｜ the-DAWN-is-COM-ing<br>\n<strong>重音</strong>　NIGHT / DARKest / DAWN / PROMise / COMing<br>\n<strong>大意</strong>　黎明之前，夜最黑——而我向你保证，黎明就要来了<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_6\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>最高级 the darkest</strong> ＋ <code>just before</code> 时间状语<br>\n<strong>原书对应</strong>　《必修英文法100》PART 5（比较）；原书 100 句 <strong>017</strong> <code>The best thing about my stay…</code><br>\n<strong>直译</strong>　黎明之前，夜最黑。我向你保证，黎明就要来了。<br>\n<strong>怎么用</strong>　<strong>一句覆盖两个考点</strong>：前句 → 最高级 <code>the darkest</code>；后句 → <strong>插入语</strong>（I promise you）＋ <strong>现在进行表将来</strong>（is coming）。<br>\n<strong>提醒</strong>　个别来源省略 <code>just</code>（<code>The night is darkest before the dawn.</code>）→ 本卡以<strong>含 just</strong> 为主。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_6\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>night‿is</td>\n<td>连读</td>\n<td>/naɪt‿ɪz/</td>\n</tr>\n<tr>\n<td>darkest‿just</td>\n<td><strong>不完全爆破</strong></td>\n<td>/ˈdɑːrkɪst‿dʒʌst/</td>\n</tr>\n<tr>\n<td>just‿before</td>\n<td><strong>不完全爆破</strong></td>\n<td>/dʒʌsʔ bɪˈfɔːr/</td>\n</tr>\n<tr>\n<td>before the</td>\n<td>弱读</td>\n<td>the /ðə/</td>\n</tr>\n<tr>\n<td>is coming</td>\n<td>弱读</td>\n<td>is /ɪz/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_6\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找（记者会）；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 用最高级造句</p>\n<hr>\n<h2 id=\"d0-08-i-m-gonna-make-him-an-offer-he-can-t-refuse-l2-l3\">08 ｜ I'm gonna make him an offer he can't refuse 　【L2 + L3】</h2>\n<div class=\"qline\">I'm gonna make him an offer he can't refuse.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《教父》The Godfather（1972）<br>\n🗣 <strong>谁说的</strong>　Vito Corleone（马龙·白兰度）<br>\n🎞 <strong>哪一幕</strong>　<strong>前段</strong>——教子 Johnny Fontane 来求助（想拿到电影角色，制片人 Jack Woltz 不松口），Vito 应下这桩事、说了这句。<strong>紧接着就是「床上马头」那场戏</strong>——这句和那个画面是连着的，找到马头就找到它。<br>\n⏱ <strong>大概位置</strong>　前段（开场约前 25–30 分钟）<br>\n🔍 <strong>在线找</strong>　搜 <code>Godfather \"an offer he can't refuse\" horse head scene</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_7\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　I'm-GONna ｜ MAKE-him ｜ an-OF-fer ｜ he-CAN'T-re-FUSE<br>\n<strong>重音</strong>　MAKE / OFfer / FUSE；<code>gonna</code> 读成 /ˈɡənə/，<code>him</code> 几乎吞掉<br>\n<strong>大意</strong>　我要给他一个他没法拒绝的条件<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_7\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>定语从句（关系代词作宾语被省略）</strong><br>\n<strong>原书对应</strong>　《必修英文法100》PART 3（关系词）；原书 100 句 <strong>031</strong> <code>the novel I borrowed from the library yesterday</code>——<strong>同样省略了关系代词</strong>，与本句结构完全对应<br>\n<strong>直译</strong>　我要给他一个他无法拒绝的条件。<br>\n<strong>怎么用</strong>　考点：<code>an offer **he can't refuse**</code>——<strong>关系代词作宾语时被省略</strong>。补全即 <code>an offer **that** he can't refuse</code>。这个「省略」正是高考 / 专八改错的高频点。<br>\n<strong>提醒</strong>　⚠️ <strong>有版本分歧</strong>：原著小说（Puzo）作 <code>I'll make him…</code>；片中白兰度发音<strong>近于</strong> <code>I wanna make him…</code>；同片不同角色另有变体。→ 本卡以 <code>I'm gonna make him an offer he can't refuse.</code> 为准。</p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_7\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>gonna</td>\n<td>弱化</td>\n<td>/ˈɡənə/（＝ going to）</td>\n</tr>\n<tr>\n<td>make‿him</td>\n<td><strong>h 脱落</strong></td>\n<td>/meɪk‿ɪm/</td>\n</tr>\n<tr>\n<td>him‿an</td>\n<td>连读 ＋ 弱读</td>\n<td>/ɪm‿ən/</td>\n</tr>\n<tr>\n<td>an‿offer</td>\n<td>连读</td>\n<td>/ən‿ˈɔːfər/</td>\n</tr>\n<tr>\n<td>offer‿he</td>\n<td><strong>h 脱落</strong></td>\n<td>/ˈɔːfər‿i/</td>\n</tr>\n<tr>\n<td>can't</td>\n<td>吞音</td>\n<td>/kænʔ/，t 吞</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_7\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　这句与「床上马头」前后相连，找到马头那场戏即可<br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把省略的关系代词补回去</p>\n<hr>\n<h2 id=\"d0-09-is-life-always-this-hard-or-is-it-just-when-you-re-a-kid-l2-l3\">09 ｜ is life always this hard, or is it just when you're a kid 　【L2 + L3】</h2>\n<div class=\"qline\">Is life always this hard, or is it just when you're a kid?</div>\n<div class=\"qsub\">Always like this.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《这个杀手不太冷》Léon: The Professional（1994）<br>\n🗣 <strong>谁说的</strong>　Mathilda 问，Léon 答<br>\n🎞 <strong>哪一幕</strong>　<strong>早段</strong>——公寓楼道里，Mathilda 被父亲打得流鼻血坐在楼梯口，Léon 经过、递给她一块手帕，她抬头问了这句。（此时她的家人<strong>还没</strong>被杀。）<br>\n⏱ <strong>大概位置</strong>　早段<br>\n🔍 <strong>在线找</strong>　搜 <code>Leon The Professional \"is life always this hard\" hallway</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_8\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　Is-LIFE-always-this-HARD ｜ or-is-it-just ｜ when-you're-a-KID<br>\n<strong>重音</strong>　LIFE / HARD / KID；<code>or is it just</code> 一句带过；答句 <code>AL-ways-like-THIS</code> 三下<br>\n<strong>大意</strong>　人生总是这么苦吗，还是只有小时候才这样？——一直如此。<br>\n<strong>动作</strong>　一问一答连着念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_8\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒</summary>\n<p><strong>结构</strong>　<strong>选择疑问句</strong> ＋ <strong>when 引导的时间状语从句</strong> ＋ <strong>省略答语</strong><br>\n<strong>原书对应</strong>　《必修英文法100》PART 3（连词）；原书 100 句 <strong>005</strong> <code>When waiting for the elevator to come…</code><br>\n<strong>直译</strong>　人生总是这么苦吗，还是只有小时候才这样？—— 一直如此。<br>\n<strong>怎么用</strong>　⚠️ 答语 <code>Always like this.</code> 是<strong>省略句</strong>（省略了 It is）。写作中<strong>必须补全</strong>为 <code>It is always like this.</code>，<strong>不可照抄</strong>。<br>\n<strong>提醒</strong>　<strong>一个漂亮的对照</strong>：同一部片里，反派 Stansfield 那句 <code>I like these calm/quiet little moments before the storm</code> <strong>有版本分歧</strong>（见 <code>05_台词金句方案.md</code>），而这一句<strong>有定本</strong>。→ <strong>「可信度」是逐句判定的，不是按影片整体判定的。</strong></p>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_8\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Is‿life</td>\n<td>连读</td>\n<td>/ɪz‿laɪf/</td>\n</tr>\n<tr>\n<td>life‿always</td>\n<td>连读</td>\n<td>/laɪf‿ˈɔːlweɪz/</td>\n</tr>\n<tr>\n<td>or‿is‿it</td>\n<td><strong>连续连读</strong></td>\n<td>/ɔːr‿ɪz‿ɪt/</td>\n</tr>\n<tr>\n<td>just</td>\n<td><strong>喉塞</strong></td>\n<td>/dʒʌsʔ/</td>\n</tr>\n<tr>\n<td>when‿you're</td>\n<td>连读 ＋ 弱读</td>\n<td>/wen‿jər/</td>\n</tr>\n<tr>\n<td>a kid</td>\n<td>弱读</td>\n<td>/ə kɪd/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_8\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找（公寓楼道楼梯口）；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说这一问一答 + 把答语补全</p>\n<hr>\n<h2 id=\"d0-10-with-great-power-comes-great-responsibility-仅-l3\">10 ｜ with great power comes great responsibility 　【仅 L3】</h2>\n<div class=\"qline\">With great power comes great responsibility.</div>\n\n<div class=\"locate\">\n<p>🎬 <strong>电影</strong>　《蜘蛛侠》Spider-Man（2002）<br>\n🗣 <strong>谁说的</strong>　Uncle Ben（本叔叔），对 Peter<br>\n🎞 <strong>哪一幕</strong>　<strong>前段</strong>——Uncle Ben 开车送 Peter 去（他谎称的）图书馆，路上语重心长地讲「你正在变成你将来要成为的那个人」，末了说了这句。Peter 顶撞他「你别装我爸」，<strong>这是两人最后一次对话</strong>；当晚 Ben 便遭劫车枪杀。<br>\n⏱ <strong>大概位置</strong>　前段（Ben 遇害之前）<br>\n🔍 <strong>在线找</strong>　搜 <code>Spider-Man 2002 Uncle Ben \"with great power comes great responsibility\" car</code></p>\n</div>\n<h3 id=\"d0-①-先背-先别管语法_9\">① 先背 · 先别管语法</h3>\n<div class=\"mem\">\n<p><strong>按块念</strong>　With-GREAT-POWer ｜ COMES ｜ great-re-SPON-si-BIL-i-ty<br>\n<strong>重音</strong>　GREAT / POWer / COMES / SPON；<code>comes</code> 处停半拍——它是倒装的支点<br>\n<strong>大意</strong>　能力越大，责任越大<br>\n<strong>动作</strong>　出声念 3 遍 → 合眼 2 遍</p>\n</div>\n<h3 id=\"d0-②-再懂-这句话里装了什么-先自己猜-再点开_9\">② 再懂 · 这句话里装了什么〔先自己猜，再点开〕</h3>\n<details>\n<summary>点开：结构 / 原书对应 / 直译 / 怎么用 / 一处必须知道的源流</summary>\n<p><strong>结构</strong>　<strong>介词短语前置引起的全部倒装</strong>（状语前置 → 谓语 comes 跑到主语之前）<br>\n<strong>原书对应</strong>　《必修英文法100》PART 3（特殊句式）<br>\n<strong>直译</strong>　能力越大，责任越大。<br>\n<strong>怎么用</strong>　还原为正常语序即：<code>Great responsibility comes with great power.</code>——这是<strong>倒装的正体</strong>。考点：<strong>状语前置 → 完全倒装</strong>（谓语在主语前，且不用 do 支持）。<br>\n<strong>源流提醒</strong>　⚠️⚠️ <strong>流传版 ≠ 1962 年漫画原文，这是本批最严重的一条。</strong></p>\n<blockquote>\n<p>1962 年《Amazing Fantasy》#15，<strong>原文是旁白（narration caption），并非角色台词</strong>：<br>\n<code>And a lean, silent figure slowly fades in the gathering darkness, aware at last that in this world, with great power there must also come — great responsibility!</code><br>\n① 措辞不同：原文是 <code>there must also come — great responsibility</code>，流传版被<strong>简化</strong>为 <code>comes great responsibility</code>；<br>\n② 归属是<strong>后期追认</strong>：原著中 Uncle Ben 只有两句台词，把此话算作他的教诲，<strong>1987 年漫画起才明确</strong>。<br>\n→ <strong>本卡只把「倒装结构」当教学点</strong>，措辞一律标注为「简化流传版」，<strong>不得作为权威引文使用</strong>。（注：2002 年电影里确由 Uncle Ben 在车中说出，本卡的定位描述以<strong>电影</strong>为准，措辞仍属简化版。）</p>\n</blockquote>\n</details>\n<h3 id=\"d0-③-后调-背顺了再来抠发音_9\">③ 后调 · 背顺了再来抠发音</h3>\n<details>\n<summary>点开：语音标注（连读 / 弱读 / 吞音）</summary>\n<table>\n<thead>\n<tr>\n<th>位置</th>\n<th>现象</th>\n<th>标注</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>With great</td>\n<td>不完全爆破</td>\n<td>/wɪð ɡreɪt/，great 的 t 与 comes 的 k 相接</td>\n</tr>\n<tr>\n<td>power comes great</td>\n<td>不完全爆破</td>\n<td>/ˈpaʊər kʌmz ɡreɪt/</td>\n</tr>\n<tr>\n<td>comes great</td>\n<td>省音倾向</td>\n<td>/kʌmz ɡreɪt/，z ＋ ɡ 相接</td>\n</tr>\n<tr>\n<td>（原文版）there must also</td>\n<td>弱读</td>\n<td>there /ðər/、must /məst/</td>\n</tr>\n</tbody>\n</table>\n</details>\n<h3 id=\"d0-④-去练-找到片段-作业_9\">④ 去练 · 找到片段 + 作业</h3>\n<p><strong>找片段</strong>　按「🎞 哪一幕」找（车内）；要精确到秒，用 <code>工具/find_quote.py</code><br>\n<strong>作业</strong>　盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 还原成正常语序（本句<strong>仅作听说</strong>，措辞不作权威引用）</p>\n<hr>\n<h2 id=\"d0-下一步\">下一步</h2>\n<table>\n<thead>\n<tr>\n<th>步骤</th>\n<th>内容</th>\n<th>状态</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1</td>\n<td>挑 10 个最高频结构</td>\n<td>✅</td>\n</tr>\n<tr>\n<td>2</td>\n<td>配 1 句过闸台词</td>\n<td>✅（8 句 L2，2 句降级）</td>\n</tr>\n<tr>\n<td>3</td>\n<td>改「先背 → 再懂 → 后调」顺序</td>\n<td>✅ 本版</td>\n</tr>\n<tr>\n<td>4</td>\n<td>加「片段定位」（场景 ＋ 搜索词 ＋ 定位工具）</td>\n<td>✅ 本版（<code>工具/find_quote.py</code>）</td>\n</tr>\n<tr>\n<td>5</td>\n<td>接入 10 段 10–30 秒音频 / 视频片段</td>\n<td>⏳ <strong>待补</strong>（需人工剪辑定位）</td>\n</tr>\n<tr>\n<td>6</td>\n<td>自测验收（脱稿复述 ＋ 听出连读点）</td>\n<td>⏳ 待做</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p><strong>片段补充说明</strong>：本版已完成「文本 ＋ 语音标注 ＋ 定位信息」，但 10 段<strong>音频 / 视频片段尚未接入</strong>——需要人工按定位信息剪辑。这是 v0.3 的工作。</p>\n</blockquote>\n<hr>\n<p><em>版本 v0.2 ｜ 2026-10-01 ｜ 依据 <code>05_台词金句方案.md</code> 的三层架构与 6 道闸筛选器；定位信息经检索核实</em></p>", "sections": [{"id": "d0-使用说明", "title": "使用说明"}, {"id": "d0-总表-10-句过闸结果", "title": "总表：10 句过闸结果"}, {"id": "d0-01-some-birds-aren-t-meant-to-be-caged-l2-l3", "title": "01 ｜ some birds aren't meant to be caged 【L2 + L3】"}, {"id": "d0-02-what-we-do-in-life-echoes-in-eternity-l2-l3", "title": "02 ｜ what we do in life, echoes in eternity 【L2 + L3】"}, {"id": "d0-03-it-s-not-who-i-am-underneath-but-what-i-do-that-defines-me-l2-l3", "title": "03 ｜ it's not who I am underneath, but what I do that defines me 【L2 + L3】"}, {"id": "d0-04-i-m-also-just-a-girl-standing-in-front-of-a-boy-l2-l3", "title": "04 ｜ I'm also just a girl, standing in front of a boy 【L2 + L3】"}, {"id": "d0-05-life-is-like-a-box-of-chocolates-l2-l3", "title": "05 ｜ life is like a box of chocolates 【L2 + L3】"}, {"id": "d0-06-stupid-is-as-stupid-does-仅-l3", "title": "06 ｜ stupid is as stupid does 【仅 L3】"}, {"id": "d0-07-the-night-is-darkest-just-before-the-dawn-l2-l3", "title": "07 ｜ the night is darkest just before the dawn 【L2 + L3】"}, {"id": "d0-08-i-m-gonna-make-him-an-offer-he-can-t-refuse-l2-l3", "title": "08 ｜ I'm gonna make him an offer he can't refuse 【L2 + L3】"}, {"id": "d0-09-is-life-always-this-hard-or-is-it-just-when-you-re-a-kid-l2-l3", "title": "09 ｜ is life always this hard, or is it just when you're a kid 【L2 + L3】"}, {"id": "d0-10-with-great-power-comes-great-responsibility-仅-l3", "title": "10 ｜ with great power comes great responsibility 【仅 L3】"}, {"id": "d0-下一步", "title": "下一步"}]}];
+const SECTIONS = [{"id": "d0-使用说明", "title": "使用说明", "docIndex": 0, "text": "一张卡的三步节奏：先背 → 再懂 → 后调 不要一上来就读讲解。 v0.1 的失败就在这里：把「结构 / 出处 / 权威状态 / 直译 / 用法」五块解释全堆在台词前面，初学者翻了两页说明还没见到句子，人已经走了。 正确的顺序是： 步 做什么 位置 为什么 ① 先背 看大字台词，出声念 3 遍 → 合眼再念 2 遍 卡片最上方 记忆优先 ：先让句子变成「能脱口而出的一块声音」 ② 再懂 点开折叠，看结构 / 原书对应 / 直译 / 怎么用 折叠区 1 句子已进嘴，此时讲解是「解密」而非「负担」 ③ 后调 点开折叠，抠连读 / 弱读 / 吞音 折叠区 2 语音要在 念顺了之后 才微调，否则越抠越乱 用「折叠」是 故意的 ——讲解默认 不展开 ，逼你先和句子独处一分钟。手点开，就说明你准备好了。 怎么找到这个片段——四种办法，从省事到最准 办法 精度 怎么做 适用 ① 场景描述 认得出即可 看卡上「🎞 哪一幕」，凭画面找 最快， 推荐先做这个 ② 字幕秒级定位 精确到秒 拿 你自己片源 的 .srt / .ass / .vtt 字幕，喂给 工具/find_quote.py 唯一精确的办法 ，见下 ③ 在线搜索词 找到视频片段 把卡上「🔍 在线找」那行直接粘进 B站 / YouTube 想直接看视频 ④ 死时间戳 ❌ 不可靠 —— 本卡故意不给 ，原因见下 为什么卡上「不写死」时间戳 同一个「几点几分几秒」， 换个片源就错 ：影院版 / 加长版 / 不同压制组的字幕时间轴都会平移。写下 01:23:45 ，在你手上的版本里可能是别的地方—— 那是假精确 。 正确做法是自己量。 项目里附了一个本地工具： python 工具/find_quote.py 我的字幕.srt \"some birds aren't meant to be caged\" 它会输出 你这版片源的精确时间戳 ，外加前后几句对白。字幕文件从哪来：下载的 .srt 字幕包，或用播放器（PotPlayer / VLC）导出。 例： 02 角斗士 那句，某来源标注为「开场字幕起算 00:07:09–00:07:12」——可作参考，但 以你自己的字幕定位为准 。 一条铁律 凡是「权威状态」标了警告的句子，只能当听说素材，不能当写作模板。 原因见 05_台词金句方案.md §2.4： 电影台词没有「卷末定本」，同一句话在不同字幕 / 配音 / 剧本间会漂移。"}, {"id": "d0-总表-10-句过闸结果", "title": "总表：10 句过闸结果", "docIndex": 0, "text": "# 结构 台词 出处 权威状态 定级 01 be meant to be V-ed Some birds aren't meant to be caged. 肖申克的救赎 1994 ✅ 多源一致 L2 + L3 02 what 主语从句 …what we do in life, echoes in eternity. 角斗士 2000 ✅ 多源一致 L2 + L3 03 it 强调句 + not…but… It's not who I am underneath, but what I do that defines me. 蝙蝠侠：侠影之谜 2005 ✅ 一致（同片另有变体） L2 + L3 04 现在分词后置修饰 I'm also just a girl, standing…, asking… 诺丁山 1999 ✅ 一致（流传版漏 also） L2 + L3 05 what 宾语从句 + gonna Life is like a box of chocolates. You never know what you're gonna get. 阿甘正传 1994 ⚠️ is / was 有分歧 L2 + L3 06 as … as 同级比较 Stupid is as stupid does. 阿甘正传 1994 ✅ 一致 仅 L3 （俗谚语域） 07 最高级 + just before The night is darkest just before the dawn. 黑暗骑士 2008 ✅ 一致（个别源省略 just） L2 + L3 08 定语从句（省略关系代词） I'm gonna make him an offer he can't refuse. 教父 1972 ⚠️ 多版本 L2 + L3 09 选择疑问 + when 从句 Is life always this hard, or is it just when you're a kid? 这个杀手不太冷 1994 ✅ 多源一致 L2 + L3 10 前置状语 + 全部倒装 With great power comes great responsibility. 蜘蛛侠 2002 ⚠️⚠️ 流传版 ≠ 原文 仅 L3 试点统计 ：10 句中， 7 句多源一致、3 句查出版本问题 （05 / 08 / 10），其中 10 号最严重。另有 2 句因 语域 不合格而降级为「仅 L3」。 结论 ：6 道闸 确实在筛掉东西 ——不是走过场。"}, {"id": "d0-01-some-birds-aren-t-meant-to-be-caged-l2-l3", "title": "01 ｜ some birds aren't meant to be caged 【L2 + L3】", "docIndex": 0, "text": "Some birds aren't meant to be caged. Their feathers are just too bright. 🎬 电影 《肖申克的救赎》The Shawshank Redemption（1994） 🗣 谁说的 Red（摩根·弗里曼 旁白） 🎞 哪一幕 Andy 越狱之后。Red 还关在狱里 ，旁白回忆 Andy。画面是监狱操场、食堂、墓地干活这些日常。 ⏱ 大概位置 中后段（越狱之后、结尾之前）。 注意 ：它 不是 结尾那段旁白，很多人记错。 🔍 在线找 搜 Shawshank \"some birds aren't meant to be caged\" clip ① 先背 · 先别管语法 按块念 some-BIRDS ｜ aren't-MEANT-to-be ｜ CAGED 重音 BIRDS / MEANT / CAGED 三下落地，其余一带而过 大意 有些鸟天生就不该关着 动作 看大字出声念 3 遍 → 合眼再念 2 遍。念不顺，别往下走。 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 be meant to be V-ed —— 「（被设计 / 注定）要…」 原书对应 《必修英文法100》PART 2（被动语态 ＋ to 不定式） 直译 有些鸟不是被设计来关在笼子里的。它们的羽毛就是太鲜亮了。 怎么用 X is not meant to be Y-ed 可整块搬用（把 X 当 Y 对待是不对的）——这个结构本身 可迁移 ，是它过闸的关键。 提醒 ⚠️ 中文流传版不可信：「有些鸟儿是关不住的，因为它们的每一片羽翼上都沾满了自由的光辉」——对照原文 Their feathers are just too bright. ，这是 意译 ，不是原文。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 some‿birds 连读 /sʌm‿bɜːrdz/ aren't 吞音 /ɑːrnt/ → /ɑːrnʔ/，词尾 t 常吞 meant‿to 连读 ＋ 弱读 /ment‿tə/（to 弱读 /tə/） to be 弱读 be 弱读 /bi/ feathers‿are 连读 /ˈfeðərz‿ɑːr/ just too 不完全爆破 /dʒʌsʔ tuː/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 be meant to 造 2 句"}, {"id": "d0-02-what-we-do-in-life-echoes-in-eternity-l2-l3", "title": "02 ｜ what we do in life, echoes in eternity 【L2 + L3】", "docIndex": 0, "text": "Brothers, what we do in life, echoes in eternity. 🎬 电影 《角斗士》Gladiator（2000） 🗣 谁说的 Maximus（罗素·克劳），对麾下骑兵的战前演说 🎞 哪一幕 开场第一场戏 ——罗马军团在日耳曼森林列阵，Maximus 骑马巡行、给士兵打气，说完这句便下令冲锋。 ⏱ 大概位置 开场约 7 分钟（某来源标注开场字幕起算 00:07:09–00:07:12） 🔍 在线找 搜 Gladiator \"what we do in life echoes in eternity\" ① 先背 · 先别管语法 按块念 Brothers ｜ what-we-DO-in-LIFE ｜ ECHOES-in-e-TER-nity 重音 DO / LIFE / ECHOES 三处用力； what we do in life 一口气带过 大意 弟兄们，我们一生所做之事，会在永恒里回响 动作 出声念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 what 引导的主语从句 （ what we do in life 整个作主语） 原书对应 《必修英文法100》PART 3（从句）；原书 100 句 025 Humans learn to express what they think… （what 宾语从句） 直译 弟兄们，我们一生所做之事，会在永恒中回响。 怎么用 what 从句作主语时，谓语用 单数 —— What we do **echoes** 。这是高考 / 四六级高频考点，而这句话把它放进了一个记得住的场景。 提醒 片中是 what we do in life**,** echoes… （中间有停顿）；海报标语版作 What We Do In Life Echoes In Eternity. ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 what‿we 喉塞 /wɒʔ wi/ we do‿in 连读 /wi duː‿ɪn/ life‿echoes 连读（浊化） /laɪf‿ˈekəʊz/，f 受浊音影响近于 /v/ echoes‿in 连读 /ˈekəʊz‿ɪn/ in‿eternity 连读 /ɪn‿ɪˈtɜːrnəti/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词，并用 what 主语从句造 2 句"}, {"id": "d0-03-it-s-not-who-i-am-underneath-but-what-i-do-that-defines-me-l2-l3", "title": "03 ｜ it's not who I am underneath, but what I do that defines me 【L2 + L3】", "docIndex": 0, "text": "It's not who I am underneath, but what I do that defines me. 🎬 电影 《蝙蝠侠：侠影之谜》Batman Begins（2005） 🗣 谁说的 Batman（Bruce Wayne），对 Rachel Dawes 🎞 哪一幕 高潮段 ——城市被稻草人 / 刺客联盟投放毒气，Batman 救下 Rachel 和一个孩子后，正要再冲进战场，Rachel 拦住他问「面具下的你到底是谁」，Batman 转身说了这句，随后跃下屋顶。 ⏱ 大概位置 接近结尾（单轨列车决战之前） 🔍 在线找 搜 Batman Begins \"what I do that defines me\" Rachel rooftop ① 先背 · 先别管语法 按块念 It's-not ｜ who-I-am-underneath ｜ but-what-I-DO ｜ that-de-FINES-me 重音 DO 和 DEFINES 两处最重， underneath 拖一下 大意 定义我的不是我内在是谁，而是我做了什么 动作 出声念 3 遍 → 合眼 2 遍。这句节奏感强，念顺了很好听。 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 it 强调句（it…that…） ＋ not … but … 原书对应 《必修英文法100》PART 3（特殊句式）；原书 100 句 076 It is not until you go abroad that you realize… —— 同为 it…that 强调句 ，可直接互参 直译 定义我的不是我内在是谁，而是我做了什么。 怎么用 把强调句「去强调」还原成普通句： What I do defines me, not who I am underneath. 反复互转，这个考点就拿下了。 提醒 ⚠️ 同片另有一版，结构不同 （Rachel 在早段的台词）： It's not who you are underneath, it's what you do that defines you. —— 后半用的是 it's ， 不是 that 。两句 不可混用 ，混用就丢掉了强调句。 本卡取 Batman 版。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 It's not 喉塞 /ɪts nɒʔ/ not‿who 连读 /nɒʔ huː/ who‿I 滑音连读 /huː‿waɪ/ I‿am 滑音连读 /aɪ‿jæm/ but 弱读 /bət/ that 弱读 /ðət/（关系代词弱读） do that 不完全爆破 /duː ðət/，t ＋ ð 相接 ④ 去练 · 找到片段 + 作业 找片段 注意这句 在片中出现两次 ，本卡要的是 结尾前 Batman 版 （ …but what I do that defines me ），不是早段 Rachel 版 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把它还原成普通语序"}, {"id": "d0-04-i-m-also-just-a-girl-standing-in-front-of-a-boy-l2-l3", "title": "04 ｜ I'm also just a girl, standing in front of a boy 【L2 + L3】", "docIndex": 0, "text": "I'm also just a girl, standing in front of a boy, asking him to love her. 🎬 电影 《诺丁山》Notting Hill（1999） 🗣 谁说的 Anna Scott（茱莉亚·罗伯茨），对书店老板 Will 🎞 哪一幕 后段 ——Anna 第二次到 Will 的书店，想复合，被 Will 拒绝；临走前说了这句（手里还拿着名画《La Mariée》当礼物）。 ⏱ 大概位置 接近结尾。 结尾 是 Savoy 酒店记者会，不要找错。 🔍 在线找 搜 Notting Hill \"just a girl standing in front of a boy\" ① 先背 · 先别管语法 按块念 I'm-AL-so-just-a-GIRL ｜ STAND-ing-in-front-of-a-BOY ｜ ASK-ing-him-to-LOVE-her 重音 GIRL / BOY / LOVE 三个名词落地； standing 、 asking 两个分词轻快带过 大意 我也不过是个女孩，站在一个男孩面前，求他爱她 动作 出声念 3 遍 → 合眼 2 遍。这句长，分队念就好背。 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 现在分词短语作后置修饰 （standing… / asking…） 原书对应 《必修英文法100》PART 2（分词）；原书 100 句 003 …listening to birds sing. 、 038 Some students coming to the library act as if… （现在分词作定语） 直译 我也只是个女孩，站在一个男孩面前，请求他爱她。 怎么用 「 分词替代定语从句 」的活标本——补全即 a girl who is standing in front of a boy, who is asking him to love her 。写作用它，句式立刻升一档。 提醒 ⚠️ 流传版漏字 ：广传版本作 I'm just a girl… ， 漏掉了 also ；多个来源原文均可查到 I'm **also** just a girl… 。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 just‿a 闪音 / 浊化 /dʒʌs‿ə/，t 在元音前浊化 standing‿in 连读 /ˈstændɪŋ‿ɪn/ front‿of 连读 ＋ 弱读 /frʌnt‿əv/，of 弱读 /əv/ of‿a 连读 /əv‿ə/ asking‿him h 脱落 /ˈæskɪŋ‿ɪm/ to love 弱读 to /tə/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找（书店内景）；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把两个分词还原成定语从句"}, {"id": "d0-05-life-is-like-a-box-of-chocolates-l2-l3", "title": "05 ｜ life is like a box of chocolates 【L2 + L3】", "docIndex": 0, "text": "Life is like a box of chocolates. You never know what you're gonna get. 🎬 电影 《阿甘正传》Forrest Gump（1994） 🗣 谁说的 Forrest（汤姆·汉克斯 旁白 / 对白） 🎞 哪一幕 前段 ——Forrest 坐在公交站的长椅上，对旁边的陌生人讲自己的妈妈，说到这句。 ⏱ 大概位置 开场后不久（约前 15 分钟） 🔍 在线找 搜 Forrest Gump \"life is like a box of chocolates\" bus stop ① 先背 · 先别管语法 按块念 LIFE-is-like-a-BOX-of-CHOColates ｜ you-NEV-er-KNOW ｜ what-you're-GONna-GET 重音 LIFE / BOX / KNOW / GET； gonna 一定要读成一块 /ˈɡənə/，别读成 going to 大意 生活就像一盒巧克力，你永远不知道会拿到哪颗 动作 出声念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 两个提醒 结构 what 引导的宾语从句 ＋ gonna （going to 的口语弱化） 原书对应 原书 100 句 025 …express what they think… （what 宾语从句） 直译 生活就像一盒巧克力。你还不知道你会拿到什么。 怎么用 what you're gonna get 是 宾语从句 ，作 know 的宾语。 提醒一 ⚠️ 有版本分歧 ： is 与 was 两种写法均见于不同来源（维基语录作 is ；部分来源作 was ）。→ 本卡 采用 is 。 提醒二 ⚠️ gonna 只能用于口语 ——书面作文必须写回 going to 。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 life‿is 连读 /laɪf‿ɪz/ like‿a 连读 /laɪk‿ə/ box‿of 连读 ＋ 弱读 /bɒks‿əv/ what‿you're 同化 /wɒtʃə/，t ＋ j → tʃ gonna 弱化 /ˈɡənə/（＝ going to） you're 弱读 /jər/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找（长椅）；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把 gonna 写回 going to 再念一遍"}, {"id": "d0-06-stupid-is-as-stupid-does-仅-l3", "title": "06 ｜ stupid is as stupid does 【仅 L3】", "docIndex": 0, "text": "Stupid is as stupid does. 🎬 电影 《阿甘正传》Forrest Gump（1994） 🗣 谁说的 Forrest 🎞 哪一幕 前段 —— 同一段长椅戏 里，旁边的人问 Forrest「Are you stupid?（你是不是傻）」，Forrest 用这句回敬。 ⏱ 大概位置 开场后不久，与第 05 句同一段 🔍 在线找 搜 Forrest Gump \"stupid is as stupid does\" ① 先背 · 先别管语法 按块念 STU-pid ｜ is-as ｜ STU-pid ｜ DOES 重音 两个 STUpid 、一个 DOES ，三下；中间的 is as 极轻 大意 蠢就是蠢人所为（看行为就知道人蠢不蠢） 动作 出声念 3 遍 → 合眼 2 遍。短句，5 秒就能记住。 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 为什么它被降级 结构 as … as 同级比较 （以「平行省略」形式出现） 原书对应 《必修英文法100》PART 5（比较）；原书 100 句 062 about twice as expensive in the U.K. as in Japan 直译 蠢就是蠢人所为。 怎么用 听说是好素材；写作请回到 062 的 as … as … 常规句式。 为什么降级 ⚠️ 语域不合格 → 仅作 L3 ：这是 俗谚 / 口语体 （ stupid does 是省略表达），与 as…as 的书面常规用法不同， 不能当 as...as 的写作模板 。这正是第 4 道闸（语域）在起作用。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 stupid‿is 连读 /ˈstjuːpɪd‿ɪz/ is‿as 连读 /ɪz‿əz/ as stupid 不完全爆破 /əz‿ˈstjuːpɪd/ 重音对比 第一个 as /əz/ 弱读，第二个 as 重读 /æz/ 平行结构的重音示范 ④ 去练 · 找到片段 + 作业 找片段 与第 05 句 同一段长椅戏 ，连在一起看更省事 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说出台词（本句 不作 写作练习）"}, {"id": "d0-07-the-night-is-darkest-just-before-the-dawn-l2-l3", "title": "07 ｜ the night is darkest just before the dawn 【L2 + L3】", "docIndex": 0, "text": "The night is darkest just before the dawn. And I promise you, the dawn is coming. 🎬 电影 《黑暗骑士》The Dark Knight（2008） 🗣 谁说的 Harvey Dent（地方检察官） 🎞 哪一幕 中段 ——记者会上，Harvey 回应小丑造成的恐慌，先说「情况确实更糟了」，接着说这句安抚民众； 紧接着当场宣布「我就是蝙蝠侠」 （替 Batman 顶罪）。 ⏱ 大概位置 中段 🔍 在线找 搜 Dark Knight \"night is darkest just before the dawn\" press conference ① 先背 · 先别管语法 按块念 The-NIGHT-is-DARK-est ｜ just-be-FORE-the-DAWN ｜ and-I-PROM-ise-you ｜ the-DAWN-is-COM-ing 重音 NIGHT / DARKest / DAWN / PROMise / COMing 大意 黎明之前，夜最黑——而我向你保证，黎明就要来了 动作 出声念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 最高级 the darkest ＋ just before 时间状语 原书对应 《必修英文法100》PART 5（比较）；原书 100 句 017 The best thing about my stay… 直译 黎明之前，夜最黑。我向你保证，黎明就要来了。 怎么用 一句覆盖两个考点 ：前句 → 最高级 the darkest ；后句 → 插入语 （I promise you）＋ 现在进行表将来 （is coming）。 提醒 个别来源省略 just （ The night is darkest before the dawn. ）→ 本卡以 含 just 为主。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 night‿is 连读 /naɪt‿ɪz/ darkest‿just 不完全爆破 /ˈdɑːrkɪst‿dʒʌst/ just‿before 不完全爆破 /dʒʌsʔ bɪˈfɔːr/ before the 弱读 the /ðə/ is coming 弱读 is /ɪz/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找（记者会）；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 用最高级造句"}, {"id": "d0-08-i-m-gonna-make-him-an-offer-he-can-t-refuse-l2-l3", "title": "08 ｜ I'm gonna make him an offer he can't refuse 【L2 + L3】", "docIndex": 0, "text": "I'm gonna make him an offer he can't refuse. 🎬 电影 《教父》The Godfather（1972） 🗣 谁说的 Vito Corleone（马龙·白兰度） 🎞 哪一幕 前段 ——教子 Johnny Fontane 来求助（想拿到电影角色，制片人 Jack Woltz 不松口），Vito 应下这桩事、说了这句。 紧接着就是「床上马头」那场戏 ——这句和那个画面是连着的，找到马头就找到它。 ⏱ 大概位置 前段（开场约前 25–30 分钟） 🔍 在线找 搜 Godfather \"an offer he can't refuse\" horse head scene ① 先背 · 先别管语法 按块念 I'm-GONna ｜ MAKE-him ｜ an-OF-fer ｜ he-CAN'T-re-FUSE 重音 MAKE / OFfer / FUSE； gonna 读成 /ˈɡənə/， him 几乎吞掉 大意 我要给他一个他没法拒绝的条件 动作 出声念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 定语从句（关系代词作宾语被省略） 原书对应 《必修英文法100》PART 3（关系词）；原书 100 句 031 the novel I borrowed from the library yesterday —— 同样省略了关系代词 ，与本句结构完全对应 直译 我要给他一个他无法拒绝的条件。 怎么用 考点： an offer **he can't refuse** —— 关系代词作宾语时被省略 。补全即 an offer **that** he can't refuse 。这个「省略」正是高考 / 专八改错的高频点。 提醒 ⚠️ 有版本分歧 ：原著小说（Puzo）作 I'll make him… ；片中白兰度发音 近于 I wanna make him… ；同片不同角色另有变体。→ 本卡以 I'm gonna make him an offer he can't refuse. 为准。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 gonna 弱化 /ˈɡənə/（＝ going to） make‿him h 脱落 /meɪk‿ɪm/ him‿an 连读 ＋ 弱读 /ɪm‿ən/ an‿offer 连读 /ən‿ˈɔːfər/ offer‿he h 脱落 /ˈɔːfər‿i/ can't 吞音 /kænʔ/，t 吞 ④ 去练 · 找到片段 + 作业 找片段 这句与「床上马头」前后相连，找到马头那场戏即可 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 把省略的关系代词补回去"}, {"id": "d0-09-is-life-always-this-hard-or-is-it-just-when-you-re-a-kid-l2-l3", "title": "09 ｜ is life always this hard, or is it just when you're a kid 【L2 + L3】", "docIndex": 0, "text": "Is life always this hard, or is it just when you're a kid? Always like this. 🎬 电影 《这个杀手不太冷》Léon: The Professional（1994） 🗣 谁说的 Mathilda 问，Léon 答 🎞 哪一幕 早段 ——公寓楼道里，Mathilda 被父亲打得流鼻血坐在楼梯口，Léon 经过、递给她一块手帕，她抬头问了这句。（此时她的家人 还没 被杀。） ⏱ 大概位置 早段 🔍 在线找 搜 Leon The Professional \"is life always this hard\" hallway ① 先背 · 先别管语法 按块念 Is-LIFE-always-this-HARD ｜ or-is-it-just ｜ when-you're-a-KID 重音 LIFE / HARD / KID； or is it just 一句带过；答句 AL-ways-like-THIS 三下 大意 人生总是这么苦吗，还是只有小时候才这样？——一直如此。 动作 一问一答连着念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一个提醒 结构 选择疑问句 ＋ when 引导的时间状语从句 ＋ 省略答语 原书对应 《必修英文法100》PART 3（连词）；原书 100 句 005 When waiting for the elevator to come… 直译 人生总是这么苦吗，还是只有小时候才这样？—— 一直如此。 怎么用 ⚠️ 答语 Always like this. 是 省略句 （省略了 It is）。写作中 必须补全 为 It is always like this. ， 不可照抄 。 提醒 一个漂亮的对照 ：同一部片里，反派 Stansfield 那句 I like these calm/quiet little moments before the storm 有版本分歧 （见 05_台词金句方案.md ），而这一句 有定本 。→ 「可信度」是逐句判定的，不是按影片整体判定的。 ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 Is‿life 连读 /ɪz‿laɪf/ life‿always 连读 /laɪf‿ˈɔːlweɪz/ or‿is‿it 连续连读 /ɔːr‿ɪz‿ɪt/ just 喉塞 /dʒʌsʔ/ when‿you're 连读 ＋ 弱读 /wen‿jər/ a kid 弱读 /ə kɪd/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找（公寓楼道楼梯口）；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说这一问一答 + 把答语补全"}, {"id": "d0-10-with-great-power-comes-great-responsibility-仅-l3", "title": "10 ｜ with great power comes great responsibility 【仅 L3】", "docIndex": 0, "text": "With great power comes great responsibility. 🎬 电影 《蜘蛛侠》Spider-Man（2002） 🗣 谁说的 Uncle Ben（本叔叔），对 Peter 🎞 哪一幕 前段 ——Uncle Ben 开车送 Peter 去（他谎称的）图书馆，路上语重心长地讲「你正在变成你将来要成为的那个人」，末了说了这句。Peter 顶撞他「你别装我爸」， 这是两人最后一次对话 ；当晚 Ben 便遭劫车枪杀。 ⏱ 大概位置 前段（Ben 遇害之前） 🔍 在线找 搜 Spider-Man 2002 Uncle Ben \"with great power comes great responsibility\" car ① 先背 · 先别管语法 按块念 With-GREAT-POWer ｜ COMES ｜ great-re-SPON-si-BIL-i-ty 重音 GREAT / POWer / COMES / SPON； comes 处停半拍——它是倒装的支点 大意 能力越大，责任越大 动作 出声念 3 遍 → 合眼 2 遍 ② 再懂 · 这句话里装了什么〔先自己猜，再点开〕 点开：结构 / 原书对应 / 直译 / 怎么用 / 一处必须知道的源流 结构 介词短语前置引起的全部倒装 （状语前置 → 谓语 comes 跑到主语之前） 原书对应 《必修英文法100》PART 3（特殊句式） 直译 能力越大，责任越大。 怎么用 还原为正常语序即： Great responsibility comes with great power. ——这是 倒装的正体 。考点： 状语前置 → 完全倒装 （谓语在主语前，且不用 do 支持）。 源流提醒 ⚠️⚠️ 流传版 ≠ 1962 年漫画原文，这是本批最严重的一条。 1962 年《Amazing Fantasy》#15， 原文是旁白（narration caption），并非角色台词 ： And a lean, silent figure slowly fades in the gathering darkness, aware at last that in this world, with great power there must also come — great responsibility! ① 措辞不同：原文是 there must also come — great responsibility ，流传版被 简化 为 comes great responsibility ； ② 归属是 后期追认 ：原著中 Uncle Ben 只有两句台词，把此话算作他的教诲， 1987 年漫画起才明确 。 → 本卡只把「倒装结构」当教学点 ，措辞一律标注为「简化流传版」， 不得作为权威引文使用 。（注：2002 年电影里确由 Uncle Ben 在车中说出，本卡的定位描述以 电影 为准，措辞仍属简化版。） ③ 后调 · 背顺了再来抠发音 点开：语音标注（连读 / 弱读 / 吞音） 位置 现象 标注 With great 不完全爆破 /wɪð ɡreɪt/，great 的 t 与 comes 的 k 相接 power comes great 不完全爆破 /ˈpaʊər kʌmz ɡreɪt/ comes great 省音倾向 /kʌmz ɡreɪt/，z ＋ ɡ 相接 （原文版）there must also 弱读 there /ðər/、must /məst/ ④ 去练 · 找到片段 + 作业 找片段 按「🎞 哪一幕」找（车内）；要精确到秒，用 工具/find_quote.py 作业 盲听 3 遍 → 看标注精听 → 影子跟读 5 遍 → 脱稿说 + 还原成正常语序（本句 仅作听说 ，措辞不作权威引用）"}, {"id": "d0-下一步", "title": "下一步", "docIndex": 0, "text": "步骤 内容 状态 1 挑 10 个最高频结构 ✅ 2 配 1 句过闸台词 ✅（8 句 L2，2 句降级） 3 改「先背 → 再懂 → 后调」顺序 ✅ 本版 4 加「片段定位」（场景 ＋ 搜索词 ＋ 定位工具） ✅ 本版（ 工具/find_quote.py ） 5 接入 10 段 10–30 秒音频 / 视频片段 ⏳ 待补 （需人工剪辑定位） 6 自测验收（脱稿复述 ＋ 听出连读点） ⏳ 待做 片段补充说明 ：本版已完成「文本 ＋ 语音标注 ＋ 定位信息」，但 10 段 音频 / 视频片段尚未接入 ——需要人工按定位信息剪辑。这是 v0.3 的工作。 版本 v0.2 ｜ 2026-10-01 ｜ 依据 05_台词金句方案.md 的三层架构与 6 道闸筛选器；定位信息经检索核实"}];
+
+const navEl=document.getElementById('nav'), sideEl=document.getElementById('sidebar');
+const searchEl=document.getElementById('search'), themeBtn=document.getElementById('themeBtn');
+const topBtn=document.getElementById('topBtn'), menuBtn=document.getElementById('menuBtn');
+
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderNav(){
+  navEl.innerHTML = DOCS.map(d =>
+    '<div class="nav-doc" data-target="'+d.id+'">'+esc(d.title)+'</div>'+
+    d.sections.map(s => '<div class="nav-sec" data-target="'+s.id+'">'+esc(s.title)+'</div>').join('')
+  ).join('');
+}
+function jump(id){
+  const el=document.getElementById(id); if(!el) return;
+  window.scrollTo({top: el.getBoundingClientRect().top+window.scrollY-70, behavior:'smooth'});
+  sideEl.classList.remove('open');
+}
+navEl.addEventListener('click', e => {
+  const hit = e.target.closest('[data-target]'); if(hit) jump(hit.dataset.target);
+});
+
+function snippet(text,q){
+  const i=text.toLowerCase().indexOf(q);
+  const from=Math.max(0,i-36), to=Math.min(text.length,i+q.length+64);
+  const s=(from>0?'…':'')+text.slice(from,to)+(to<text.length?'…':'');
+  const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  return esc(s).replace(re,'<mark>$1</mark>');
+}
+let timer=null;
+searchEl.addEventListener('input',()=>{clearTimeout(timer); timer=setTimeout(runSearch,130);});
+function runSearch(){
+  const q=searchEl.value.trim().toLowerCase();
+  if(!q){ renderNav(); return; }
+  const hits=[];
+  for(const s of SECTIONS){
+    const t=s.text.toLowerCase();
+    let i=t.indexOf(q), c=0;
+    while(i!==-1 && c<999){ c++; i=t.indexOf(q,i+q.length); }
+    const inTitle=s.title.toLowerCase().includes(q);
+    if(c>0||inTitle) hits.push({s,c:c+(inTitle?50:0)});
+  }
+  hits.sort((a,b)=>b.c-a.c);
+  if(!hits.length){ navEl.innerHTML='<div class="nav-empty">没有找到「'+esc(searchEl.value.trim())+'」</div>'; return; }
+  navEl.innerHTML='<div class="res-count">命中 '+hits.length+' 个章节</div>'+
+    hits.slice(0,80).map(h =>
+      '<div class="res" data-target="'+h.s.id+'">'+
+        '<div class="res-t">'+esc(h.s.title)+'</div>'+
+        '<div class="res-d">'+esc(DOCS[h.s.docIndex].title)+'　·　'+h.c+' 处</div>'+
+        (h.s.text?'<div class="res-s">'+snippet(h.s.text,q)+'</div>':'')+
+      '</div>').join('');
+}
+
+const secEls=()=>Array.from(document.querySelectorAll('.doc h2[id], .doc h1[id]'));
+let ticking=false;
+function onScroll(){
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(()=>{
+    const h=document.documentElement.scrollHeight-window.innerHeight;
+    document.getElementById('progress').style.width=(h>0?(window.scrollY/h*100):0)+'%';
+    topBtn.style.display = window.scrollY>700 ? 'block':'none';
+    const line=window.scrollY+100; let cur=null;
+    for(const el of secEls()){
+      if(el.getBoundingClientRect().top+window.scrollY<=line) cur=el.id; else break;
+    }
+    if(cur){
+      document.querySelectorAll('.nav-sec.active').forEach(e=>e.classList.remove('active'));
+      const a=navEl.querySelector('.nav-sec[data-target="'+cur+'"]');
+      if(a){
+        a.classList.add('active');
+        const r=a.getBoundingClientRect(), nr=sideEl.getBoundingClientRect();
+        if(r.top<nr.top+40||r.bottom>nr.bottom-40) a.scrollIntoView({block:'center'});
+      }
+    }
+    ticking=false;
+  });
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+
+const saved=localStorage.getItem('reader-theme');
+if(saved) document.documentElement.dataset.theme=saved;
+function syncThemeBtn(){ themeBtn.textContent = document.documentElement.dataset.theme==='dark'?'浅色':'深色'; }
+syncThemeBtn();
+themeBtn.addEventListener('click',()=>{
+  const t=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=t;
+  localStorage.setItem('reader-theme',t);
+  syncThemeBtn();
+});
+menuBtn.addEventListener('click',()=>sideEl.classList.toggle('open'));
+topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();searchEl.focus();searchEl.select();}
+  if(e.key==='Escape'){searchEl.value='';runSearch();searchEl.blur();}
+});
+
+renderNav(); onScroll();
+</script>
+</body>
+</html>
