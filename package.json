@@ -13,7 +13,9 @@
     "check:tools": "node scripts/check-tools.mjs",
     "sync:tools": "node scripts/sync-tools.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
-    "ship": "node scripts/ship.mjs"
+    "ship": "node scripts/ship.mjs",
+    "backlog": "node scripts/backlog.mjs",
+    "backlog:scan": "node scripts/backlog.mjs scan"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
