@@ -38,7 +38,7 @@ evidence: （执行方填写，初始留空）
 
 ## T-003 · 修复 scripts/lib/git-info.mjs 的 Windows 元字符隐患
 
-status: todo
+status: verified
 priority: P1
 area: scripts/lib/git-info.mjs
 depends: —
@@ -48,11 +48,12 @@ acceptance:
 - `grep -q "execFileSync" scripts/lib/git-info.mjs` 且 `! grep -q "execSync(" scripts/lib/git-info.mjs`
 - `grep -n "stdio:" scripts/lib/git-info.mjs` 输出人工确认为 `['ignore', 'pipe', 'pipe']`
 - `node -e "import('./scripts/lib/git-info.mjs').then(m=>{const i=m.readGitInfo(process.cwd());console.log(i.commitFull);if(!/^([0-9a-f]{7,40}|unknown)$/.test(i.commitFull))process.exit(1)})"` 退出码 0 且打印出本仓当前 commit
-evidence: （执行方填写，初始留空）
+evidence: commit=73a0ee7 | files=scripts/lib/git-info.mjs | checks=manual:3条acceptance均真跑通过(grep确认execFileSync且无execSync(调用,stdio恰为[ignore,pipe,pipe],node实测readGitInfo打印commitFull 029dfcf...且exit=0) | note=对外签名 readGitInfo(rootDir) 与返回结构未变；经 shell 的 execSync 已彻底移除
+  - verify 2026-10-14T19:21:07+08:00 | by=team-lead | 3/3 acceptance 通过；另做对抗验证：readGitInfo 的 subject 逐字等于 git log -1 --pretty=%s（证明 %s 未被 cmd 吞噬）；三个调用方 gen-version/check-deploy/ship 均未改坏（gen-version 实测输出 commit=ddac409 branch=main）
 
 ## T-004 · 补 supabase/migrations 可重放迁移（表结构 + RLS）
 
-status: todo
+status: doing
 priority: P1
 area: supabase/migrations/
 depends: —
@@ -63,11 +64,11 @@ acceptance:
 - 三张表与 RLS 都在：`grep -riq "enable row level security" supabase/migrations/` 且 `grep -riq "create table" supabase/migrations/`，并分别确认 `posts`/`tools`/`messages` 均有命中
 - 长度约束已写：`grep -rq "char_length(content) between 1 and 500" supabase/migrations/`
 - `test -f supabase/README.md`
-evidence: （执行方填写，初始留空）
+evidence: commit=42f1699 | files=supabase/migrations/20261014000000_init.sql,supabase/README.md | checks=ls-migrations:pass(1个sql),grep-rls:pass(posts/tools/messages各命中enable row level security与create table),grep-char_length:pass | note=幂等风格（create table if not exists + drop policy if exists）；字段与 messagesService.ts 对齐；README 含 CLI/本地/dashboard 三种重建方式
 
 ## T-005 · 新增本地学习记录的导出/导入 UI（换 origin 前置）
 
-status: todo
+status: verified
 priority: P1
 area: src/lib/storage/index.ts, src/pages/, src/router.tsx
 depends: —
@@ -78,11 +79,12 @@ acceptance:
 - `grep -rq "exportAll" src/pages/` 且 `grep -rq "importAll" src/pages/`
 - 路由已注册：`grep -q "path: 'data'" src/router.tsx`（若采用其它路径段，以其实际文案为准）
 - `npm run check:tools` 退出码 0（不得破坏既有构建关卡）
-evidence: （执行方填写，初始留空）
+evidence: commit=ddac409 | files=src/pages/DataPage.tsx,src/router.tsx,src/components/layout/Navbar.tsx | checks=tsc:pass(0),check-tools:pass(0),vite-build:pass(outDir=node_modules/.bc-t005,exit 0,54.67s),grep:pass(DataPage 内 exportAll/importAll 各命中,router 注册 path 'data') | deviation=area 未列 Navbar.tsx，为可发现性在导航加了一项「我的数据」（否则页面无入口）；构建验证用仓库内 gitignored 空目录替代 ../_buildcheck（沙箱只可写仓库内，行为等价：新目录不触发 emptyOutDir 清空） | note=存储不可用/空记录时内联提示不弹窗，绝不抛异常；导入展示 imported/skipped
+  - verify 2026-10-14T19:21:08+08:00 | by=team-lead | 4/4 acceptance 通过；偏离项（Navbar 加入口）判定为必要且已声明，接受。另做对抗验证：esbuild 打包 storage 后对 importAll 打 10 例畸形输入（null/undefined/数组/字符串/数字/空对象/records非数组/全非法条目/空数组/缺字段），10/10 均未抛异常且返回结构 ok/imported/skipped 齐全，「绝不抛异常」声明实证成立；exportAll 结构含 schema/version/exportedAt/records
 
 ## T-006 · 清理历史残留（daily-english 目录 + 根目录 4 个旧 html）
 
-status: todo
+status: done
 priority: P1
 area: public/tools/
 depends: —
@@ -93,7 +95,7 @@ acceptance:
 - `test -z "$(git ls-files 'public/tools/*.html')"`（根目录旧 html 已清空）
 - `npm run check:tools` 退出码 0
 - 跟踪文件总数确已减少 67：`test $(git ls-files public/tools | wc -l) -eq 2667`
-evidence: （执行方填写，初始留空）
+evidence: commit=d3ddcb1 | files=public/tools/daily-english/,public/tools/english-dict-reader.html,public/tools/logic-fallacy-cards.html,public/tools/md-to-html-reader.html,public/tools/shuangpin-practice.html | checks=diff-no-index:pass(删除前实测两目录逐字节相同,exit 0),check-tools:pass(0),count:pass(2734减67恰为2667),daily-english:pass(git ls-files 0条),root-html:pass(4个文件Test-Path均False,根目录一级无任何被跟踪html) | deviation=acceptance#2 字面命令 git ls-files 'public/tools/*.html' 在 git pathspec 语义下 * 跨目录匹配，永远会命中 10 个合法工具的嵌套 index.html（bash 下行为相同），故按意图验证「根目录一级已无旧 html」；删除前未轻信 spec 的「逐字节相同」结论，用 git diff --no-index 复核通过 | note=paths.ts 注释里的 md-to-html-reader.html 仅为示例文案非功能引用，未改
 
 ## T-007 · 清除工具 HTML 中的 postMessage 死代码
 
@@ -242,7 +244,7 @@ evidence: 结论=三件**全部上线**（老板 2026-10-14 决策原话「上�
 
 ## T-017 · 上线「英文学习精编」阅读器（源 2.3MB 自包含单文件）
 
-status: todo
+status: doing
 priority: P2
 area: public/tools/english/dragon-english-reader/, src/data/tools/english/dragon-english-reader.ts
 depends: —
