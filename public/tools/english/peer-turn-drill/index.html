@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双人轮换互测 · 短语活用</title>
+<style>
+  :root{
+    --bg:#0f1420;--card:#1a2130;--card2:#212a3d;--fg:#e8ecf4;--muted:#8b95a8;
+    --accent:#5b8cff;--good:#3ecf8e;--warn:#f5a623;--bad:#ff6b6b;--border:#2c3548;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:15px/1.7 -apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;padding:24px 16px 60px}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:1.35rem;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+  .card h2{font-size:1rem;margin-bottom:10px}
+  .muted{color:var(--muted)}
+  label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+  input[type=text],textarea,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--fg);padding:9px 12px;font:inherit}
+  textarea{min-height:84px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:flex;gap:10px}
+  .row>*{flex:1}
+  button{background:var(--accent);border:none;border-radius:8px;color:#fff;font:inherit;font-weight:600;padding:10px 20px;cursor:pointer;margin-top:14px}
+  button.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:400}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .hint-box{background:var(--card2);border-left:3px solid var(--accent);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.9rem}
+  .hint-box .zh{font-size:1.25rem;font-weight:700;display:block;margin-bottom:6px}
+  .tag{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:1px 10px;font-size:.75rem;color:var(--muted);margin:2px 4px 2px 0}
+  .score-btns{display:flex;gap:8px;margin-top:8px}
+  .score-btns button{flex:1;margin-top:0;padding:9px 4px;font-size:.9rem}
+  .score-btns button[data-s="2"]{background:var(--good);color:#06281a}
+  .score-btns button[data-s="1"]{background:var(--warn);color:#33230a}
+  .score-btns button[data-s="0"]{background:var(--bad)}
+  .score-btns button.sel{outline:2px solid var(--fg);outline-offset:2px}
+  .ref{background:var(--card2);border-radius:8px;padding:12px 14px;margin-top:10px}
+  .ref .en{font-size:1.15rem;font-weight:700;color:var(--good)}
+  .step{font-size:.75rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:6px}
+  .status-bar{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-bottom:14px}
+  .status-bar b{color:var(--fg)}
+  .log-item{border-top:1px solid var(--border);padding:10px 0;font-size:.85rem}
+  .log-item:first-of-type{border-top:none}
+  .pill{font-size:.7rem;border-radius:99px;padding:1px 8px;font-weight:700}
+  .pill.s2{background:rgba(62,207,142,.18);color:var(--good)}
+  .pill.s1{background:rgba(245,166,35,.18);color:var(--warn)}
+  .pill.s0{background:rgba(255,107,107,.18);color:var(--bad)}
+  .role-badge{background:var(--accent);color:#fff;border-radius:6px;padding:2px 10px;font-size:.8rem;font-weight:700}
+  .hidden{display:none}
+  .err{color:var(--bad);font-size:.85rem;margin-top:8px}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎭 双人轮换互测 · 短语活用</h1>
+  <div class="sub">一台设备两人轮流：一方看中文短语出题，另一方写出英文表达，判分并追问「为什么这么说」——零后端，全部记录存浏览器本地。</div>
+
+  <div class="status-bar">
+    <span>第 <b id="st-round">0</b> 轮</span>
+    <span><b id="st-a">甲</b>：出题 <b id="st-aq">0</b> · 答题 <b id="st-aa">0</b></span>
+    <span><b id="st-b">乙</b>：出题 <b id="st-bq">0</b> · 答题 <b id="st-ba">0</b></span>
+  </div>
+
+  <!-- 第 0 步：设置 -->
+  <section class="card" id="view-setup">
+    <h2>开始前</h2>
+    <div class="row">
+      <div><label for="inp-a">出题方甲的称呼</label><input type="text" id="inp-a" value="甲" maxlength="12"></div>
+      <div><label for="inp-b">答题方乙的称呼</label><input type="text" id="inp-b" value="乙" maxlength="12"></div>
+    </div>
+    <label for="sel-diff">短语难度（1 简单 → 5 进阶）</label>
+    <select id="sel-diff">
+      <option value="0">全部难度（346 条短语）</option>
+      <option value="1">1</option><option value="2">2</option>
+      <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+    </select>
+    <div class="muted" style="font-size:.8rem;margin-top:10px">题库取自本站短语库；加载失败时自动使用内置示例题。每轮判分后自动互换角色。</div>
+    <button id="btn-start">开始第一轮</button>
+    <div class="err hidden" id="setup-err"></div>
+  </section>
+
+  <!-- 第 1 步：出题方确认出题 -->
+  <section class="card hidden" id="view-prompt">
+    <div class="step">STEP 1 · 本轮出题</div>
+    <h2><span class="role-badge" id="examiner-name">甲</span> <span class="muted" style="font-size:.85rem">是本轮出题方（判分人），确认开始后展示题干</span></h2>
+    <div class="hint-box">
+      <span class="zh" id="ph-zh">…</span>
+      <span class="muted">功能：</span><span id="ph-func"></span>
+      <span class="muted">场景：</span><span id="ph-scene"></span>
+      <span class="muted">语气：</span><span id="ph-tone"></span>
+    </div>
+    <div class="muted" style="font-size:.85rem">⚠️ 同屏注意：出题方确认前，答题方请不要看屏幕。题干只给中文与提示，<b>不给英文原句</b>。</div>
+    <button id="btn-show">出题完毕，交给 <span id="author-name-inline">乙</span> 作答</button>
+  </section>
+
+  <!-- 第 2 步：答题方作答 -->
+  <section class="card hidden" id="view-answer">
+    <div class="step">STEP 2 · 作答</div>
+    <h2><span class="role-badge" id="author-name">乙</span> <span class="muted" style="font-size:.85rem">根据题干写出英文表达（鼓励写出变体）</span></h2>
+    <div class="hint-box"><span class="zh" id="ph-zh2">…</span><span id="ph-hint2"></span></div>
+    <label for="inp-answer">你的英文表达</label>
+    <textarea id="inp-answer" placeholder="写出你觉得最地道的说法，可以不止一句…"></textarea>
+    <button id="btn-submit-answer">提交，交给出题方判分</button>
+  </section>
+
+  <!-- 第 3 步：判分 -->
+  <section class="card hidden" id="view-judge">
+    <div class="step">STEP 3 · 判分与追问</div>
+    <h2><span class="role-badge" id="examiner-name2">甲</span> <span class="muted" style="font-size:.85rem">对照参考答案，判分并追问</span></h2>
+    <div class="ref">答题方（<span id="author-name2">乙</span>）：<div id="ans-show" style="margin-top:4px;white-space:pre-wrap"></div></div>
+    <div class="ref">参考原句：<div class="en" id="ref-en">…</div></div>
+    <div class="muted" style="font-size:.8rem;margin-top:6px">参考句并非唯一答案 —— 只要表达对、场景对即可给分。</div>
+    <div class="score-btns">
+      <button data-s="2">👍 优秀</button>
+      <button data-s="1">✅ 通过</button>
+      <button data-s="0">🔁 需重练</button>
+    </div>
+    <label for="inp-followup">追问（如「为什么用过去式？」——答题方下轮可看到）</label>
+    <textarea id="inp-followup" placeholder="针对 TA 的用词/时态/语气提一个问题…"></textarea>
+    <button id="btn-save" disabled>记入本地记录，互换角色进入下一轮</button>
+  </section>
+
+  <!-- 记录回顾 -->
+  <section class="card">
+    <h2>本机互测记录 <span class="muted" style="font-size:.8rem" id="log-count"></span></h2>
+    <div class="muted" style="font-size:.85rem;margin-bottom:6px">每轮判分即时写入浏览器 IndexedDB（与主站同 origin），可在主站「我的数据」页导出。</div>
+    <div id="log-list"><div class="muted" style="font-size:.85rem">暂无记录，开始第一轮吧。</div></div>
+    <button class="ghost" id="btn-refresh-log">刷新记录</button>
+  </section>
+
+  <footer>peer-turn-drill v1.0 · 零后端 · 数据仅存本机</footer>
+</div>
+
+<script>
+'use strict';
+/* ===== IndexedDB：与主站同 origin 共享（内联自 src/lib/storage/idb.ts，结构一字不改） ===== */
+var DB_NAME = 'bannianjihua';
+var DB_VERSION = 1;
+var RECORDS_STORE = 'records';
+var dbPromise = null;
+function openDatabase() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise(function (resolve) {
+    try {
+      if (typeof indexedDB === 'undefined' || indexedDB === null) { resolve(null); return; }
+      var request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = function () {
+        var db = request.result;
+        if (!db.objectStoreNames.contains(RECORDS_STORE)) {
+          db.createObjectStore(RECORDS_STORE, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = function () { resolve(request.result); };
+      request.onerror = function () { resolve(null); };
+      request.onblocked = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  });
+  return dbPromise;
+}
+function put(store, value) {
+  return openDatabase().then(function (db) {
+    if (!db) return false;
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).put(value);
+        tx.oncomplete = function () { resolve(true); };
+        tx.onerror = function () { resolve(false); };
+        tx.onabort = function () { resolve(false); };
+      } catch (e) { resolve(false); }
+    });
+  });
+}
+function getAll(store) {
+  return openDatabase().then(function (db) {
+    if (!db) return [];
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readonly');
+        var request = tx.objectStore(store).getAll();
+        request.onsuccess = function () {
+          resolve(Array.isArray(request.result) ? request.result : []);
+        };
+        request.onerror = function () { resolve([]); };
+        tx.onabort = function () { resolve([]); };
+      } catch (e) { resolve([]); }
+    });
+  });
+}
+
+/* ===== 内置降级题库（题库 JSON 加载失败时使用） ===== */
+var FALLBACK = [
+  { id: 'fb-1', en: "I'm flattered.", zh: '我很受宠若惊。', difficulty: 1, function: ['表达感谢'], scene: ['日常寒暄'], tone: 'friendly' },
+  { id: 'fb-2', en: "We'll get through this together.", zh: '我们会一起挺过去的。', difficulty: 3, function: ['安慰鼓励'], scene: ['安慰疗伤'], tone: 'affectionate' },
+  { id: 'fb-3', en: "It's on me this time.", zh: '这次我请客。', difficulty: 2, function: ['表达感谢'], scene: ['朋友聚会'], tone: 'friendly' },
+  { id: 'fb-4', en: "Let's play it by ear.", zh: '我们到时候看情况吧。', difficulty: 3, function: ['提议建议'], scene: ['日常寒暄'], tone: 'casual' },
+  { id: 'fb-5', en: "I couldn't agree more.", zh: '我完全同意。', difficulty: 2, function: ['表达观点'], scene: ['工作讨论'], tone: 'formal' },
+  { id: 'fb-6', en: "Sorry, my mind went blank.", zh: '抱歉，我大脑一片空白。', difficulty: 2, function: ['致歉解释'], scene: ['日常寒暄'], tone: 'casual' }
+];
+
+/* ===== 状态与元素 ===== */
+var state = { names: ['甲', '乙'], turn: 0, round: 0, pool: [], current: null, answer: '', score: null };
+var VIEW_IDS = ['view-setup', 'view-prompt', 'view-answer', 'view-judge'];
+function $(id) { return document.getElementById(id); }
+function show(id) {
+  VIEW_IDS.forEach(function (v) { $(v).classList.toggle('hidden', v !== id); });
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function randId() {
+  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+}
+function examiner() { return state.names[state.turn % 2]; }
+function author() { return state.names[(state.turn + 1) % 2]; }
+
+/* ===== 题库加载（相对路径同源 fetch；失败降级内置题） ===== */
+function loadPool(difficulty) {
+  return fetch('../moear/tool/phrases.json')
+    .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function (data) {
+      var arr = Array.isArray(data && data.phrases) ? data.phrases : [];
+      if (!arr.length) throw new Error('empty');
+      return arr;
+    })
+    .catch(function () { return FALLBACK.slice(); })
+    .then(function (arr) {
+      return difficulty > 0 ? arr.filter(function (p) { return p.difficulty === difficulty; }) : arr;
+    });
+}
+
+/* ===== 渲染 ===== */
+function renderStatus() {
+  $('st-round').textContent = state.round;
+  $('st-a').textContent = state.names[0];
+  $('st-b').textContent = state.names[1];
+  var qa = [0, 0], aa = [0, 0];
+  state.sessionLog = state.sessionLog || [];
+  state.sessionLog.forEach(function (r) {
+    var e = state.names.indexOf(r.payload.examiner);
+    var a = state.names.indexOf(r.payload.author);
+    if (e >= 0) qa[e]++;
+    if (a >= 0) aa[a]++;
+  });
+  $('st-aq').textContent = qa[0]; $('st-aa').textContent = aa[0];
+  $('st-bq').textContent = qa[1]; $('st-ba').textContent = aa[1];
+}
+function renderHint(p, zhEl, hintEl) {
+  $(zhEl).textContent = p.zh;
+  if (hintEl) {
+    var tags = [];
+    (p.function || []).forEach(function (f) { tags.push(esc(f)); });
+    (p.scene || []).forEach(function (s) { tags.push(esc(s)); });
+    if (p.tone) tags.push(esc(p.tone));
+    $(hintEl).innerHTML = tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('');
+  }
+}
+function nextRound() {
+  state.round++;
+  state.current = state.pool[Math.floor(Math.random() * state.pool.length)];
+  state.score = null;
+  renderStatus();
+  $('examiner-name').textContent = examiner();
+  $('examiner-name2').textContent = examiner();
+  $('author-name').textContent = author();
+  $('author-name2').textContent = author();
+  $('author-name-inline').textContent = author();
+  renderHint(state.current, 'ph-zh', null);
+  $('ph-func').textContent = (state.current.function || []).join(' / ') || '—';
+  $('ph-scene').textContent = (state.current.scene || []).join(' / ') || '—';
+  $('ph-tone').textContent = state.current.tone || '—';
+  $('inp-answer').value = '';
+  $('inp-followup').value = '';
+  $('btn-save').disabled = true;
+  document.querySelectorAll('.score-btns button').forEach(function (b) { b.classList.remove('sel'); });
+  show('view-prompt');
+  window.scrollTo(0, 0);
+}
+
+/* ===== 记录 ===== */
+function refreshLog() {
+  getAll(RECORDS_STORE).then(function (all) {
+    var mine = (all || [])
+      .filter(function (r) { return r && r.kind === 'peer-turn'; })
+      .sort(function (a, b) { return (b.createdAt || '').localeCompare(a.createdAt || ''); });
+    $('log-count').textContent = mine.length ? '（共 ' + mine.length + ' 轮）' : '';
+    if (!mine.length) {
+      $('log-list').innerHTML = '<div class="muted" style="font-size:.85rem">暂无记录，开始第一轮吧。</div>';
+      return;
+    }
+    var labels = { 2: '👍 优秀', 1: '✅ 通过', 0: '🔁 需重练' };
+    $('log-list').innerHTML = mine.slice(0, 30).map(function (r) {
+      var p = r.payload || {};
+      return '<div class="log-item">'
+        + '<span class="pill s' + (p.score in labels ? p.score : 0) + '">' + (labels[p.score] || labels[0]) + '</span> '
+        + '<b>' + esc(p.author || '?') + '</b> 答 「' + esc((p.promptZh || '').slice(0, 24)) + '…」· '
+        + '出题 ' + esc(p.examiner || '?')
+        + (p.followup ? ' · 追问：' + esc(p.followup) : '')
+        + ' <span class="muted" style="font-size:.7rem">' + esc((r.createdAt || '').slice(0, 16).replace('T', ' ')) + '</span>'
+        + '</div>';
+    }).join('');
+  });
+}
+
+/* ===== 事件 ===== */
+$('btn-start').addEventListener('click', function () {
+  var a = $('inp-a').value.trim() || '甲';
+  var b = $('inp-b').value.trim() || '乙';
+  if (a === b) {
+    $('setup-err').textContent = '双方称呼不能相同，请区分开。';
+    $('setup-err').classList.remove('hidden');
+    return;
+  }
+  $('setup-err').classList.add('hidden');
+  state.names = [a, b];
+  state.turn = 0; state.round = 0; state.sessionLog = [];
+  var diff = parseInt($('sel-diff').value, 10) || 0;
+  $('btn-start').disabled = true;
+  loadPool(diff).then(function (pool) {
+    $('btn-start').disabled = false;
+    if (!pool.length) {
+      $('setup-err').textContent = '该难度下没有可用短语，换个难度试试。';
+      $('setup-err').classList.remove('hidden');
+      return;
+    }
+    state.pool = pool;
+    nextRound();
+  });
+});
+$('btn-show').addEventListener('click', function () {
+  renderHint(state.current, 'ph-zh2', 'ph-hint2');
+  show('view-answer');
+  $('inp-answer').focus();
+});
+$('btn-submit-answer').addEventListener('click', function () {
+  var v = $('inp-answer').value.trim();
+  if (!v) { $('inp-answer').focus(); return; }
+  state.answer = v;
+  $('ans-show').textContent = v;
+  $('ref-en').textContent = state.current.en;
+  show('view-judge');
+});
+document.querySelectorAll('.score-btns button').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.score-btns button').forEach(function (b) { b.classList.remove('sel'); });
+    btn.classList.add('sel');
+    state.score = parseInt(btn.getAttribute('data-s'), 10);
+    $('btn-save').disabled = false;
+  });
+});
+$('btn-save').addEventListener('click', function () {
+  var record = {
+    id: randId(),
+    toolId: 'peer-turn-drill',
+    kind: 'peer-turn',
+    refId: state.current.id,
+    payload: {
+      round: state.round,
+      examiner: examiner(),
+      author: author(),
+      promptZh: state.current.zh,
+      hint: { func: state.current.function || [], scene: state.current.scene || [], tone: state.current.tone || '' },
+      answer: state.answer,
+      referenceEn: state.current.en,
+      score: state.score,
+      followup: $('inp-followup').value.trim()
+    },
+    createdAt: new Date().toISOString()
+  };
+  put(RECORDS_STORE, record).then(function (ok) {
+    if (ok) {
+      state.sessionLog.push(record);
+      state.turn++;
+      refreshLog();
+      nextRound();
+    } else {
+      alert('写入本地记录失败（IndexedDB 不可用？），本轮未保存。');
+    }
+  });
+});
+$('btn-refresh-log').addEventListener('click', refreshLog);
+
+/* ===== 初始化 ===== */
+refreshLog();
+</script>
+</body>
+</html>
