@@ -1,29 +1,34 @@
 # 半年计划 · 待办交接清单
 
-> 这份文件写给**承接实现的 AI 工具**（不是给人读的项目文档）。任务按优先级从高到低排列，每项是一段自包含的说明 + 可执行的验收标准。
-> **状态流转**：执行方完成一项后，把该项的 `status` 从 `todo` 改成 `done`，并在 `evidence:` 顶格单行里填写证据（跑过的命令 + 结果 / 产出的文件路径）。
-> **执行方只能写 `doing` / `done`**（开工时 `doing`、完成后 `done`）；`blocked` 用于确实无法推进时并注明原因。
-> **`verified` 只能由我方（半年计划团队）在独立验证通过后写入** —— 执行方不得自行标 `verified`。
-> 协议细节与扫描流程见同目录的 `docs/AI-HANDOFF.md`（另一同事维护）。
+> 这份文件写给**承接实现的 AI 工具**。任务按优先级从高到低排列，每项是一段自包含的说明 + 可执行的验收标准。
+> ⚠️ **本文件归「我方」所有，执行方只读。** 从 2026-10-14 起状态被拆成两个文件（协议 **§7.3 双文件契约**）：
+> **`docs/BACKLOG.md` = 我方**（任务定义 + 本文件顶部的指令区块 + 我方的 `verdict` 与轨迹）；
+> **`docs/EXEC-REPORT.md` = 执行方**（`status` / `evidence` / 执行方轨迹）。
+> 一个文件只有一个写者 —— 两个写者改同一个文件会**静默互相覆盖**。执行方只写 `doing` / `done` / `blocked`；
+> **`verified` 只能由我方表达**（执行方任务写 `verdict: verified`，我方自办任务写 `status: verified`）。
+> 协议细节与扫描流程见同目录的 `docs/AI-HANDOFF.md`。
 
 ---
 
 ## 📢 给执行方的当前指令
 
-> **本区块 + 下面的 `## T-xxx` 任务块 = 我方对你的唯一主通道。**
-> 我方对你说的一切（新任务 / 暂缓 / 边界澄清）都会写进本区块。**每次扫描请先读它，再按 `todo` 取活。**
-> `docs/EXEC-COMMS.md` 只作问答存档 —— **那条通道不保证被定时扫描到**（见协议 §7.1）。
+> **本区块 = 我方对你说的一切（新任务 / 暂缓 / 边界澄清）的唯一落点。每次扫描先读它。**
+> `docs/EXEC-COMMS.md` 只作问答存档 —— 那条通道**不保证被定时扫描到**（协议 §7.1）。
 
-> **本轮（2026-10-14 20:45 更新）**
+> **现行规则（长期有效）**
 >
-> 1. ✅ 你每 20 分钟轮询一次 → **一次可以连着做多项**，不必只做一个就停：按 `priority` 高者、再按 id 顺序取。但**每项单独一个 commit**，严禁多项混一个提交。
-> 2. ✅ 提交前自查 `status` 与 `evidence` 是否**成对更新**（历史上出现过「填了 evidence 忘改 status」→ 该项永远扫不到；现在 `scan` 已会报出 `staleDoing`）。若发现上一批漏改，**自己补正**即可，不必等我方。
-> 3. 🚫 **`T-013` / `T-014` / `T-015` 暂时不要领** —— 三者都依赖**仓库外**的「每日英语」源料（`D:/workspaces/每日英语*/`），而源料镜像与源侧改动由我方在 **`T-023`** 里做。等 `T-023` 变成 `verified` 再领，否则白跑一轮。这三项的 `depends` 已写明这一点。
-> 4. 📌 **本轮可以领的**：`T-021`（3 个新工具的移动端/深色/子路径核查）、`T-012`（C3 互评走廊，`depends: T-004` 已满足）；以及你手上在飞的 `T-009`。
-> 5. 🔒 重申两条铁律：**不要 `git push`**（协议 §6.2，你只 `commit`）；**`_src-tmp/` 只读、产出必须落正式目录**（协议 §6.1）。
-> 6. ⚠️ 本机验证构建用 `npx vite build --outDir <仓库外目录>`；不要跑 `npm run build` / `npm run ship`。
-> 7. 📣 **上一批回报**：`T-008`（C1 双人轮换互测）已由我方**独立复验 4/4 通过**并部署上线 —— 其中「手动走一遍」那条我没看自评，用真浏览器（headless Chrome + CDP 驱动）跑了两轮，确认**角色互换真的发生**（甲出题/乙答题 → 乙出题/甲答题）、真题库 346 条、`kind==='peer-turn'` 记录恰 2 条、控制台零报错。你的 `T-004` / `T-017` 亦已 verified。「漏改 status」一事不必再解释，已加固工具自动发现。
-> 8. ⭐ **状态写法变了**：你的 `status` / `evidence` / 轨迹行现在写在 **`docs/EXEC-REPORT.md`**（新文件，归你维护）。**`docs/BACKLOG.md` 现在完全归我方，你只读、一个字都不要改**（详见协议 §7.3）。
+> 1. 你每 20 分钟轮询一次 → **一次可连做多项**（`priority` 高者优先、再按 id 顺序），但**每项单独一个 commit**。
+> 2. 你的 `status` / `evidence` / 轨迹行**只写 `docs/EXEC-REPORT.md`**；**`docs/BACKLOG.md` 一个字都不要改**（那正是锁死的根源，协议 §7.3）。有疑问就写进 `docs/EXEC-REPORT.md` 的 `## Q-xxx` 区块。
+> 3. 提交前自查 `status` 与 `evidence` 是否成对更新；发现上一批漏改，自己补正即可。
+> 4. 🔒 不要 `git push`（你只 `commit`）；`_src-tmp/` 只读、产出必须落正式目录；本机验证构建用 `npx vite build --outDir <仓库外目录>`，不要 `npm run build` / `npm run ship`。
+
+> **本轮（2026-10-14 21:15）**
+>
+> 5. 📣 **回报**：`T-008`（双人轮换互测）与 `T-009`（AI 陪练）我方均已**独立复验 4/4 通过**并上线 —— 两项都不是看你的自评：`T-008` 用真浏览器确认**角色互换真的发生**；`T-009` 真浏览器**两次冷启动**一致、`kind==='ai-sparring'` 恰 2 条、`bankCount=346`、控制台零报错。你建的 `docs/EXEC-REPORT.md` 结构规范，很好。
+> 6. 🚫 **`T-013` / `T-014` / `T-015` 暂时别领** —— 三者都依赖**仓库外**的「每日英语」源料（`D:/workspaces/每日英语*/`），镜像与源侧改动由我方在 **`T-023`** 里做（已设 `depends: T-023`）。等 `T-023` → `verified` 再领，否则白跑一轮。
+> 7. 📌 **现在可领**：`T-012`（C3 互评走廊，`depends: T-004` 已满足）。
+> 8. ⚠️ **我方越界一次，已纠正**：我方 21:03 的「状态拆分」迁移**误把你 20:54 认领的 `T-021` 从 `doing` 改成了 `todo`**，现已**原样恢复为 `doing`**。按契约我方不该写你的文件，这是**纠错性质的例外**（协议 §7.3 已记明）。**你随时可依真实进度改回任何值。**
+> 9. ⛔ `T-021` 的边界提醒：本项**只出核查报告、禁止修改任何工具 HTML**（见 spec）。报告落 `docs/t021-qa/`（你已在做，7 张截图方向正确）。
 
 ---
 
@@ -161,6 +166,7 @@ acceptance:
 
 ## T-009 · 实现方案 C2：单人 + 外部 AI 陪练工具（零后端）
 
+verdict: verified
 priority: P2
 area: public/tools/english/, src/data/tools/english/
 depends: —
@@ -171,6 +177,7 @@ acceptance:
 - `test -f public/tools/english/ai-sparring/index.html`
 - 工具无对外域网络请求：`grep -nE "fetch\(['\"]https?:|XMLHttpRequest" public/tools/english/ai-sparring/index.html` 无输出
 - 手动走一遍：完成 ≥1 轮（题面 → 追问 → 作答）后，`kind==='ai-sparring'` 的记录能被读出
+  - verify 2026-10-14T21:10:54+08:00 | by=team-lead | 4/4 acceptance 通过。① `check-tools` exit 0（18 工具 / 4 频道 / 4 集合 / 2 路径）。② 文件存在 72,385 字节。③ 外域请求：原判据 grep 零命中；另做更强审计（`https?://|WebSocket|EventSource|sendBeacon|importScripts|<script src=|<link href=|url(http`）零命中，全文**零网络调用**；并做了**阳性对照**证明探针有效（同一 grep 在 `peer-turn-drill` 上命中 1 处 `fetch(`、在本工具 0 命中）。④ **真浏览器跑通两轮**：自建 CDP 探针（headless Chrome 155 + 静态服务器 webroot=仓库 `public/`，与线上同相对路径），在真实页面上下文模拟用户操作（抽题 → 粘回追问 → 作答 → 保存），**连续两次冷启动结果一致** —— `roundCount` 0→1→2，UI 记录区 2 条，直读 IndexedDB 得 `kind==='ai-sparring'` **恰 2 条**且记录结构与 spec 逐项吻合（`{id,toolId:'ai-sparring',kind,refId,payload{phrase{id,en,zh,difficulty,scene,func,tone},followUp,answer},createdAt}`），`bankCount=346`（内置全量题库，断网可用），**控制台零 error / 零 warning**，运行期**非本站请求 0**。附注：承载提交 `236dc7a`；执行方自报的两处偏离（构建 outDir 用仓库内 `node_modules/.bc-t009`、题库内联而非相对 fetch）**均不影响任何 acceptance 判据**；`Network.enable` 在导航之后开启，故首屏文档请求未被捕获（已由静态审计覆盖）
 
 ## T-010 · 清退已废弃脚本 scripts/sync-daily-english.mjs 及其失效文档引用
 

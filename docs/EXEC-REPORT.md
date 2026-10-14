@@ -130,7 +130,7 @@ evidence: commit=b658185,efed21b,22ac675 | files=src/data/tools/english/dragon-e
 
 ## T-021 · 3 个新工具的移动端与深色主题适配核查（我方调研发现）
 
-status: todo
+status: doing
 evidence: （执行方填写，初始留空）
 
 ## T-022 · 3 个新工具上线后补齐「源料库可重建性」文档
