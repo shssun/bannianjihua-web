@@ -22,13 +22,14 @@
 > 3. 提交前自查 `status` 与 `evidence` 是否成对更新；发现上一批漏改，自己补正即可。
 > 4. 🔒 不要 `git push`（你只 `commit`）；`_src-tmp/` 只读、产出必须落正式目录；本机验证构建用 `npx vite build --outDir <仓库外目录>`，不要 `npm run build` / `npm run ship`。
 
-> **本轮（2026-10-14 21:15）**
+> **本轮（2026-10-14 22:05）**
 >
 > 5. 📣 **回报**：`T-008`（双人轮换互测）与 `T-009`（AI 陪练）我方均已**独立复验 4/4 通过**并上线 —— 两项都不是看你的自评：`T-008` 用真浏览器确认**角色互换真的发生**；`T-009` 真浏览器**两次冷启动**一致、`kind==='ai-sparring'` 恰 2 条、`bankCount=346`、控制台零报错。你建的 `docs/EXEC-REPORT.md` 结构规范，很好。
 > 6. 🚫 **`T-013` / `T-014` / `T-015` 暂时别领** —— 三者都依赖**仓库外**的「每日英语」源料（`D:/workspaces/每日英语*/`），镜像与源侧改动由我方在 **`T-023`** 里做（已设 `depends: T-023`）。等 `T-023` → `verified` 再领，否则白跑一轮。
-> 7. 📌 **现在可领**：`T-012`（C3 互评走廊，`depends: T-004` 已满足）。
+> 7. 📌 **现在可领**：`T-012`（C3 互评走廊，`depends: T-004` 已满足）与 **`T-024`（新，P1，见文件末尾）**。
 > 8. ⚠️ **我方越界一次，已纠正**：我方 21:03 的「状态拆分」迁移**误把你 20:54 认领的 `T-021` 从 `doing` 改成了 `todo`**，现已**原样恢复为 `doing`**。按契约我方不该写你的文件，这是**纠错性质的例外**（协议 §7.3 已记明）。**你随时可依真实进度改回任何值。**
 > 9. ⛔ `T-021` 的边界提醒：本项**只出核查报告、禁止修改任何工具 HTML**（见 spec）。报告落 `docs/t021-qa/`（你已在做，7 张截图方向正确）。
+> 10. 🆕 **`T-024` 是 `math` 频道的第一个工具**（该频道此前只有一个 `planned` 占位、`public/tools/math/` 目录都不存在）。它的硬约束：**手写 Canvas、零第三方绘图库、零外部请求、禁用 `eval`/`new Function`** —— 理由写在 spec 里，请照做。规划全文 `docs/PLAN-math.md` 可参考，但**以 `## T-024` 的 spec / acceptance 为准**。
 
 ---
 
@@ -387,4 +388,78 @@ acceptance:
 - 新源根已登记：`grep -q "每日英语" docs/AI-HANDOFF.md`
 - 门禁已解除：`T-013` / `T-014` / `T-015` 的 `depends` 不再指向 `T-023`（`grep -c "depends: T-023" docs/BACKLOG.md` 输出 0）
 evidence: （初始留空 —— 本项由我方自行执行，完成后由我方填写）
+
+## T-024 · 新建「函数参数实验室」工具（math 频道第一个落地工具）
+
+priority: P1
+area: public/tools/math/function-param-lab/, src/data/tools/math/, src/data/collections.ts
+depends: —
+size: L
+spec: 站点 `math` 频道（见 `src/data/channels.ts`）**至今没有任何已落地工具** —— 只有一个 `planned` 占位 `set-theory-cards`，且 `public/tools/math/` 目录**尚不存在**。本项是该频道第一个工具，请一次做到位。
+
+**老板需求原话**：「高中数学…很多容易误解的点，希望能有个全面的」「画个图也可…如果能调参数是最好不过了。比如 AX 方加上 BX 加上 C，然后 ABC 的值取正负 0，分别看到它这个图像发生什么变化，位置什么的」「先快速的」。
+
+**交付（只新建 2 个文件 + 追加 1 处，不改任何既有文件）**：
+
+1. **产物** `public/tools/math/function-param-lab/index.html` —— **自包含单文件**：内联 `<style>`/`<script>`，**零外部引用**（无 `<script src>` / `<link rel=stylesheet>` / 远程字体 / 图片）。风格参考站内既有单文件工具 `public/tools/english/dict-reader/index.html`（`<html lang="zh-CN" data-theme="dark">` + CSS 变量 + 系统字体栈）。
+2. **注册表** `src/data/tools/math/function-param-lab.ts` —— 纯字面量（构建设用 `Function()` 求值解析，**不得**出现函数/模板字符串/变量引用）。必填 `id: 'function-param-lab'`（**必须单引号字面量**，且 == 文件名 == 产物目录名）、`channel: 'math'`、`name: '函数参数实验室'`、`description`、`tags: ['数学','函数','图象','参数']`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/math/function-param-lab/index.html'`（**显式完整路径，不得拼**）、`cover`、`version: '1.0.0'`、`createdAt: '2026-10-14'`、`order`（**同频道 `set-theory-cards` 已占一个 order，请查重**）、`collections: ['high-school-math']`、`icap: ['active']`。
+3. **集合** 在 `src/data/collections.ts` 的 `COLLECTIONS` 数组里**追加一个对象**（⚠️ 该文件用正则 `\bid\s*:\s*'([^']+)'` 解析 id，**所有 id 必须写单引号字面量**；追加在数组末尾即可）：
+
+```ts
+{
+  id: 'high-school-math',
+  name: '高中数学',
+  cover: '📐',
+  description: '易错易误解点 · 数形结合：拖动参数，看图象怎么变',
+  order: 3,          // 现有占用：books 1 / movie-lines 2 / dragon-english-basic100 10 / dragon-english-grammar100 11
+  path: [
+    { label:'看图辨形', note:'拖动参数，看常见函数图象怎么变、位置怎么移',
+      toolId:'function-param-lab' },
+    { label:'（待建）', note:'更多章节的易误解点',
+      todo:'等「高中数学易误解点全清单」调研后按可视化性排序补入' },
+  ],
+}
+```
+
+**工具功能要求**（第一版要快、要能用，**不要过度设计**）：
+
+- **画布**：手写 **Canvas 2D**（**禁止任何第三方绘图库**）。坐标轴 + 网格 + 刻度（步长取 1/2/5×10ⁿ 自适应）。坐标系固定视窗（**不做**拖拽平移 / 滚轮缩放）；参数变化导致曲线超界时，自动取一个能看全的视窗即可。
+- **场景切换**：6 个标签页，切换时重建滑块：
+
+| # | 场景 | 参数（滑块） | 必须体现的「易误解点」 |
+|---|---|---|---|
+| 1 | `y = ax² + bx + c` | **a** ∈ [−3,3] 步 .1；**b** ∈ [−5,5] 步 .5；**c** ∈ [−5,5] 步 .5 | **a=0 时二次项消失、图象退化为直线**（最经典的"忘记讨论 a=0"）；a 变号 → 开口翻转且**值域随之翻转**；b 变 → 对称轴 `x=−b/(2a)` 移动；c 变 → 上下平移（过 `(0,c)`） |
+| 2 | `y = kx + b` | **k** ∈ [−5,5] 步 .5；**b** ∈ [−5,5] 步 .5 | `k=0` → 退化为**常函数**（不是"斜率为 0 的一次函数"） |
+| 3 | `y = k/x` | **k** ∈ [−5,5] 步 .5 | k 正负 → 一三 / 二四象限；**x=0 处必须断开**，见下方"断点硬要求" |
+| 4 | `y = aˣ` | **a** ∈ (0,4] 步 .1 | 0<a<1 减 / a>1 增；**值域恒 (0,+∞)，不随 a 变**（反直觉点） |
+| 5 | `y = log_a x` | **a** ∈ (0,4] 步 .1，**a=1 必须给提示** | 定义域恒 (0,+∞)；**底数不能为 1** |
+| 6 | `y = x + a/x` | **a** ∈ [−10,10] 步 .1 | 拐点 (√a, 2√a)；`a<0` 变「飘带函数」单调无最值；`a=0` 退化成直线 `y=x` |
+
+- **滑块交互**：拖动 → **实时重绘**（用 `requestAnimationFrame` 合并高频 input，不要每个 input 事件都重画）。每个滑块旁配一个**「归零」小按钮**（一键把该参数设为 0）—— 老板特别提到要"取 0"做对比。
+- **参数必须能取到 0 与负值**：不得把 0 从滑块范围里排除；取到 0 时**图象照常画**，用提示文案说明退化。
+- **定义域 / 值域读数**：每个场景**用解析式精确给出**（例如二次函数 `a>0 → [k,+∞)`，`k = c − b²/(4a)` 为顶点纵坐标；`a=0 → ℝ`），**不要靠采样猜**。用两行文本显示。
+- **一句结论**：随参数状态**动态切换**的文案（例如 `a=0` 时显示「a=0 使二次项消失，图象退化为直线 y = bx + c」；`a>0` 时显示「开口向上，值域 [k, +∞)」）。
+- **暗色主题**，与站内其他工具观感一致。
+
+**技术硬约束**：
+
+- **零第三方库**：不用 Desmos / GeoGebra / plotly / echarts / chart.js / d3 / function-plot 等任何绘图库，也不引任何 CDN 资源（理由：站点是纯静态、要求零外部请求；且 Desmos 需 API key + 必请求境外域、GeoGebra 整套仅非商业免费）。
+- **禁止 `eval` / `new Function`**（理由：① 将来加 CSP `script-src 'self'` 会被直接拦；② 同源上下文里能读本机 `localStorage` 与同源资源）。6 个场景的求值**直接写死成各自的 JS 函数**即可，**不需要**通用表达式解析器。
+- ⚠️ **断点硬要求**：`y = k/x` 在 `x=0` 处**绝对不得画出一条穿屏的竖线**（这是本项目最典型的一类视觉错误）。做法：遇 `NaN`/`±Infinity`/非有限值就记断点，折线里 `moveTo` 断开路径；相邻两点 y 均有限但**符号相反且 |Δy| > 1.5 × 画布高度** → 同样判为跨渐近线，断开。
+- **采样**：按画布像素列采样（每列一个 x），不要固定点数；对 `k/x` 这类陡峭段可用"相邻点中点递归细分"改善。
+- **高 DPI**：canvas 的 `width/height` 乘 `devicePixelRatio`，用 `ctx.setTransform(dpr,0,0,dpr,0,0)`，线宽取 `1/dpr` 的整数倍，否则线条发虚。
+
+**规划全文**：`docs/PLAN-math.md`（可读；但**以本卡的 spec / acceptance 为准**）。
+
+acceptance:
+- `test -f public/tools/math/function-param-lab/index.html`
+- `test -f src/data/tools/math/function-param-lab.ts` 且 `grep -n "id: 'function-param-lab'" src/data/tools/math/function-param-lab.ts` 命中
+- 集合已登记：`grep -q "id: 'high-school-math'" src/data/collections.ts`
+- **零外部引用**：`grep -nE "<(script|link)[^>]*(src|href)=" public/tools/math/function-param-lab/index.html` **无输出**
+- **零外部域名**：`grep -nE "https?://" public/tools/math/function-param-lab/index.html` 的输出**只允许**出现在注释或说明文案里（须人工确认无任何资源引用）
+- **不用动态求值**：`! grep -qE "\b(eval|new Function)\s*\(" public/tools/math/function-param-lab/index.html`
+- `node scripts/check-tools.mjs` 退出码 0（工具总数 19、`math` 频道 2 个）
+- `npx tsc -b` 退出码 0
+- **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
+- 真跑（人工项，**我方会用无头浏览器独立复验**）：打开工具后，① 把场景 1 的 `a` 拖到 **0**，图象**确实变成直线**且有退化提示文案；② 拖到负值，开口翻转、值域随之翻转；③ 切到 `y=k/x`，图象在 x=0 处**断开、无穿屏竖线**；④ 控制台零报错。
 
