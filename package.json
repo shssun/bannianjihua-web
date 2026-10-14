@@ -15,7 +15,9 @@
     "check:deploy": "node scripts/check-deploy.mjs",
     "ship": "node scripts/ship.mjs",
     "backlog": "node scripts/backlog.mjs",
-    "backlog:scan": "node scripts/backlog.mjs scan"
+    "backlog:scan": "node scripts/backlog.mjs scan",
+    "src-tmp:check": "node scripts/src-tmp-sync.mjs",
+    "src-tmp:refresh": "node scripts/src-tmp-sync.mjs --refresh"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

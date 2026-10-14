@@ -39,3 +39,8 @@ pnpm-debug.log*
 
 # workspace tooling (local memory / cache)
 .workbuddy/
+
+# 临时源料区：仓库外源料（内容 md + 生成脚本）的本地镜像
+# 仅作「让执行方看得见」之用 —— 不在版本库里，也禁止把正式产出写进这里。
+# 正式产出必须落到项目对应目录（public/tools/... 、src/data/tools/...）。
+_src-tmp/
