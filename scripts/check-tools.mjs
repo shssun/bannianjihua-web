@@ -17,13 +17,16 @@
  *   | icap 是字符串数组                              | error |
  *   | icap[] 里的每个值存在于 ICAP_LEVELS            | error |
  *   | icap[] 内部无重复值                            | error |
+ *   | path[].toolId 存在于工具注册表                 | error |
+ *   | path[].toolId 属于本集合                       | error |
+ *   | path 缺口步必须有 todo                         | error |
  *   | 有 entry 时文件名以 index.html 结尾            | warn  |
  *   | 同频道内 order 重复                            | warn  |
  */
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve } from 'node:path';
-import { loadChannelIds, loadCollectionIds, loadIcapLevelIds, loadToolRegistry } from './lib/registry.mjs';
+import { loadChannelIds, loadCollectionIds, loadCollections, loadIcapLevelIds, loadToolRegistry } from './lib/registry.mjs';
 
 const TAG = '[check-tools]';
 const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -55,6 +58,7 @@ const channelIds = new Set(loadChannelIds(repoRoot));
 const collectionIds = new Set(loadCollectionIds(repoRoot));
 const icapIds = new Set(loadIcapLevelIds(repoRoot));
 const tools = loadToolRegistry(repoRoot);
+const collections = loadCollections(repoRoot);
 
 // ---- id 唯一性（分组报告，避免同一冲突刷屏） ----
 const idToFiles = new Map();
@@ -159,6 +163,58 @@ for (const tool of tools) {
   }
 }
 
+// ---- collections[].path：ICAP 学习路径编排 ----
+// 路径只能引用**属于本集合**的工具，否则「路径」会串到别的集合的工具上，
+// 学习者点进去会发现上下文不对。缺口步（无 toolId）必须写 todo 说明原因。
+const toolObjectById = new Map();
+for (const tool of tools) {
+  toolObjectById.set(tool.object.id ?? tool.id, tool.object);
+}
+const pathCollections = collections.filter((collection) => Array.isArray(collection.path));
+for (const collection of pathCollections) {
+  const cid = collection.id;
+  if (typeof cid !== 'string') {
+    errors.push('src/data/collections.ts: 配了 path 的集合缺少 string 类型的 id');
+    continue;
+  }
+  const seenPathTools = new Set();
+  collection.path.forEach((step, index) => {
+    const at = `src/data/collections.ts: 集合 "${cid}" 路径第 ${index + 1} 步`;
+    if (typeof step !== 'object' || step === null) {
+      errors.push(`${at} 必须是对象`);
+      return;
+    }
+    if (typeof step.label !== 'string' || step.label.length === 0) {
+      errors.push(`${at} 缺少 label`);
+    }
+    if (step.toolId === undefined) {
+      if (typeof step.todo !== 'string' || step.todo.length === 0) {
+        errors.push(`${at}（${step.label ?? '?'}）没有 toolId，必须给 todo 说明缺口`);
+      }
+      return;
+    }
+    if (typeof step.toolId !== 'string' || step.toolId.length === 0) {
+      errors.push(`${at} 的 toolId 必须是非空字符串`);
+      return;
+    }
+    if (seenPathTools.has(step.toolId)) {
+      errors.push(`${at} 的 toolId "${step.toolId}" 在同一条路径里重复`);
+    }
+    seenPathTools.add(step.toolId);
+    const target = toolObjectById.get(step.toolId);
+    if (!target) {
+      errors.push(`${at} 的 toolId "${step.toolId}" 不在工具注册表中`);
+      return;
+    }
+    const owned = Array.isArray(target.collections) ? target.collections : [];
+    if (!owned.includes(cid)) {
+      errors.push(
+        `${at} 引用了工具 "${step.toolId}"，但该工具的 collections 里没有 "${cid}"`,
+      );
+    }
+  });
+}
+
 // ---- 同频道 order 重复 ----
 const byChannel = new Map();
 for (const tool of tools) {
@@ -185,7 +241,7 @@ for (const [channel, list] of byChannel) {
 
 // ---- 汇总输出 ----
 console.log(
-  `${TAG} 频道 ${channelIds.size} 个 · 集合 ${collectionIds.size} 个 · ICAP ${icapIds.size} 层 · 工具 ${tools.length} 个`,
+  `${TAG} 频道 ${channelIds.size} 个 · 集合 ${collectionIds.size} 个 · ICAP ${icapIds.size} 层 · 工具 ${tools.length} 个 · 路径 ${pathCollections.length} 个`,
 );
 
 if (warnings.length > 0) {

@@ -6,6 +6,7 @@ import { getToolsByCollection } from '@/data/tools';
 import type { Collection } from '@/data/collections';
 import { getChildCollections, getCollectionById } from '@/data/collections';
 import ToolCard from '@/components/tools/ToolCard';
+import LearningPath from '@/components/tools/LearningPath';
 import EmptyState from '@/components/common/EmptyState';
 import Section from '@/components/common/Section';
 
@@ -69,9 +70,11 @@ function ChildCollectionCard({
  * 同一个工具在频道页和任意多个集合页里都会出现，但物理上只有一份产物。
  *
  * 页面结构：
- * 1. 若有子集合（如「书与方法」下的各本书），先渲染子集合入口区块；
- * 2. 再渲染该集合下的全部工具（已上线在前、研发中在后）；
- * 3. 集合 id 非法、或既无子集合也无工具时，给出友好占位（不白屏）。
+ * 1. 学习路径（若本集合配了 `path`）—— 把工具按 ICAP 认知投入从低到高串成阶梯，
+ *    渲染在工具网格**之上**；
+ * 2. 若有子集合（如「书与方法」下的各本书），再渲染子集合入口区块；
+ * 3. 最后渲染该集合下的全部工具（已上线在前、研发中在后）；
+ * 4. 集合 id 非法、或既无子集合也无工具时，给出友好占位（不白屏）。
  */
 export default function CollectionPage(): JSX.Element {
   const { collection: collectionId } = useParams<{ collection: string }>();
@@ -124,6 +127,10 @@ export default function CollectionPage(): JSX.Element {
         />
       ) : (
         <Stack spacing={4}>
+          {collection.path && collection.path.length > 0 ? (
+            <LearningPath collectionId={collection.id} steps={collection.path} />
+          ) : null}
+
           {children.length > 0 ? (
             <Box>
               <Typography variant="caption" color="var(--muted)">

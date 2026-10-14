@@ -155,3 +155,69 @@ export function loadIcapLevelIds(repoRoot) {
   }
   return loadDeclaredIds(file);
 }
+
+/**
+ * 解析 `src/data/collections.ts` 里的 `COLLECTIONS` 数组字面量（含 `path` 嵌套对象）。
+ *
+ * `loadDeclaredIds` 的正则只够取平的 id 列表，看不到 `path[].toolId`，
+ * 所以这里做一次「字符串感知的括号配对」后整体求值 ——
+ * 字面量是纯数据（字符串 / 数字 / 数组 / 嵌套对象），`Function` 求值无副作用。
+ *
+ * ⚠️ 定位锚点必须是 `export const COLLECTIONS`：文件头 JSDoc 里也出现过
+ * `COLLECTIONS` 字样，用 `indexOf('COLLECTIONS')` 会命中注释。
+ *
+ * @param {string} repoRoot 仓库根目录
+ * @returns {Array<Record<string, unknown>>} 解析失败返回空数组
+ */
+export function loadCollections(repoRoot) {
+  const file = join(repoRoot, 'src', 'data', 'collections.ts');
+  if (!existsSync(file)) {
+    return [];
+  }
+  const text = readFileSync(file, 'utf8');
+  const marker = text.indexOf('export const COLLECTIONS');
+  if (marker === -1) {
+    return [];
+  }
+  const start = text.indexOf('[', text.indexOf('=', marker));
+  if (start === -1) {
+    return [];
+  }
+  let depth = 0;
+  let quote = '';
+  let end = -1;
+  for (let i = start; i < text.length; i += 1) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === '\\') {
+        i += 1;
+      } else if (ch === quote) {
+        quote = '';
+      }
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === '`') {
+      quote = ch;
+      continue;
+    }
+    if (ch === '[' || ch === '{') {
+      depth += 1;
+    } else if (ch === ']' || ch === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        end = i;
+        break;
+      }
+    }
+  }
+  if (end === -1) {
+    return [];
+  }
+  try {
+    // eslint-disable-next-line no-new-func
+    const parsed = Function(`"use strict"; return (${text.slice(start, end + 1)});`)();
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}

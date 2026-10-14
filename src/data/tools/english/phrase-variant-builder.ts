@@ -27,6 +27,12 @@ import type { Tool } from '@/types';
  * 工具与主站**同 origin**，因此工具内联一份与 `src/lib/storage/idb.ts` **同名同结构**
  * 的逻辑（删掉 export、逻辑一字不改）：库名 `bannianjihua`、版本 1、对象仓库 `records`。
  * 学习者产出以 `LearnerRecord`（camelCase，`kind: 'variant'`）落库，主站以后能直接读到。
+ *
+ * ## 与「学习路径」的关系
+ *
+ * 本工具挂在 `movie-lines`（影视台词）集合下，是该集合学习路径的**第 2 步**
+ * （「磨耳朵 → 变体」）。其产出记录 `kind: 'variant'` 被集合页用作该步的**自动判据**
+ * （见 `src/lib/storage/progress.ts` 与 `src/data/collections.ts` 的 `PathStep.evidenceKind`）。
  */
 const tool: Tool = {
   id: 'phrase-variant-builder',
@@ -42,6 +48,7 @@ const tool: Tool = {
   version: '1.0.0',
   createdAt: '2026-10-13',
   order: 14,
+  collections: ['movie-lines'],
   icap: ['passive', 'active', 'constructive'],
 };
 

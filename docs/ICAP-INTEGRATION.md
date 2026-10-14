@@ -160,7 +160,9 @@
 
 ---
 
-### 方案 D｜ICAP 阶梯编排：不造新引擎，把现有工具串成一门课
+### 方案 D｜ICAP 阶梯编排：不造新引擎，把现有工具串成一门课 —— ✅ 已实现
+
+> 状态：**方案 D 已实现**（集合页「学习路径」区块 + 进度判据 + 构建期校验）。实现说明见 **§7**。
 
 **机制**：**不给工具箱再加零件**，而是给「集合 / 书的落地页」编排三层阶梯：
 
@@ -285,4 +287,75 @@ export function getToolsByIcap(level: ICAPLevel): Tool[] {
   （用 `getSortedIcapLevels()` 渲染 4 个层级名 + 描述）。**只作图例、不可点击** ——
   可点击筛选需新增路由，属方案 D，本期不做。
 - 两处均明示「**设计意图 ≠ 实际层级**」，符合 §1.2 的第二条铁律。
+
+---
+
+## 7. 方案 D 实现说明 —— ✅ 已实现
+
+> 状态：**已实现**。集合页从「工具清单」升级为「学习路径」：把本集合下的工具按 ICAP 认知投入
+> 从低到高串成阶梯，渲染在工具网格**之上**。本期**不新增路由、不引入新依赖**。
+
+### 7.1 数据模型（`Collection.path: PathStep[]`）
+
+路径是**集合的可选字段**（`src/data/collections.ts`）。只有「有明确教学法次序」的集合才配路径 ——
+路径是**编排**，不是清单的重复。`PathStep` 字段：
+
+| 字段 | 必填 | 含义 |
+|---|---|---|
+| `label` | ✅ | 步骤短标签（如「听读」「默写」「变体」） |
+| `note` | — | 这一步为什么排在这里（展示在标签下方） |
+| `toolId` | — | 用哪个工具，**必须已挂在本集合下**（构建期校验）；省略 = 路径缺口 |
+| `evidenceKind` | — | 哪一类产出记录算「这一步完成」（对应 `LearnerRecord.kind`）；省略 = 无自动判据 |
+| `todo` | — | 缺口步的说明（`toolId` 省略时**必填**） |
+
+**三态判据**（判定逻辑见 `src/lib/storage/progress.ts`）：
+
+| 状态 | 触发条件 | UI 呈现 |
+|---|---|---|
+| `pending` | 步骤无 `toolId`（工具还没做） | 灰色 `待建` 徽章 + `todo` 说明 |
+| `auto` | 有 `toolId` + `evidenceKind` | 该工具该类产出记录数 > 0 即「已产出 N 条」 |
+| `manual` | 有 `toolId`、无 `evidenceKind` | 学习者**自评**（「标记完成 / 已完成 ✓」按钮） |
+
+### 7.2 两条已编排的路径
+
+1. **《基本英文100》**（`dragon-english-basic100`，三步，含一个缺口）：
+   `听读`（`basic100-sentence-reader`）→ `默写`（`chinese-to-english-drill`）→
+   `变体`（**缺口**，`todo`：在 100 句基础上换语气 / 换场景改写，工具还没做）。
+   前两步暂无 `evidenceKind`，进度由学习者**手动标记**。
+2. **影视台词**（`movie-lines`，两步，含自动判据）：
+   `磨耳朵`（`moear`，手动标记）→ `变体`（`phrase-variant-builder`，`evidenceKind: 'variant'`，**自动**）。
+
+### 7.3 进度判定与存储约定
+
+- 进度复用与工具**同一** IndexedDB（`recordsStore`，见 `src/lib/storage/index.ts`）。
+- **自动判据**：直接数 `recordsStore.listRecords()` 里 `toolId === step.toolId && kind === step.evidenceKind`
+  的记录条数（一次拉取、纯内存判定）。
+- **手动自评**：写一条 `kind: 'progress'`、`toolId: 'path-progress'` 的记录。
+  其 **id 是确定性的** `path-progress:<collectionId>:<toolId>` → 「重复标记」**幂等**，
+  不会积累多条；取消标记 = 删该条。
+- 所有 progress 记录都能经 `recordsStore.exportAll()` 一并导出归档，与工具产出**同一份包**。
+- ⚠️ 进度不可用（IndexedDB 被禁用 / 无痕模式）时全部退化为 `todo`，页面照常工作，不报错、不弹窗。
+
+### 7.4 构建期校验（`scripts/check-tools.mjs`，三条 error）
+
+`loadDeclaredIds` 的正则看不到 `path[].toolId`，因此新增 `loadCollections(repoRoot)`
+（`scripts/lib/registry.mjs`）对 `COLLECTIONS` 数组字面量做「字符串感知的括号配对 + 整体求值」。
+三条校验（任一不通过即 `exit 1`）：
+
+1. `path[].toolId` **存在于工具注册表**；
+2. `path[].toolId` **属于本集合**（该工具的 `collections` 里含本集合 id）；同一路径内 `toolId` 不重复；
+3. **缺口步（无 `toolId`）必须有 `todo`** 说明原因。
+
+汇总行追加「· 路径 N 个」。
+> ⚠️ `path[].toolId` **不参与** `loadDeclaredIds` 的 `\bid\s*:\s*'([^']+)'` 解析（`toolId` 里 `Id` 前是词字符，`\b` 不成立）。
+
+### 7.5 诚实边界（不自欺）
+
+1. **手动标记是「自评」，不是客观证据** —— 与 ICAP「意图 ≠ 实际」（§1.2）一致。页面对 `manual`
+   步骤明确标注「自评 · 非客观证据」，`auto` 步骤标注「自动判据：该工具的产出记录」。
+2. **目前只有 `phrase-variant-builder` 会写产出记录**（`kind: 'variant'`）—— 也就是全站**唯一**
+   能走通 `auto` 判据的步骤。其余步骤要么手动自评，要么是缺口。这不掩饰：`auto` 才是有硬证据的那一类，
+   它的出现率低，正说明 §2.3 的结论「产出物零留存」仍未被大规模解决。
+3. 路径是**编排**不是强制：跳步不拦人，但高层产出会失去输入侧地垫，页面文案如实点出。
+
 

@@ -63,6 +63,10 @@ collections: ['books', 'dragon-english-basic100'],
 集合支持一层父子关系（`Collection.parentId`）：顶层集合页会把子集合作为入口区块渲染在工具网格之上，
 避免把「某一本书」和「书籍」平铺在一起造成层级混乱。
 
+集合还可选配 `path`（**ICAP 学习路径**）：把本集合下的工具按 ICAP 认知投入从低到高串成阶梯，
+在集合页工具网格**之上**渲染为「学习路径」区块。其 `path[].toolId` **必须属于本集合**
+（该工具的 `collections` 里含本集合 id），缺口步（无 `toolId`）必须写 `todo` —— 均由构建期校验兜住。
+
 > 新增集合 = 在 `COLLECTIONS` 里加一项；给工具挂集合 = 在该工具的 `collections: []` 里加 id。
 > **两者都不需要改任何其他文件**，与「新增工具」一样保持零耦合。
 
@@ -367,6 +371,8 @@ export interface Tool {
 | `collections[]` 里每个 id 存在于 `COLLECTIONS` | **报错退出** |
 | `collections[]` 内部 id 无重复 | **报错退出** |
 | `collections` 是字符串数组 | **报错退出** |
+| 集合 `path[].toolId` 必须属于本集合 | **报错退出** |
+| 集合 `path` 缺口步必须有 `todo` | **报错退出** |
 | `icap` 是字符串数组 | **报错退出** |
 | `icap[]` 里的每个值存在于 `ICAP_LEVELS` | **报错退出** |
 | `icap[]` 内部无重复值 | **报错退出** |
