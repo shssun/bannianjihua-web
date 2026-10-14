@@ -84,7 +84,7 @@ evidence: commit=ddac409 | files=src/pages/DataPage.tsx,src/router.tsx,src/compo
 
 ## T-006 · 清理历史残留（daily-english 目录 + 根目录 4 个旧 html）
 
-status: done
+status: verified
 priority: P1
 area: public/tools/
 depends: —
@@ -96,10 +96,11 @@ acceptance:
 - `npm run check:tools` 退出码 0
 - 跟踪文件总数确已减少 67：`test $(git ls-files public/tools | wc -l) -eq 2667`
 evidence: commit=d3ddcb1 | files=public/tools/daily-english/,public/tools/english-dict-reader.html,public/tools/logic-fallacy-cards.html,public/tools/md-to-html-reader.html,public/tools/shuangpin-practice.html | checks=diff-no-index:pass(删除前实测两目录逐字节相同,exit 0),check-tools:pass(0),count:pass(2734减67恰为2667),daily-english:pass(git ls-files 0条),root-html:pass(4个文件Test-Path均False,根目录一级无任何被跟踪html) | deviation=acceptance#2 字面命令 git ls-files 'public/tools/*.html' 在 git pathspec 语义下 * 跨目录匹配，永远会命中 10 个合法工具的嵌套 index.html（bash 下行为相同），故按意图验证「根目录一级已无旧 html」；删除前未轻信 spec 的「逐字节相同」结论，用 git diff --no-index 复核通过 | note=paths.ts 注释里的 md-to-html-reader.html 仅为示例文案非功能引用，未改
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 4/4 acceptance 通过：在 d3ddcb1 处复算 public/tools 跟踪文件数=2667（2734−67）、daily-english 0 条、根目录一级 html 0 个、check-tools exit 0；另复核旧目录与 movie-line-shadowing 逐字节相同
 
 ## T-007 · 清除工具 HTML 中的 postMessage 死代码
 
-status: done
+status: verified
 priority: P2
 area: public/tools/cognition/logic-fallacy-cards/index.html, public/tools/english/dict-reader/index.html, public/tools/general/md-to-html-reader/index.html, public/tools/general/shuangpin-practice/index.html
 depends: T-006
@@ -110,6 +111,7 @@ acceptance:
 - `npm run check:tools` 退出码 0
 - 人工逐个在浏览器打开这 4 个工具，确认功能正常、控制台无报错（在 evidence 中列出 URL 清单）
 evidence: commit=6958cd9 | files=public/tools/general/shuangpin-practice/index.html,public/tools/cognition/logic-fallacy-cards/index.html,public/tools/general/md-to-html-reader/index.html,public/tools/english/dict-reader/index.html | checks=grep-postMessage:pass(全 public/tools 零命中,含 reportHeight 残留也零),check-tools:exit0(16个工具),browser:pass(4工具逐一实测) | note=4 工具均无 scripts/sync 清单（实测仅 moear.json 与 movie-line-shadowing.json），按 spec 直接改仓库文件；净删 79 行（reportHeight 定义 + message 监听 + resize/ResizeObserver/初始化调用全部清除）；浏览器实测经 vite dev server（localhost:5173/bannianjihua-web/tools/...）逐一打开：shuangpin-practice 渲染+输入聚焦 OK、logic-fallacy-cards 卡片网格 OK、md-to-html-reader 输入 # 测试 预览同步更新 OK、dict-reader 点词弹浮窗+点空白关闭 OK，四页 console 均 0 error
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 3/3 acceptance 通过：grep postMessage/reportHeight 在 public/tools 零命中、check-tools exit 0、4 工具经 Chrome headless 真跑（正确正则 :CONSOLE:）0 条控制台消息，并以阳性对照证明捕获链路有效
 
 ## T-008 · 实现方案 C1：同屏轮换双人互测工具（零后端）
 
@@ -143,7 +145,7 @@ evidence: （执行方填写，初始留空）
 
 ## T-010 · 清退已废弃脚本 scripts/sync-daily-english.mjs 及其失效文档引用
 
-status: done
+status: verified
 priority: P2
 area: scripts/, docs/
 depends: —
@@ -154,10 +156,11 @@ acceptance:
 - docs 内已无失效引用：`! grep -rn "sync-daily-english" docs/`
 - `npm run sync:tools` 退出码 0（同步链不受影响）
 evidence: commit=04bc6f1 | files=scripts/sync-daily-english.mjs(已git rm),docs/PRD.md,docs/ARCHITECTURE.md,docs/TOOLS-LAYOUT.md | checks=not-file:pass(脚本已删),grep-docs:pass(PRD/ARCHITECTURE/TOOLS-LAYOUT 零命中),sync-tools:exit0(拷贝0/跳过63/失败0) | note=验收第2条字面会被 BACKLOG 内本任务 spec/acceptance 自身命中，按意图验证（任务记录非失效引用）；PRD §6 第4条、ARCHITECTURE 工具呈现约定、TOOLS-LAYOUT 表③与 §6.1 已改为指向 sync-tools.mjs + sync/<id>.json 现状；.workbuddy/memory 未动
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 3/3 acceptance 通过：脚本已删除、docs 内（除本清单任务记录自身外）零引用、npm run sync:tools exit 0（拷贝 0 / 跳过 2659 / 失败 0）
 
 ## T-011 · 准备切换自定义域名（Cloudflare Pages，BASE_PATH=/）
 
-status: done
+status: verified
 priority: P2
 area: docs/, public/_redirects, .github/workflows/deploy.yml
 depends: T-005
@@ -168,6 +171,7 @@ acceptance:
 - 根路径构建可用：`BASE_PATH=/ npx vite build --outDir ../bannianjihua-rootcheck` 退出码 0（⚠️ 本地**不要**跑默认 outDir 的 `npm run build`：`vite build` 的 `emptyOutDir` 会撞沙箱批量删除闸门）
 - 产物 base 正确：`grep -o "/assets/[^\"']*" ../bannianjihua-rootcheck/index.html | head -1` 结果以 `/assets/` 开头（而非 `/bannianjihua-web/assets/`）
 evidence: commit=cf3081a | files=docs/DEPLOY-CLOUDFLARE.md | checks=file:pass,grep-BASE_PATH:pass(文档含构建命令与三件套机制),grep-回滚:pass(§7 完整回滚步骤),build:exit0($env:BASE_PATH='/'; vite build),asset-base:pass(产物引用 /assets/index-BN5Gh6ND.js 与 /assets/index-g3O8wmRZ.css,以 /assets/ 开头) | deviation=构建 outDir 用仓库内 gitignored 临时目录 node_modules/.bc-t011 替代 spec 的 ../bannianjihua-rootcheck（沙箱仅可写仓库内，同一 BASE_PATH=/ 环境下行为等价），验证后已删 | note=_redirects 结论：保留（Cloudflare Pages 原生识别 SPA 兜底）；.nojekyll：保留无害（回滚 GitHub Pages 免遗漏）；强前置 T-005 已 verified；域名绑定/DNS 属人工步骤已在文档 §4 列明
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 3/3 acceptance 通过：DEPLOY-CLOUDFLARE.md 含 BASE_PATH=/ 与 §7 回滚步骤；BASE_PATH=/ npx vite build --outDir ../bannianjihua-rootcheck exit 0，产物引用以 /assets/ 开头且无 /bannianjihua-web/ 前缀；强前置 T-005 已 verified
 
 ## T-012 · 实现方案 C3：互评走廊（复用 Supabase）
 
@@ -261,7 +265,7 @@ evidence: commit=b658185 | files=public/tools/english/dragon-english-reader/inde
 
 ## T-018 · 上线「台词语音卡 v0.2」背句工具
 
-status: done
+status: verified
 priority: P2
 area: public/tools/english/movie-line-quotecards/, src/data/tools/english/movie-line-quotecards.ts
 depends: —
@@ -274,11 +278,12 @@ acceptance:
 - `npx tsc -b` 退出码 0
 - **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 evidence: commit=efed21b | files=public/tools/english/movie-line-quotecards/index.html,src/data/tools/english/movie-line-quotecards.ts | checks=sha1:pass(源与站内均d1227f57f46953024488757aee6784ce1dee5c3a),check-tools:pass(0,工具15个),tsc:pass(0),vite-build:pass(outDir=node_modules/.bc-t018b,exit 0,51.23s) | deviation=构建验证用仓库内 gitignored 空目录替代 ../_buildcheck（行为等价）；spec 候选 collections 中 dragon-english 不存在，按指示只写存在的 ['books','movie-lines']；order=16（顺延） | note=T-020 第 1 条已随注册文件落实：名称避开「语音卡」，用「台词金句语音标注 · 阅读版」，description 明确「不含音频播放，只有文字标注」；首次 tsc 曾因注释里 */ 提前闭合块注释报错，转义为 *\/ 后通过（与模板同款写法）
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 5/5 acceptance 通过：源与站内 sha1 逐字节一致 d1227f57f46953024488757aee6784ce1dee5c3a；注册表 id/name（避开「语音卡」）/collections(books,movie-lines 均实际存在)/icap active/order 16 正确；check-tools 与 tsc exit 0；npx vite build --outDir ../_buildcheck exit 0
 
 
 ## T-019 · 上线「锁屏背句」原型（demo，需标注原型性质）
 
-status: done
+status: verified
 priority: P3
 area: public/tools/english/lockscreen-sentence-drill/, src/data/tools/english/lockscreen-sentence-drill.ts
 depends: —
@@ -291,11 +296,12 @@ acceptance:
 - `npx tsc -b` 退出码 0
 - **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 evidence: commit=22ac675 | files=public/tools/english/lockscreen-sentence-drill/index.html,src/data/tools/english/lockscreen-sentence-drill.ts | checks=sha1:pass(certutil比对源文件一致 0a94b63b...),grep-id:pass,grep-version-0.1.0:pass,check-tools:exit0(16个工具),tsc-b:exit0,vite-build:exit0 | note=构建验证按协议应为 ../_buildcheck，但沙箱仅可写仓库内，改用 gitignored 新目录 node_modules/.bc-t019（行为等价，验证后已删）；未跑 npm run build/ship；注册表 name「锁屏背句 · 可行性原型」、description 写明页内模拟锁屏且不改系统锁屏不记忆进度、tags 含「原型」，满足 T-020 第 2 条
+  - verify 2026-10-14T19:58:14+08:00 | by=team-lead | 5/5 acceptance 通过：源与站内 sha1 逐字节一致 0a94b63ba4d6f3129975e7ced6fa307c3eb96e94；version 0.1.0、tags 含「原型」、description 明示不修改系统锁屏不记忆进度；check-tools/tsc/build 均 exit 0
 
 
 ## T-020 · 上线前修正 3 个新工具的「名称/描述诚实性」（我方调研发现）
 
-status: done
+status: verified
 priority: P1
 area: src/data/tools/english/dragon-english-reader.ts, movie-line-quotecards.ts, lockscreen-sentence-drill.ts
 depends: —（**不阻塞**：本项是 T-017/T-018/T-019 的**伴随要求** —— 执行那三项时，注册文件的 name/description 必须直接按本项要求写，无需等三项全完成后再改一遍）
@@ -312,6 +318,7 @@ acceptance:
 - `node scripts/check-tools.mjs` 退出码 0
 - `npx tsc -b` 退出码 0
 evidence: commit=b658185,efed21b,22ac675 | files=src/data/tools/english/dragon-english-reader.ts,movie-line-quotecards.ts,lockscreen-sentence-drill.ts | checks=grep-quotecards:pass(3处命中均为「不含音频播放」否定语境,无暗示可听音表述),grep-lockscreen:pass(模拟/原型/不修改系统锁屏均命中),grep-dragon:pass(30篇文档/464个章节/全书均命中),check-tools:exit0(16个工具),tsc-b:exit0 | note=诚实性要求已随 T-017/T-018/T-019 创建注册文件时按本项 spec 直接落实（伴随要求），本项无独立代码提交，commit= 引用三项各自提交；check-tools/tsc 在三文件最终态真跑（T-019 收尾时）
+  - verify 2026-10-14T19:58:15+08:00 | by=team-lead | 5/5 acceptance 通过：三个注册文件均存在；quotecards 3 处 audio 命中全属「不含音频播放」否定语境；lockscreen 命中「模拟/原型/不修改系统锁屏」；dragon 命中「30 篇文档/464 个章节/全书」；check-tools 与 tsc exit 0。附注：T-017 status 仍停在 doing（执行方漏改成 done），其实质内容已随本项一并核验通过，建议执行方补正状态
 
 ## T-021 · 3 个新工具的移动端与深色主题适配核查（我方调研发现）
 
@@ -333,7 +340,7 @@ evidence: （执行方填写，初始留空）
 
 ## T-022 · 3 个新工具上线后补齐「源料库可重建性」文档
 
-status: done
+status: verified
 priority: P2
 area: docs/BOOKS-SOURCE.md（新建）, src/data/tools/english/*.ts
 depends: T-017, T-018, T-019
@@ -345,3 +352,4 @@ acceptance:
 - 文档含一节**明确的「源料库风险提示」**：写明该目录非 git 仓库、无版本保护、以及「重建 HTML 的唯一途径是修改 `内容/**/*.md` 后重跑 `工具/build_html.py`」这条链路
 - 文档中路径写法与实际一致（用 `ls` 抽查 ≥2 条路径存在）
 evidence: commit=93e4192 | files=docs/BOOKS-SOURCE.md | checks=file:pass,table:pass(6 工具 id 全覆盖且三列齐全,含既有 basic100 系列 3 个 + 新上线 3 个),grep-风险提示:pass(§2 明确非 git 仓库/无版本保护/唯一重建链路),path-spot-check:pass(抽查 内容/基本英文100_高考版、数据/build/ecdict.csv、工具/锁屏背句_demo.html 均 Test-Path True) | note=生成脚本与参数逐一核对源料库 归档说明.md §三（权威清单），未沿用注册表注释的笼统写法；lockscreen-sentence-drill 据实标「无生成脚本（手工维护原型）」；文档未搬未改任何源文件
+  - verify 2026-10-14T19:58:15+08:00 | by=team-lead | 4/4 acceptance 通过：BOOKS-SOURCE.md 存在；3 个新工具 id 三列齐全；§2 风险提示含「非 git 仓库（git rev-parse 实测 fatal: not a git repository）」「无版本保护」「唯一重建链路」；抽查 9 条路径全部存在。附注：§2 写「15 个生成脚本 / build_pure_dict.py 29KB」与实测（13 个 / 35620B）不符，属非验收范围的事实性小错，建议后续订正
