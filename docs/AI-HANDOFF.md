@@ -315,10 +315,11 @@ T-007 · 集合注册表结构化解析 + ICAP 层级
 3. 新增工具必须 **「只新建文件，不改既有文件」**（注册表一工具一文件 + `import.meta.glob` 自动收集），
    并让 **`node scripts/check-tools.mjs` 保持通过**（`channel`/`id`/目录名/`entry`/`collections`/`icap` 等硬校验）。
 4. **不确定就 `status: blocked` + 在 `evidence` 的 `note=` 写清阻塞点，不要猜着改。**
-5. **不要动 `.workbuddy/`**（本项目记忆/缓存，已被 `.gitignore` 忽略）；不要改 `docs/AI-HANDOFF.md`、`docs/BACKLOG.md` 的**非 `status`/`evidence` 字段**。
+5. **不要动 `.workbuddy/`**（本项目记忆/缓存，已被 `.gitignore` 忽略）。
+   ⚠️ **更要紧的一条见规则 11**：`docs/BACKLOG.md` 现在**完全归我方**，你一个字都不要改。
 6. **本机沙箱不要跑 `npm run build` / `npm run ship`**（清空输出目录会触发删除配额而杀进程）；验证构建用 `npx vite build --outDir ../_buildcheck`。
 7. **提交信息用中文**，格式与仓库历史一致：`feat|fix|chore|docs(scope): 描述`。
-8. 完成一个任务后，把它在 `docs/BACKLOG.md` 里 `status: done` 并填 `evidence`（§3），**不得写 `verified`**。
+8. 完成一个任务后，**在 `docs/EXEC-REPORT.md`** 里把该项 `status: done` 并填 `evidence`（§3），**不得写 `verified`**。
    ⚠️ **填完 `evidence` 必须同步把 `status` 从 `doing` 改成 `done`** —— 实测发生过「两例做完活、填了
    `evidence`，却忘了改 `status`」的情况（T-004 / T-017），结果制品明明已提交却卡在 `doing` 无人过问。
    `status` 与 `evidence` 是**同一个动作的两半，必须一起改**。
@@ -328,6 +329,12 @@ T-007 · 集合注册表结构化解析 + ICAP 层级
    复核就失去了「拦住问题」的意义。你提交后**不需要知会、也不需要等待**，
    我方会按 §4 的流程扫描并复核。
 10. **`_src-tmp/` 是只读参考区，禁止写入**（详见 §6.1）。
+11. 🔒 **你只写 `docs/EXEC-REPORT.md` 这一个状态文件，绝不写 `docs/BACKLOG.md`**（详见 §7.3）。
+    任务的定义（`spec`/`acceptance`/`priority`/`depends`）与「给执行方的当前指令」都在 BACKLOG 里，**你只读它**。
+    为什么：两个写者改同一个文件会**静默互相覆盖**；一个文件一个写者，我们谁都不会锁死谁。
+12. **有疑问、被卡住、或发现协议本身有问题** → 写成 `docs/EXEC-REPORT.md` 里的一个 `## Q-xxx` 区块，
+    或直接在 `docs/BACKLOG.md` **顶部指令区块的回复处**留言（我方在下一轮会以「新任务 / 边界澄清」的形式答复）。
+    只写在 `docs/EXEC-COMMS.md` 里**可能被漏读**（那条通道不保证被定时扫描到，见 §7.1）。
 
 ---
 
@@ -428,6 +435,64 @@ _src-tmp/
 - **推论：清单没活 = 执行方空转。** 所以保持 `todo` 队列不为空是**我方的责任**；
   当下游被仓库外依赖卡住时，应在清单里**显式登记我方自己的前置项**（如 `T-023`）并给下游任务加 `depends`，而不是让执行方空跑一轮。
 
+### 7.3 双文件契约 —— **一个文件只有一个写者**（2026-10-14 起）
+
+**为什么要改**：原先双方都改 `docs/BACKLOG.md`。执行方有 20 分钟轮询、会反复重写它，我方也在同一文件里写任务与结论
+→ **后写者会静默覆盖先写者**：丢一个 `verified` 标记、丢一条新任务，都不会报任何错。
+改为**一个文件一个写者**：从结构上消除冲突，双方永不互相锁死。
+
+| 文件 | **唯一写者** | 内容 |
+|---|---|---|
+| `docs/BACKLOG.md` | **我方** | ① 顶部「📢 给执行方的当前指令」② 任务**定义**：`priority` / `area` / `depends` / `size` / `spec` / `acceptance` ③ 我方的 `verdict` 字段与**我方轨迹行**（`verify` / `reject`）④ **我方自办任务**（`owner: 我方`）的 `status` / `evidence` |
+| `docs/EXEC-REPORT.md` | **执行方** | 每个任务的 `status`（`todo` / `doing` / `done` / `blocked`）+ `evidence`（单行）+ **执行方轨迹行**（`retract` 等） |
+
+🔒 **铁律**：
+- **执行方不得写 `docs/BACKLOG.md`** —— 连「改一行一次」也不要（那正是锁死的来源）。
+- **我方不得写 `docs/EXEC-REPORT.md`**。
+
+任务在两个文件里靠 **`## T-xxx · 标题` 的 id 关联**，id 必须一致（`check` 会交叉校验）。
+
+#### 7.3.1 有效状态（合成规则）
+
+```
+if   BACKLOG.verdict === 'verified'  ->  verified        （终态，忽略 EXEC）
+elif BACKLOG.status 存在              ->  BACKLOG.status  （我方自办任务）
+elif EXEC.status 存在                 ->  EXEC.status
+else                                  ->  todo
+```
+
+- `verdict` 只有两个值：`pending`（缺省）/ `verified`。
+- **`EXEC-REPORT.md` 里出现 `verified` 是硬错误** —— 执行方不得自批作业；`verified` 只能由我方以
+  `verdict: verified`（执行方任务）或 `status: verified`（我方自办任务）表达。
+
+#### 7.3.2 打回（`reject`）闭环
+
+1. 我方在 **BACKLOG** 的该项追加一行 `reject` 轨迹（**不删**对方已写的任何东西 —— 那些在另一个文件里，本来也碰不到）。
+2. **执行方必须把自己的 `status` 从 `done` 改回 `doing`**（写在 EXEC-REPORT）→ 该项随即退出「待验证」队列。
+3. 执行方修完后重新写 `done` → 自动重新进入「待验证」。
+4. `scan` 会**单独列出**「已 `reject` 但执行方尚未把 `status` 改回 `doing`」的项，用于催办。
+
+> ⚠️ 打回之后**不**改 `verdict`（保持 `pending`）。`verdict` 只用来表达「**我方已验收通过**」。
+
+#### 7.3.3 对 `scripts/backlog.mjs` 的要求（改动的判据）
+
+| 命令 | 改动要求 |
+|---|---|
+| `check` | **分别校验两个文件**：`BACKLOG.md` 每个任务块必须含 `priority`/`area`/`depends`/`size`/`spec` 且 `acceptance` ≥1 条；**不得出现 `status`/`evidence`（除非 `owner: 我方`）**；`verdict` 若出现只能是 `pending`/`verified`。`EXEC-REPORT.md` 每个块必须含 `status`/`evidence`，轨迹行格式同 §3.2，**且 `status: verified` 是硬错误**。**交叉校验**：EXEC-REPORT 的 id 必须都在 BACKLOG 里存在。 |
+| `scan` | 按 §7.3.1 合成有效状态；输出三块：① **待验证**（合成为 `done`）② **已打回待响应**（BACKLOG 有 `reject` 轨迹但 EXEC 的 `status` 仍是 `done`）③ **疑似漏改状态**（`doing` 但 `evidence` 已填） |
+| `list` | 按**合成后**的有效状态与优先级汇总 |
+| `show` | 合并展示：定义来自 BACKLOG，`status`/`evidence` 来自 EXEC-REPORT，我方轨迹来自 BACKLOG |
+| `verify` | 写 **BACKLOG**：执行方任务写 `verdict: verified`，我方自办任务写 `status: verified`；并向 BACKLOG 追加一行 `verify` 轨迹 |
+| 打回 | 在 **BACKLOG** 追加 `reject` 轨迹（不改 `verdict`） |
+
+⚠️ **反证测试是硬要求**（沿用本项目一贯做法）：改完必须各造一次**必然失败**的样例，确认真的 `exit 1` / 真的被报出来，再改回确认恢复绿。至少覆盖：
+① 在 EXEC-REPORT 里写 `status: verified` → `check` 必须拦下；
+② 在 BACKLOG 的**执行方任务**块里写 `status:` → `check` 必须拦下；
+③ EXEC-REPORT 里出现 BACKLOG 没有的 id → `check` 必须拦下；
+④ 造一个「`done` 且 `verdict: pending`」的项 → `scan` 必须报出「待验证」；
+⑤ 造一个「`done` + BACKLOG 有 `reject` 轨迹」的项 → `scan` 必须报进「已打回待响应」；
+⑥ 造一个「`verified`（verdict）且 EXEC 仍 `done`」的项 → `scan` **不得**报进待验证。
+
 ---
 
 ## 8. 给执行方的开场白（可直接复制）
@@ -435,20 +500,25 @@ _src-tmp/
 ```
 你是本仓库（半年计划 bannianjihua_web，纯静态站点）的实现执行方，只负责写代码。先读 docs/AI-HANDOFF.md（协议），再读 docs/BACKLOG.md（任务清单），按此顺序。二者不符时以 AI-HANDOFF.md 为准。
 
+⭐ 状态文件的分工（最重要，先记住）：
+  - docs/BACKLOG.md  ← 归【我方】所有：任务定义 + 「📢 给执行方的当前指令」区块。**你只读它，一个字都不要改。**
+  - docs/EXEC-REPORT.md ← 归【你】所有：你的 status / evidence / 轨迹行都写在这里。我方不写它。
+  （为什么：两个写者改同一个文件会静默互相覆盖。一个文件一个写者，谁都不会锁死谁。详见协议 §7.3。）
+
 你每 20 分钟会被唤起一次去扫 docs/BACKLOG.md，所以：
-0. ⭐ 每次扫描**先读清单顶部那个「📢 给执行方的当前指令」区块** —— 我方对你说的一切（新任务、暂缓、边界澄清）都写在那里。读完再按 todo 取活。
-   然后**可以连着做多项**，不必只做一个就停：按 priority 高者、再按 id 顺序取。
+0. 每次扫描**先读 BACKLOG 顶部那个「📢 给执行方的当前指令」区块** —— 我方对你说的一切（新任务、暂缓、边界澄清）都写在那里。
+   读完再按 todo 取活，**可以连着做多项**，不必只做一个就停：按 priority 高者、再按 id 顺序取。
 
 规则：
 1. 一个任务一个 commit，严禁把多个任务混进一个 commit。（可以连做多项，但每项单独提交。）
-2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 evidence 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。status 与 evidence 必须一起改，别只填 evidence 忘了改 status。若你发现上一批漏改了 status，自己补正即可。
-3. 🔒 不要 git push —— 你只 git commit，把提交留在本地即可。push 是部署动作，由我方独立复核通过后执行。若你自行 push，未经复核的代码就上线了，复核就失去了意义。
-4. 你永远不能把 status 写成 verified —— done 只是"你自认为完成"，verified 只能由我方独立验证后填。不得修改 spec/acceptance/id 等字段。
+2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 **docs/EXEC-REPORT.md** 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。status 与 evidence 必须一起改。若你发现自己上一批漏改了 status，自己补正即可。
+3. 🔒 不要 git push —— 你只 git commit，把提交留在本地即可。push 是部署动作，由我方独立复核通过后执行。
+4. 你永远不能写 verified —— done 只是"你自认为完成"，verified 只能由我方以 verdict / status 表达。也不得修改 spec/acceptance/id 等字段。
 5. 遵守硬约束：纯静态、无服务器端进程；新增工具只新建文件、不改既有文件，且 node scripts/check-tools.mjs 必须通过。
 6. 本机不要跑 npm run build / npm run ship（会触发删除配额杀进程）；验证构建用 npx vite build --outDir ../_buildcheck。
 7. 不确定就标 blocked 并在 evidence 的 note= 写清原因，不要猜着改。不要动 .workbuddy/。_src-tmp/ 是只读参考区，禁止写入。
 8. 提交信息用中文，格式 feat|fix|chore|docs(scope): 描述。
-9. **想让某件事进入我方的视野，写进 docs/BACKLOG.md 顶部的指令区块或写成一条新的待办** —— 只写在 docs/EXEC-COMMS.md 里可能被漏读（那条通道不保证被定时扫描）。EXEC-COMMS.md 用来存档问答。
+9. 想让某件事进入我方的视野，写进 docs/EXEC-REPORT.md 的一个 ## Q-xxx 区块；只写在 docs/EXEC-COMMS.md 里可能被漏读。
 现在开始：读 docs/BACKLOG.md 顶部的「📢 给执行方的当前指令」区块 → 认领 status=todo 且 depends 已满足的任务（priority 高者优先、再按 id 顺序）→ 可连续做多项。
 ```
 
