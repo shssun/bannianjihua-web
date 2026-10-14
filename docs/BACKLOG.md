@@ -29,9 +29,11 @@ priority: P1
 area: .workbuddy/memory/MEMORY.md
 depends: —
 size: S
-spec: `.workbuddy/memory/MEMORY.md` 是每个会话注入给 AI 的项目长期记忆，注入上限约 13.7KB，**超出会从文件尾部截断**；当前实测 **15575 字节（约 15.6KB）**，也就是排在尾部的「环境坑 / 文档位置 / 工具清单 / ⚠️遗留」这些关键段落正在被静默截掉（而它们恰是本次交接的重要来源）。需在不丢失硬约束的前提下把它压到 13.7KB 以内：合并重复表述、删去过时历史叙述、把可指向其他文档的细节改为「见 docs/xxx」。**必须保留**下列关键项：三件套子路径部署（vite `base` / router `basename` / `paths.ts`）、`check-tools.mjs` 校验规则、沙箱「批量删除闸门」与「脚本调 git 一律 `stdio:['ignore','pipe','pipe']`」规约、判据选型、当前遗留清单。该文件位于 gitignore 的 `.workbuddy/` 下（git 不跟踪），但仍须保留在磁盘上。
+spec: ⚠️ **本项的前提已于 2026-10-14 被实测推翻，且本项改由我方自行执行 —— 执行方请跳过。**
+
+订正：原文写的「注入上限约 13.7KB，超出从尾部截断」**未复现** —— 2026-10-14 复看，**15575 B 时可完整注入**（尾部段落并未被截）。故正确口径是「**控制在 ~18KB 内、硬规则一律写在最前面**」，而不是死守 13.7KB。保留原始意图（瘦身、不丢硬约束）如下：合并重复表述、删去过时历史叙述、把可指向其他文档的细节改为「见 docs/xxx」。**必须保留**下列关键项：三件套子路径部署（vite `base` / router `basename` / `paths.ts`）、`check-tools.mjs` 校验规则、沙箱「批量删除闸门」与「脚本调 git 一律 `stdio:['ignore','pipe','pipe']`」规约、判据选型、当前遗留清单。该文件位于 gitignore 的 `.workbuddy/` 下（git 不跟踪），但仍须保留在磁盘上。
 acceptance:
-- 字节数已压缩：`test $(wc -c < .workbuddy/memory/MEMORY.md) -le 13700`
+- 字节数在合理范围：`test $(wc -c < .workbuddy/memory/MEMORY.md) -le 18000`（原判据 13700 基于已被推翻的前提；按订正口径取 18000）
 - 关键规约仍在：`grep -q "批量删除" .workbuddy/memory/MEMORY.md` 且 `grep -q "ignore','pipe','pipe" .workbuddy/memory/MEMORY.md`
 - 部署关键信息仍在：`grep -q "bannianjihua-web" .workbuddy/memory/MEMORY.md`
 evidence: （执行方填写，初始留空）
@@ -116,7 +118,7 @@ evidence: commit=6958cd9 | files=public/tools/general/shuangpin-practice/index.h
 
 ## T-008 · 实现方案 C1：同屏轮换双人互测工具（零后端）
 
-status: todo
+status: doing
 priority: P2
 area: public/tools/english/, src/data/tools/english/, src/data/collections.ts
 depends: —

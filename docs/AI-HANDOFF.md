@@ -322,8 +322,11 @@ T-007 · 集合注册表结构化解析 + ICAP 层级
    ⚠️ **填完 `evidence` 必须同步把 `status` 从 `doing` 改成 `done`** —— 实测发生过「两例做完活、填了
    `evidence`，却忘了改 `status`」的情况（T-004 / T-017），结果制品明明已提交却卡在 `doing` 无人过问。
    `status` 与 `evidence` 是**同一个动作的两半，必须一起改**。
-9. **改完 `docs/BACKLOG.md` 后必须 `git push`** —— 你的状态标记只有推上远端，我方才能扫到。
-   只 commit 不 push 等于**没有交接**（实测发生过：提交留在本地，远端仍停在旧版本）。
+9. 🔒 **不要 `git push`** —— 这是分工的关键闸门（详见 §6.2）。
+   **你只做 `git commit`，把提交留在本地即可。** `push` 由我方在**独立复核通过后**执行。
+   理由：`push` 会触发 CI 直接部署上线。若执行方自行 push，未经复核的代码就上线了，
+   复核就失去了「拦住问题」的意义。你提交后**不需要知会、也不需要等待**，
+   我方会按 §4 的流程扫描并复核。
 10. **`_src-tmp/` 是只读参考区，禁止写入**（详见 §6.1）。
 
 ---
@@ -361,6 +364,33 @@ _src-tmp/
 
 ---
 
+## 6.2 提交与推送的职责边界
+
+| 动作 | 执行方 | 我方 |
+|---|---|---|
+| 改代码 / 建文件 | ✅ | ❌ |
+| `git commit` | ✅ | ✅ |
+| **`git push`（触发 CI 上线）** | ❌ **禁止** | ✅ **唯一** |
+| 复核（按 `acceptance` 逐条验） | ❌ | ✅ |
+| 标 `verified` | ❌ | ✅ |
+
+**为什么要这样切**：`push` = 部署。如果执行方自己能 push，那「我方复核」就只是事后追认 ——
+发现问题的代价从「拦下来」变成「线上已经坏了再回滚」。所以：
+
+```
+执行方：实现 → 自测 → commit + 改 status/evidence（留在本地）
+   ↓
+我方：扫描 → 逐条独立复核 acceptance
+   ↓ 通过                    ↓ 不通过
+我方 push → CI 部署        我方写 reject 打回（不 push，问题不上线）
+```
+
+⚠️ **我方自己的纪律**：`push` 前必须**先看清单**再推 —— 执行方的提交会堆在本地，
+一次 `git push` 会把**所有**未推送提交一起带走。所以推送前必须确认
+`git log origin/main..HEAD` 里的每一个提交**都已复核通过**，否则会把未复核的代码一起推上线。
+
+---
+
 ## 7. 分工模型
 
 | 环节 | 我方（团队） | 执行方（外部 AI） |
@@ -388,12 +418,14 @@ _src-tmp/
 
 规则：
 1. 一次只做一个任务（或 depends 允许的连续几个），严禁把多个任务混进一个 commit。
-2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 evidence 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。
-3. 你永远不能把 status 写成 verified —— done 只是"你自认为完成"，verified 只能由我方独立验证后填。不得修改 spec/acceptance/id 等字段。
-4. 遵守硬约束：纯静态、无服务器端进程；新增工具只新建文件、不改既有文件，且 node scripts/check-tools.mjs 必须通过。
-5. 本机不要跑 npm run build / npm run ship（会触发删除配额杀进程）；验证构建用 npx vite build --outDir ../_buildcheck。
-6. 不确定就标 blocked 并在 evidence 的 note= 写清原因，不要猜着改。不要动 .workbuddy/。
-7. 提交信息用中文，格式 feat|fix|chore|docs(scope): 描述。
+2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 evidence 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。status 与 evidence 必须一起改，别只填 evidence 忘了改 status。
+3. 🔒 不要 git push —— 你只 git commit，把提交留在本地即可。push 是部署动作，由我方独立复核通过后执行。若你自行 push，未经复核的代码就上线了，复核就失去了意义。
+4. 你永远不能把 status 写成 verified —— done 只是"你自认为完成"，verified 只能由我方独立验证后填。不得修改 spec/acceptance/id 等字段。
+5. 遵守硬约束：纯静态、无服务器端进程；新增工具只新建文件、不改既有文件，且 node scripts/check-tools.mjs 必须通过。
+6. 本机不要跑 npm run build / npm run ship（会触发删除配额杀进程）；验证构建用 npx vite build --outDir ../_buildcheck。
+7. 不确定就标 blocked 并在 evidence 的 note= 写清原因，不要猜着改。不要动 .workbuddy/。_src-tmp/ 是只读参考区，禁止写入。
+8. 提交信息用中文，格式 feat|fix|chore|docs(scope): 描述。
+9. 有疑问、被卡住、或发现协议本身有问题，写进 docs/EXEC-COMMS.md 的登记表（我方会在那里回复）。
 现在开始：先打开 docs/BACKLOG.md，从中认领一个 status=todo 且 depends 已满足的任务（清单里有多项，先按 priority 高者、再按 id 顺序取）。
 ```
 
