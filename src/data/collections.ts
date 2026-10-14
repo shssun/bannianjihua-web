@@ -154,6 +154,25 @@ export const COLLECTIONS: Collection[] = [
     parentId: 'books',
     order: 11,
   },
+  {
+    id: 'high-school-math',
+    name: '高中数学',
+    cover: '📐',
+    description: '易错易误解点 · 数形结合：拖动参数，看图象怎么变',
+    order: 3,
+    path: [
+      {
+        label: '看图辨形',
+        note: '拖动参数，看常见函数图象怎么变、位置怎么移',
+        toolId: 'function-param-lab',
+      },
+      {
+        label: '（待建）',
+        note: '更多章节的易误解点',
+        todo: '等「高中数学易误解点全清单」调研后按可视化性排序补入',
+      },
+    ],
+  },
 ];
 
 /**
