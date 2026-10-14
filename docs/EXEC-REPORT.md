@@ -90,7 +90,7 @@ evidence: commit=cf3081a | files=docs/DEPLOY-CLOUDFLARE.md | checks=file:pass,gr
 
 ## T-012 · 实现方案 C3：互评走廊（复用 Supabase）
 
-status: todo
+status: doing
 evidence: （执行方填写，初始留空）
 
 ## T-013 · 复核音频/素材侧遗留（标签偏差 / 帧 OCR / 隔离片段 / whisper 幻觉 / 错别字文件名）
