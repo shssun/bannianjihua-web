@@ -207,30 +207,12 @@
           });
         }
 
-        // ===== postMessage 协议 =====
-        function reportHeight() {
-          var height = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-          );
-          window.parent.postMessage({ type: 'resize', height: height }, '*');
-        }
-
-        window.addEventListener('message', function (event) {
-          var data = event.data;
-          if (data && data.type === 'theme' && (data.value === 'light' || data.value === 'dark')) {
-            document.documentElement.setAttribute('data-theme', data.value);
-          }
-        });
-
         document.getElementById('open-new-tab').addEventListener('click', function () {
           window.open(window.location.href, '_blank', 'noopener');
         });
 
         // 初始化
         renderCards();
-        reportHeight();
-        window.addEventListener('resize', reportHeight);
       })();
     </script>
   </body>

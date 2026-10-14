@@ -209,33 +209,11 @@ $('tA').addEventListener('click',()=>{if(!active&&!done){resetGame()}$('tA').foc
 
 buildKB();buildRef();resetGame();
 
-// ===== 与主站的 postMessage 协议 =====
-// 工具 → 主站：上报真实高度（供主站 iframe 自适应）
-function reportHeight() {
-  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  window.parent.postMessage({ type: 'resize', height: h }, '*');
-}
-
-// 主站 → 工具：接收主题消息
-// 本工具为深色专用设计，暂不响应该消息（浅色适配需重写配色方案）
-window.addEventListener('message', function (event) {
-  var data = event.data;
-  if (data && data.type === 'theme') {
-    // no-op：见上方注释，保持深色配色不变
-  }
-});
-
 // 「在新标签打开」按钮：独立窗口打开本工具
 function openNewTab() {
   window.open(window.location.href, '_blank', 'noopener');
 }
 
-// 高度上报：初始化 + 窗口尺寸变化 + 内容变化（做题进度条/题目切换会导致高度变化）
-window.addEventListener('resize', reportHeight);
-if (typeof ResizeObserver !== 'undefined') {
-  new ResizeObserver(reportHeight).observe(document.body);
-}
-reportHeight();
 </script>
 </body>
 </html>

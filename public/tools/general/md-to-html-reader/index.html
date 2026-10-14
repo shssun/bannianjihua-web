@@ -349,28 +349,9 @@
 
         function render() {
           preview.innerHTML = renderMarkdown(input.value);
-          reportHeight();
         }
 
         input.addEventListener('input', render);
-
-        // ===== 与主站的 postMessage 协议 =====
-        // 工具 → 主站：上报真实高度
-        function reportHeight() {
-          var height = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-          );
-          window.parent.postMessage({ type: 'resize', height: height }, '*');
-        }
-
-        // 主站 → 工具：接收主题
-        window.addEventListener('message', function (event) {
-          var data = event.data;
-          if (data && data.type === 'theme' && (data.value === 'light' || data.value === 'dark')) {
-            document.documentElement.setAttribute('data-theme', data.value);
-          }
-        });
 
         // 「在新标签打开」按钮
         document.getElementById('open-new-tab').addEventListener('click', function () {
@@ -380,7 +361,6 @@
         // 初始化
         input.value = SAMPLE;
         render();
-        window.addEventListener('resize', reportHeight);
       })();
     </script>
   </body>

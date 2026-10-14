@@ -252,7 +252,6 @@
 
           anchor.classList.add('active');
           activeWord = anchor;
-          reportHeight();
         }
 
         function closePopup() {
@@ -275,22 +274,6 @@
           }
         });
 
-        // ===== postMessage 协议 =====
-        function reportHeight() {
-          var height = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-          );
-          window.parent.postMessage({ type: 'resize', height: height }, '*');
-        }
-
-        window.addEventListener('message', function (event) {
-          var data = event.data;
-          if (data && data.type === 'theme' && (data.value === 'light' || data.value === 'dark')) {
-            document.documentElement.setAttribute('data-theme', data.value);
-          }
-        });
-
         document.getElementById('open-new-tab').addEventListener('click', function () {
           window.open(window.location.href, '_blank', 'noopener');
         });
@@ -299,8 +282,6 @@
         SENTENCES.forEach(function (s) {
           reader.appendChild(buildSentence(s));
         });
-        reportHeight();
-        window.addEventListener('resize', reportHeight);
       })();
     </script>
   </body>
