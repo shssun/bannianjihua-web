@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>函数参数实验室</title>
+    <title>数学参数实验室</title>
     <style>
       :root {
         --bg: #0b1120;
@@ -66,12 +66,13 @@
       .param-val { font-size: 0.82rem; color: var(--primary); font-variant-numeric: tabular-nums; }
       .param-row { display: flex; align-items: center; gap: 8px; }
       .param-row input[type=range] { flex: 1; accent-color: var(--primary); }
-      .zero-btn {
+      .zero-btn, .preset-btn {
         padding: 2px 8px; font-size: 0.72rem; border-radius: 6px;
         border: 1px solid var(--border); background: transparent; color: var(--muted);
         cursor: pointer; font-family: inherit; white-space: nowrap;
       }
-      .zero-btn:hover { border-color: var(--accent); color: var(--accent); }
+      .zero-btn:hover, .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+      .presets { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
       .readout { font-size: 0.82rem; line-height: 1.7; }
       .readout .lbl { color: var(--muted); }
       .readout code { color: var(--accent); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; }
@@ -81,7 +82,7 @@
     </style>
   </head>
   <body>
-    <h1>函数参数实验室</h1>
+    <h1>数学参数实验室</h1>
     <div class="layout">
       <div class="canvas-wrap">
         <canvas id="cv" width="800" height="560"></canvas>
@@ -100,10 +101,9 @@
     (function () {
       'use strict';
 
-      // ---------- 工具函数 ----------
+      // ---------- 通用工具函数 ----------
       function fmt(n) {
-        if (!isFinite(n)) return String(n);
-        // 保留最多 3 位小数，去掉尾随 0
+        if (typeof n !== 'number' || !isFinite(n)) return String(n);
         var s = Number(n.toFixed(3)).toString();
         return s;
       }
@@ -111,21 +111,108 @@
         if (!isFinite(n)) return (n > 0 ? '+∞' : '−∞');
         return fmt(n);
       }
+      function gcd(a, b) {
+        a = Math.abs(a); b = Math.abs(b);
+        while (b) { var t = a % b; a = b; b = t; }
+        return a;
+      }
+      // 把 α 近似为最简分数 p/q（分母 ≤ 12）；失败 = 无理数
+      function fracApprox(alpha) {
+        for (var q = 1; q <= 12; q++) {
+          var p = Math.round(alpha * q);
+          if (Math.abs(alpha - p / q) < 1e-9) {
+            var g = gcd(p, q) || 1;
+            return { p: p / g, q: q / g };
+          }
+        }
+        return null;
+      }
+      // 值显示为 π 的十二分之几（能精确匹配时），否则小数
+      function fmtPi(v) {
+        var k = Math.round(v / (Math.PI / 12));
+        if (Math.abs(v - k * Math.PI / 12) < 1e-9) {
+          if (k === 0) return '0';
+          var sign = k < 0 ? '−' : '';
+          var n = Math.abs(k), den = 12;
+          var g = gcd(n, den) || 1;
+          n /= g; den /= g;
+          var numStr = (n === 1) ? 'π' : n + 'π';
+          return sign + (den === 1 ? numStr : numStr + '/' + den);
+        }
+        return fmt(v);
+      }
+
+      // ---------- 幂函数：域规则（分母 ≤ 12 的分数近似） ----------
+      function powerDomain(alpha) {
+        if (alpha === 0) return { dom: 'x ≠ 0', ran: '{1}', row: 'α = 0' };
+        var f = fracApprox(alpha);
+        if (!f) return { dom: '(0, +∞)', ran: '(0, +∞)', row: 'α 为无理数' };
+        var p = f.p, q = f.q;
+        if (q === 1) {
+          if (p > 0) return { dom: 'ℝ', ran: (p % 2 ? 'ℝ' : '[0, +∞)'), row: 'α = ' + p + '（正整数）' };
+          return { dom: 'x ≠ 0', ran: ((-p) % 2 ? 'y ≠ 0' : '(0, +∞)'), row: 'α = ' + p + '（负整数）' };
+        }
+        if (q % 2 === 1) {
+          return { dom: 'ℝ', ran: (p % 2 ? 'ℝ' : '[0, +∞)'), row: 'α = ' + p + '/' + q + '（最简，q 奇）' };
+        }
+        return {
+          dom: (p > 0 ? '[0, +∞)' : '(0, +∞)'),
+          ran: (p > 0 ? '[0, +∞)' : '(0, +∞)'),
+          row: 'α = ' + p + '/' + q + '（最简，q 偶）',
+        };
+      }
+      function powerValue(x, alpha) {
+        if (alpha === 0) return (x === 0) ? NaN : 1;
+        var f = fracApprox(alpha);
+        if (!f) return (x <= 0) ? NaN : Math.pow(x, alpha);
+        var p = f.p, q = f.q;
+        if (q === 1) {
+          if (x === 0 && p < 0) return NaN;
+          return Math.pow(x, p);
+        }
+        if (q % 2 === 1) {
+          if (x === 0) return (p < 0) ? NaN : 0;
+          return (x > 0 ? 1 : -1) * Math.pow(Math.abs(x), p / q);
+        }
+        if (x < 0) return NaN;
+        if (x === 0) return (p > 0) ? 0 : NaN;
+        return Math.pow(x, p / q);
+      }
+
+      // ---------- 等比数列 Sₙ ----------
+      function geoSn(n, q) {
+        if (q === 1) return n; // 临界分支：Sₙ = n·a₁（a₁=1），绝不代入含 (1−q) 分母的公式
+        return (1 - Math.pow(q, n)) / (1 - q);
+      }
 
       // ---------- 场景定义 ----------
-      // 每个场景：id / group / label / sub / params / fn(x,p) / readout(p) / conclude(p)
+      // 每个场景：id / group / label / sub / params / fn(x,p)? / fit(p)? / plotRange? / overlay(h)? / readout(p) / conclude(p)
+      // overlay 的 h：{ p, view, x2px, y2px, dash, dot, vband }
       var SCENARIOS = [
+        // ===== 组一：函数与基本初等 =====
         {
           id: 'quadratic',
           group: '函数与基本初等',
           label: 'y = ax² + bx + c',
-          sub: '二次函数 · 讨论 a=0',
+          sub: '二次 · a=0 退化 · Δ 判别',
           params: [
             { key: 'a', min: -3, max: 3, step: 0.1, def: 1 },
             { key: 'b', min: -5, max: 5, step: 0.5, def: 0 },
             { key: 'c', min: -5, max: 5, step: 0.5, def: 0 },
           ],
           fn: function (x, p) { return p.a * x * x + p.b * x + p.c; },
+          overlay: function (h) {
+            // Δ ≥ 0 时画出与 x 轴的交点（个数由 Δ 符号解析判定，非采样）
+            var p = h.p;
+            if (p.a === 0) return;
+            var D = p.b * p.b - 4 * p.a * p.c;
+            if (D < 0) return;
+            var sq = Math.sqrt(D);
+            var x1 = (-p.b - sq) / (2 * p.a);
+            var x2 = (-p.b + sq) / (2 * p.a);
+            h.dot(x1, 0, '#4ade80', 'x₁');
+            if (D > 0) h.dot(x2, 0, '#4ade80', 'x₂');
+          },
           readout: function (p) {
             var dom = 'ℝ';
             var ran;
@@ -135,22 +222,40 @@
               var k = p.c - (p.b * p.b) / (4 * p.a);
               ran = (p.a > 0) ? '[' + fmtRange(k) + ', +∞)' : '(−∞, ' + fmtRange(k) + ']';
             }
-            return '定义域：<code>' + dom + '</code><br>值域：<code>' + ran + '</code>';
+            var lines = '定义域：<code>' + dom + '</code><br>值域：<code>' + ran + '</code>';
+            if (p.a !== 0) {
+              var D = p.b * p.b - 4 * p.a * p.c;
+              var cnt = (D > 0) ? '2 个' : (D === 0 ? '1 个（相切）' : '0 个');
+              var extra = '<br>Δ = b²−4ac = <code>' + fmt(D) + '</code>，与 x 轴交点：<code>' + cnt + '</code>';
+              if (D >= 0) {
+                var sq = Math.sqrt(D);
+                extra += '，x = ' + fmt((-p.b - sq) / (2 * p.a)) + ' 或 ' + fmt((-p.b + sq) / (2 * p.a));
+              } else {
+                extra += '（无实根）';
+              }
+              lines += extra;
+            }
+            return lines;
           },
           conclude: function (p) {
             if (p.a === 0) {
               return 'a=0 使二次项消失，图象退化为直线 y = ' + fmt(p.b) + 'x + ' + fmt(p.c);
             }
+            var D = p.b * p.b - 4 * p.a * p.c;
+            if (D === 0) return '临界 · Δ=0：两个相等的实根，抛物线与 x 轴相切、恰 1 个交点（不是 2 个，也不是没有根）';
             var k = p.c - (p.b * p.b) / (4 * p.a);
-            if (p.a > 0) return '开口向上，值域 [' + fmtRange(k) + ', +∞)；对称轴 x = −b/(2a) = ' + fmt(-p.b / (2 * p.a));
-            return '开口向下，值域 (−∞, ' + fmtRange(k) + ']；对称轴 x = −b/(2a) = ' + fmt(-p.b / (2 * p.a));
+            var head = (p.a > 0)
+              ? '开口向上，值域 [' + fmtRange(k) + ', +∞)；对称轴 x = −b/(2a) = ' + fmt(-p.b / (2 * p.a))
+              : '开口向下，值域 (−∞, ' + fmtRange(k) + ']；对称轴 x = −b/(2a) = ' + fmt(-p.b / (2 * p.a));
+            if (D < 0) return head + '；Δ<0：与 x 轴无交点，方程无实根';
+            return head + '；Δ>0：与 x 轴有 2 个交点';
           },
         },
         {
           id: 'linear',
           group: '函数与基本初等',
           label: 'y = kx + b',
-          sub: '一次函数 · k=0 退化',
+          sub: '一次 · k=0 退化',
           params: [
             { key: 'k', min: -5, max: 5, step: 0.5, def: 1 },
             { key: 'b', min: -5, max: 5, step: 0.5, def: 0 },
@@ -190,22 +295,35 @@
           id: 'exp',
           group: '函数与基本初等',
           label: 'y = aˣ',
-          sub: '指数 · 值域恒正',
+          sub: '指数 · a=1 临界',
           params: [
-            { key: 'a', min: 0, max: 4, step: 0.1, def: 2 },
+            { key: 'a', min: 0, max: 4, step: 0.1, def: 2,
+              presets: [
+                { label: '0.5', value: 0.5 },
+                { label: '≈1⁻', value: 0.95 },
+                { label: '1（临界）', value: 1 },
+                { label: '≈1⁺', value: 1.05 },
+                { label: '2', value: 2 },
+                { label: 'e≈2.718', value: 2.718281828459045 },
+              ] },
           ],
           fn: function (x, p) {
             if (p.a <= 0) return NaN;
             return Math.pow(p.a, x);
           },
+          overlay: function (h) {
+            // 恒过定点 (0, 1)
+            h.dot(0, 1, '#fb923c', '(0,1)');
+          },
           readout: function (p) {
             var dom = (p.a > 0) ? 'ℝ' : '（a≤0 时无意义）';
-            var ran = (p.a > 0) ? '(0, +∞)' : '—';
+            var ran = (p.a > 0) ? ((p.a === 1) ? '{1}' : '(0, +∞)（恒不随 a 变）') : '—';
             return '定义域：<code>' + dom + '</code><br>值域：<code>' + ran + '</code>';
           },
           conclude: function (p) {
-            if (p.a <= 0) return 'a=' + fmt(p.a) + '：指数函数底数须 > 0';
-            if (p.a === 1) return 'a=1，y = 1 常函数；值域恒 (0,+∞)，不随 a 变';
+            if (p.a <= 0) return 'a=' + fmt(p.a) + '：底数必须 > 0，a≤0 时 aˣ 无意义，不予绘制';
+            if (p.a === 1) return '临界 · a=1：y ≡ 1 是常函数（水平线），不是指数函数（底数须 a>0 且 a≠1）';
+            if (p.a > 0.95 && p.a < 1.05) return 'a≈1：曲线塌平，跨过 1 时单调性由减翻增';
             if (p.a < 1) return '0 < a < 1，单调递减；值域恒 (0,+∞)，不随 a 变';
             return 'a > 1，单调递增；值域恒 (0,+∞)，不随 a 变';
           },
@@ -214,7 +332,7 @@
           id: 'log',
           group: '函数与基本初等',
           label: 'y = logₐ x',
-          sub: '对数 · a≠1',
+          sub: '对数 · 底数 ≠1',
           params: [
             { key: 'a', min: 0, max: 4, step: 0.1, def: 2 },
           ],
@@ -269,11 +387,339 @@
             return 'a < 0 飘带函数，两支分别单调，无最值';
           },
         },
+        {
+          id: 'power-function-x-alpha',
+          group: '函数与基本初等',
+          label: 'y = x^α',
+          sub: '幂函数 · 定义域跳变',
+          params: [
+            { key: 'α', min: -3, max: 4, step: 0.1, def: 2,
+              presets: [
+                { label: '1/3', value: 0.3333333333 },
+                { label: '1/2', value: 0.5 },
+                { label: '2/3', value: 0.6666666667 },
+                { label: '1', value: 1 },
+                { label: '2', value: 2 },
+                { label: '3', value: 3 },
+                { label: '−1', value: -1 },
+                { label: '−2', value: -2 },
+              ] },
+          ],
+          fit: function () { return { xMin: -4, xMax: 4, yMin: -4, yMax: 4 }; },
+          fn: function (x, p) { return powerValue(x, p['α']); },
+          readout: function (p) {
+            var d = powerDomain(p['α']);
+            return 'α = <code>' + fmt(p['α']) + '</code>（' + d.row + '）<br>' +
+              '定义域：<code>' + d.dom + '</code><br>值域：<code>' + d.ran + '</code>';
+          },
+          conclude: function (p) {
+            var a = p['α'];
+            if (a === 0) return '临界 · α=0：y ≡ 1（挖去原点）——过原点的上升支变成水平线，定义域突增为 x ≠ 0';
+            var f = fracApprox(a);
+            if (!f) return 'α 为无理数：定义域收缩为 (0, +∞)，仅第一象限单支';
+            if (f.q === 2 && f.p === 1) return 'α = 1/2（q 偶）：仅第一象限；调到 α = 2/3（q 奇）定义域突增为 ℝ——参数只动 1/6，图象凭空多出一整支';
+            if (f.q === 3 && f.p === 2) return 'α = 2/3（q 奇）：第三象限出现整支；退回 α = 1/2（q 偶）定义域突变回 [0, +∞)';
+            if (f.q === 1 && f.p === 1) return 'α = 1：恰为直线 y = x；0<α<1 上凸平缓，α>1 下凸陡峭，跨 1 只变形态不变域';
+            if (f.q === 1 && f.p === -1) return 'α = −1：值域由 (0, +∞) 扩为 y ≠ 0，负半支出现（对比 α=−2 的 (0, +∞)）';
+            var d = powerDomain(a);
+            return d.row + '：定义域 ' + d.dom + '，值域 ' + d.ran + '（分母 q 的奇偶决定负半轴有无）';
+          },
+        },
+        {
+          id: 'quadratic-fixed-axis-moving-interval',
+          group: '函数与基本初等',
+          label: 'y = x² − 2ax + 3（x∈[1,3]）',
+          sub: '定轴动区间 · 最值换点',
+          params: [
+            { key: 'a', label: '对称轴位置 a', min: -1, max: 5, step: 0.1, def: 1, presets: [1, 2, 3] },
+          ],
+          fit: function () { return { xMin: -1.5, xMax: 6, yMin: -12, yMax: 12 }; },
+          plotRange: [1, 3],
+          fn: function (x, p) { return x * x - 2 * p.a * x + 3; },
+          overlay: function (h) {
+            var p = h.p;
+            // 淡虚线画整条抛物线（上下文：看顶点滑出区间）
+            ctx.save();
+            ctx.strokeStyle = 'rgba(56,189,248,0.25)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            for (var i = 0; i <= 200; i++) {
+              var x = h.view.xMin + (i / 200) * (h.view.xMax - h.view.xMin);
+              var y = x * x - 2 * p.a * x + 3;
+              var px = h.x2px(x), py = h.y2px(y);
+              if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.restore();
+            h.vband(1, 3, 'rgba(56,189,248,0.07)');
+            h.dash(p.a, h.view.yMin, p.a, h.view.yMax, 'rgba(167,139,250,0.7)');
+            var f1 = 4 - 2 * p.a, fv = 3 - p.a * p.a, f3 = 12 - 6 * p.a;
+            var mnX = (p.a <= 1) ? 1 : (p.a < 3 ? p.a : 3);
+            var mnY = (p.a <= 1) ? f1 : (p.a < 3 ? fv : f3);
+            var mxX = (p.a < 2) ? 3 : 1;
+            var mxY = (p.a < 2) ? f3 : f1;
+            h.dot(mnX, mnY, '#4ade80', 'min');
+            h.dot(mxX, mxY, '#fb923c', 'max');
+          },
+          readout: function (p) {
+            var f1 = 4 - 2 * p.a, fv = 3 - p.a * p.a, f3 = 12 - 6 * p.a;
+            var mn, mnAt, mx, mxAt;
+            if (p.a <= 1) { mn = f1; mnAt = 'x=1（端点）'; }
+            else if (p.a < 3) { mn = fv; mnAt = 'x=a（顶点）'; }
+            else { mn = f3; mnAt = 'x=3（端点）'; }
+            if (p.a < 2) { mx = f3; mxAt = 'x=3（端点）'; }
+            else { mx = f1; mxAt = 'x=1（端点）'; }
+            return '最小值：<code>' + fmt(mn) + '</code> @ ' + mnAt +
+              '<br>最大值：<code>' + fmt(mx) + '</code> @ ' + mxAt +
+              '<br>值域：<code>[' + fmt(mn) + ', ' + fmt(mx) + ']</code>';
+          },
+          conclude: function (p) {
+            if (p.a === 1) return '临界 · a=1：对称轴恰过左端点 x=1，顶点值与端点值同为 2——两支分类在此衔接';
+            if (p.a === 3) return '临界 · a=3：对称轴恰过右端点 x=3，顶点值与端点值同为 −6——两支分类在此衔接';
+            if (p.a === 2) return '临界 · a=2：f(1) = f(3) = 0，最大值在两端点相等';
+            if (p.a < 1) return 'a < 1：区间全在对称轴右侧，区间上递减 → 最小值在右端点（顶点已滑出区间）';
+            if (p.a < 3) return '1 < a < 3：对称轴落在区间内 → 最小值在顶点（最值换点发生）';
+            return 'a > 3：区间全在对称轴左侧，区间上递增 → 最小值在左端点（顶点已滑出区间）';
+          },
+        },
+
+        // ===== 组二：数列与三角 =====
+        {
+          id: 'geometric-sum-q-one',
+          group: '数列与三角',
+          label: '等比 Sₙ（a₁=1，n=1..10）',
+          sub: 'q=1 突变 · 直线型',
+          params: [
+            { key: 'q', label: '公比 q', min: -2, max: 3, step: 0.05, def: 2,
+              presets: [
+                { label: '1（临界）', value: 1 },
+                { label: '0（失效）', value: 0 },
+                { label: '0.5', value: 0.5 },
+                { label: '2', value: 2 },
+                { label: '−1', value: -1 },
+                { label: '−2', value: -2 },
+              ] },
+          ],
+          fit: function (p) {
+            var lo = Infinity, hi = -Infinity;
+            for (var n = 1; n <= 10; n++) {
+              var s = geoSn(n, p.q);
+              if (isFinite(s)) { if (s < lo) lo = s; if (s > hi) hi = s; }
+            }
+            if (!isFinite(lo)) { lo = -10; hi = 10; }
+            if (lo === hi) { lo -= 2; hi += 2; }
+            var pad = (hi - lo) * 0.15 || 2;
+            return { xMin: -0.5, xMax: 10.8, yMin: lo - pad, yMax: hi + pad };
+          },
+          readout: function (p) {
+            var line;
+            if (p.q === 1) line = 'q=1：公式分母为 0 失效 → <code>Sₙ = n·a₁ = n</code>';
+            else if (p.q === 0) line = 'q=0：<code>a₂ = 0</code>，不是等比数列（失效）';
+            else line = 'Sₙ = a₁(1−qⁿ)/(1−q)，n=10 时 <code>S₁₀ = ' + fmt(geoSn(10, p.q)) + '</code>';
+            if (Math.abs(p.q) < 1) line += '<br>收敛上界 a₁/(1−q) = <code>' + fmt(1 / (1 - p.q)) + '</code>';
+            return line;
+          },
+          conclude: function (p) {
+            if (p.q === 1) return '临界 · q=1：求和公式分母为 0 失效；Sₙ = n·a₁，图象由「指数型」突变为「直线型」';
+            if (p.q === 0) return '失效 · q=0：a₂ = 0，数列不再是等比数列（等比数列各项均不为 0，且 q ≠ 0）';
+            if (p.q < 0) return 'q < 0：各项正负交替，Sₙ 上下摆动（非单调）';
+            if (Math.abs(p.q) < 1) return '|q| < 1：Sₙ 收敛于 a₁/(1−q) = ' + fmt(1 / (1 - p.q));
+            return 'q > 1：指数型增长，Sₙ 随 n 急剧增大';
+          },
+          overlay: function (h) {
+            var q = h.p.q;
+            // 散点连线（q=1 时 10 点精确落在直线 Sₙ=n 上）
+            ctx.strokeStyle = 'rgba(56,189,248,0.45)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            for (var n = 1; n <= 10; n++) {
+              var px = h.x2px(n), py = h.y2px(geoSn(n, q));
+              if (n === 1) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#38bdf8';
+            for (var m = 1; m <= 10; m++) {
+              ctx.beginPath();
+              ctx.arc(h.x2px(m), h.y2px(geoSn(m, q)), 3.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            // |q|<1 收敛上界虚线
+            if (Math.abs(q) < 1) {
+              h.dash(h.view.xMin, 1 / (1 - q), h.view.xMax, 1 / (1 - q), 'rgba(251,191,36,0.7)');
+            }
+          },
+        },
+        {
+          id: 'trig-phase-shift',
+          group: '数列与三角',
+          label: 'y = sin(ωx + φ)',
+          sub: '平移量是 φ/ω 不是 φ',
+          params: [
+            { key: 'ω', label: '角频率 ω', min: 0.25, max: 4, step: 0.25, def: 2,
+              presets: [0.5, 1, 2, 3] },
+            { key: 'φ', label: '初相 φ', min: -Math.PI, max: Math.PI, step: Math.PI / 12, def: Math.PI / 3,
+              presets: [
+                { label: '0', value: 0 },
+                { label: 'π/6', value: Math.PI / 6 },
+                { label: 'π/3', value: Math.PI / 3 },
+                { label: 'π/2', value: Math.PI / 2 },
+                { label: 'π', value: Math.PI },
+              ] },
+          ],
+          fit: function () { return { xMin: -2 * Math.PI, xMax: 2 * Math.PI, yMin: -1.6, yMax: 1.6 }; },
+          fn: function (x, p) { return Math.sin(p['ω'] * x + p['φ']); },
+          overlay: function (h) {
+            // 基准曲线 y = sin(ωx) 虚线
+            var w = h.p['ω'];
+            ctx.save();
+            ctx.strokeStyle = 'rgba(148,163,184,0.55)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            var cols = Math.max(400, Math.floor(CSS_W));
+            for (var i = 0; i <= cols; i++) {
+              var x = h.view.xMin + (i / cols) * (h.view.xMax - h.view.xMin);
+              var y = Math.sin(w * x);
+              var px = h.x2px(x), py = h.y2px(y);
+              if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.restore();
+          },
+          readout: function (p) {
+            var w = p['ω'], f = p['φ'];
+            var shift = f / w;
+            var dir = (shift > 0) ? '左移' : (shift < 0 ? '右移' : '无平移');
+            var T = 2 * Math.PI / w;
+            return '相位 φ：<code>' + fmtPi(f) + '</code> rad<br>' +
+              '实际平移：<code>' + dir + ' ' + fmtPi(Math.abs(shift)) + '</code>（= φ/ω）<br>' +
+              '周期 T = 2π/ω：<code>' + fmtPi(T) + '</code>';
+          },
+          conclude: function (p) {
+            var w = p['ω'], f = p['φ'];
+            if (w === 1) return '易混点 · ω=1：此时 φ/ω = φ，两者数值相等——这正是误推「平移 = φ」的来源；ω≠1 时两者就不同';
+            if (f === 0) return 'φ=0：无平移（φ/ω = 0），图象与基准 y = sin(ωx) 重合';
+            var shift = f / w;
+            var body = (shift > 0)
+              ? '实际左移 φ/ω = ' + fmtPi(shift)
+              : '实际右移 |φ/ω| = ' + fmtPi(-shift);
+            return body + '（注意：不是 φ = ' + fmtPi(f) + '——ω 变而 φ 不变时，实际平移量也跟着变）';
+          },
+        },
+
+        // ===== 组三：解析几何 =====
+        {
+          id: 'slope-undefined',
+          group: '解析几何',
+          label: '过 P(1,1)、倾角 α 的直线',
+          sub: 'α=90° 斜率不存在',
+          params: [
+            { key: 'α', label: '倾斜角 α（度）', min: 0, max: 179, step: 1, def: 45,
+              presets: [0, 30, 45, 89, 90, 91, 135] },
+          ],
+          fn: function (x, p) {
+            if (p['α'] === 90) return NaN; // α=90°：不画斜线，竖线由 overlay 单独画
+            var k = Math.tan(p['α'] * Math.PI / 180);
+            return k * (x - 1) + 1;
+          },
+          overlay: function (h) {
+            if (h.p['α'] === 90) {
+              ctx.save();
+              ctx.strokeStyle = '#38bdf8';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(h.x2px(1), 0);
+              ctx.lineTo(h.x2px(1), CSS_H);
+              ctx.stroke();
+              ctx.restore();
+            }
+            h.dot(1, 1, '#fb923c', 'P(1,1)');
+          },
+          readout: function (p) {
+            if (p['α'] === 90) {
+              return '斜率 k：<code>不存在</code>（tan90° 无意义）<br>方程：<code>x = 1</code>（点斜式失效）';
+            }
+            var k = Math.tan(p['α'] * Math.PI / 180);
+            var eq = (p['α'] === 0) ? '<code>y = 1</code>' : '<code>y − 1 = ' + fmt(k) + '(x − 1)</code>';
+            return '斜率 k = tan α：<code>' + fmt(k) + '</code><br>方程：' + eq + '<br>恒过定点 P(1, 1)';
+          },
+          conclude: function (p) {
+            if (p['α'] === 90) return '临界 · α=90°：斜率 k 不存在，点斜式失效——该直线必须单独写成 x = 1';
+            if (p['α'] === 0) return 'α=0°：k = 0，直线为水平线 y = 1（k=0 存在，与「斜率不存在」完全不同）';
+            if (p['α'] > 80 && p['α'] < 100) return 'α 接近 90°：k→±∞，直线很陡但始终不是竖直；只有 α 恰为 90° 才没有斜率';
+            return '倾斜角 α = ' + p['α'] + '°，直线恒过定点 P(1, 1)';
+          },
+        },
+        {
+          id: 'ellipse-2a-2c',
+          group: '解析几何',
+          label: '椭圆定义（F₁(−2,0) F₂(2,0)）',
+          sub: '2a=2c 退化 · 轨迹消失',
+          params: [
+            { key: 't', label: '2a（距离之和）', min: 0.5, max: 12, step: 0.1, def: 6,
+              presets: [
+                { label: '= 2c（临界）', value: 4 },
+                { label: '略大于 2c', value: 4.4 },
+                { label: '1.5×2c', value: 6 },
+              ] },
+          ],
+          fit: function () { return { xMin: -8, xMax: 8, yMin: -6, yMax: 6 }; },
+          readout: function (p) {
+            var a = p.t / 2, c = 2;
+            if (a > c) {
+              var b = Math.sqrt(a * a - c * c);
+              var py = b * Math.sin(Math.PI / 3);
+              var dSum = Math.hypot(a / 2 + 2, py) + Math.hypot(a / 2 - 2, py);
+              return 'a = <code>' + fmt(a) + '</code>，b = √(a²−c²) = <code>' + fmt(b) + '</code>，c = <code>2</code><br>' +
+                '方程：<code>x²/' + fmt(a * a) + ' + y²/' + fmt(b * b) + ' = 1</code><br>' +
+                '验证：P(a/2, √3b/2) 处 |PF₁|+|PF₂| = <code>' + fmt(dSum) + '</code> = 2a ✓';
+            }
+            if (a === c) return 'a = <code>2</code>，b = <code>0</code>（压扁至线段），c = <code>2</code><br>轨迹：线段 F₁F₂（不是椭圆）';
+            return 'a = <code>' + fmt(a) + '</code> < c = 2，b <code>无定义（退化）</code><br>轨迹：空集（不存在）';
+          },
+          conclude: function (p) {
+            var ta = p.t;
+            if (ta > 4) {
+              if (ta < 5) return '2a 略大于 2c：b = √(a²−c²) → 0，椭圆被压得很扁，趋近线段但仍为椭圆';
+              return '2a > 2c = 4：轨迹为椭圆，椭圆上任一点恒有 |PF₁| + |PF₂| = 2a';
+            }
+            if (ta === 4) return '临界 · 2a=2c：距离之和恰等于两定点距离，轨迹退化为线段 F₁F₂——椭圆定义必须 2a > |F₁F₂| = 2c';
+            return '2a < 2c：由三角不等式 |PF₁| + |PF₂| ≥ |F₁F₂| = 4 知不可能成立，轨迹不存在（空集）';
+          },
+          overlay: function (h) {
+            var p = h.p, a = p.t / 2, c = 2;
+            h.dot(-2, 0, '#f87171', 'F₁');
+            h.dot(2, 0, '#f87171', 'F₂');
+            if (a > c) {
+              var b = Math.sqrt(a * a - c * c);
+              ctx.strokeStyle = '#38bdf8';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              for (var i = 0; i <= 360; i++) {
+                var t = i / 180 * Math.PI;
+                var px = h.x2px(a * Math.cos(t)), py = h.y2px(b * Math.sin(t));
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+              }
+              ctx.stroke();
+              h.dot(a / 2, b * Math.sin(Math.PI / 3), '#a78bfa', 'P');
+            } else if (a === c) {
+              ctx.strokeStyle = '#38bdf8';
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.moveTo(h.x2px(-2), h.y2px(0));
+              ctx.lineTo(h.x2px(2), h.y2px(0));
+              ctx.stroke();
+            }
+            // 2a < 2c：不画任何曲线（L-3）
+          },
+        },
       ];
 
       // ---------- 状态 ----------
       var state = {
         sceneIdx: 0,
+        activeGroup: SCENARIOS[0].group,
         params: {},
       };
 
@@ -317,22 +763,15 @@
 
       function autoView(fn, params) {
         var xMin = -10, xMax = 10;
-        var xs = [], ys = [];
+        var lo = Infinity, hi = -Infinity;
+        var hasFinite = false;
         var N = Math.max(200, Math.floor(CSS_W));
         for (var i = 0; i <= N; i++) {
           var x = xMin + (i / N) * (xMax - xMin);
           var y = fn(x, params);
-          xs.push(x);
-          ys.push(y);
-        }
-        // 收集有限且不过大的 y，计算值域
-        var lo = Infinity, hi = -Infinity;
-        var hasFinite = false;
-        for (var j = 0; j < ys.length; j++) {
-          var v = ys[j];
-          if (isFinite(v) && Math.abs(v) < 200) {
-            if (v < lo) lo = v;
-            if (v > hi) hi = v;
+          if (isFinite(y) && Math.abs(y) < 200) {
+            if (y < lo) lo = y;
+            if (y > hi) hi = y;
             hasFinite = true;
           }
         }
@@ -341,10 +780,14 @@
         var pad = (hi - lo) * 0.15 || 2;
         var yMin = lo - pad;
         var yMax = hi + pad;
-        // 让 0 尽量在视野内
         if (yMin > -2) yMin = -2;
         if (yMax < 2) yMax = 2;
         return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
+      }
+
+      function computeView(scene) {
+        if (scene.fit) return scene.fit(state.params);
+        return autoView(scene.fn, state.params);
       }
 
       function drawGrid(view) {
@@ -389,7 +832,7 @@
         }
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-        for (var gy = Math.ceil(yMin / yStep) * yStep; gy <= yMax; gy += yStep) {
+        for (var gy = Math.ceil(yMin / yStep) * yStep; gy <= yMax; y += yStep) {
           if (Math.abs(gy) < yStep * 0.01) continue;
           var gpy = CSS_H - (gy - yMin) / (yMax - yMin) * CSS_H;
           ctx.fillText(fmt(gy), x0 - 5, gpy);
@@ -407,6 +850,14 @@
         var yRange = yMax - yMin;
         var breakThreshold = 1.5 * yRange;
 
+        // plotRange：只画该 x 区间（如定区间最值的 [1,3] 段）
+        var xLo = xMin, xHi = xMax;
+        if (scene.plotRange) {
+          xLo = Math.max(xLo, scene.plotRange[0]);
+          xHi = Math.min(xHi, scene.plotRange[1]);
+        }
+        if (xHi <= xLo) return;
+
         ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -415,7 +866,7 @@
         var prevY = null;
         var prevFinite = false;
         for (var i = 0; i <= cols; i++) {
-          var x = xMin + (i / cols) * (xMax - xMin);
+          var x = xLo + (i / cols) * (xHi - xLo);
           var y = fn(x, params);
           var finite = isFinite(y);
 
@@ -440,6 +891,43 @@
         ctx.stroke();
       }
 
+      // overlay 绘制辅助
+      function mkHelpers(view) {
+        var xSpan = view.xMax - view.xMin;
+        var ySpan = view.yMax - view.yMin;
+        function x2px(x) { return (x - view.xMin) / xSpan * CSS_W; }
+        function y2px(y) { return CSS_H - (y - view.yMin) / ySpan * CSS_H; }
+        function dash(x1, y1, x2, y2, color) {
+          ctx.save();
+          ctx.setLineDash([5, 4]);
+          ctx.strokeStyle = color || 'rgba(167,139,250,0.7)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(x2px(x1), y2px(y1));
+          ctx.lineTo(x2px(x2), y2px(y2));
+          ctx.stroke();
+          ctx.restore();
+        }
+        function dot(x, y, color, label) {
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x2px(x), y2px(y), 4.5, 0, Math.PI * 2);
+          ctx.fill();
+          if (label) {
+            ctx.fillStyle = '#e5e7eb';
+            ctx.font = '11px system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(label, x2px(x) + 6, y2px(y) - 4);
+          }
+        }
+        function vband(x1, x2, fill) {
+          ctx.fillStyle = fill;
+          ctx.fillRect(x2px(x1), 0, x2px(x2) - x2px(x1), CSS_H);
+        }
+        return { p: state.params, view: view, x2px: x2px, y2px: y2px, dash: dash, dot: dot, vband: vband };
+      }
+
       var rafPending = false;
       function scheduleDraw() {
         if (rafPending) return;
@@ -453,9 +941,10 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, CSS_W, CSS_H);
         var scene = SCENARIOS[state.sceneIdx];
-        var view = autoView(scene.fn, state.params);
+        var view = computeView(scene);
         drawGrid(view);
-        drawCurve(scene, view);
+        if (scene.fn) drawCurve(scene, view);
+        if (scene.overlay) scene.overlay(mkHelpers(view));
       }
 
       // ---------- UI 构建 ----------
@@ -465,18 +954,36 @@
         SCENARIOS.forEach(function (s) {
           if (groups.indexOf(s.group) < 0) groups.push(s.group);
         });
+        if (groups.indexOf(state.activeGroup) < 0) state.activeGroup = groups[0];
+
         var html = '<div class="group-tabs">';
         groups.forEach(function (g) {
-          html += '<button class="group-tab" data-group="' + g + '">' + g + '</button>';
+          html += '<button class="group-tab' + (g === state.activeGroup ? ' active' : '') +
+            '" data-group="' + g + '">' + g + '</button>';
         });
         html += '</div><div class="scene-tabs" id="scene-tabs">';
         SCENARIOS.forEach(function (s, i) {
+          if (s.group !== state.activeGroup) return;
           html += '<button class="scene-tab' + (i === state.sceneIdx ? ' active' : '') +
             '" data-idx="' + i + '">' + s.label + '<span class="sub">' + s.sub + '</span></button>';
         });
         html += '</div>';
         panel.innerHTML = html;
 
+        panel.querySelectorAll('.group-tab').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            state.activeGroup = btn.dataset.group;
+            // 切组时定位到该组第一个场景
+            for (var i = 0; i < SCENARIOS.length; i++) {
+              if (SCENARIOS[i].group === state.activeGroup) { state.sceneIdx = i; break; }
+            }
+            loadParams(state.sceneIdx);
+            renderTabs();
+            renderParams();
+            updateReadout();
+            scheduleDraw();
+          });
+        });
         panel.querySelectorAll('.scene-tab').forEach(function (btn) {
           btn.addEventListener('click', function () {
             state.sceneIdx = parseInt(btn.dataset.idx, 10);
@@ -495,37 +1002,57 @@
         var html = '';
         scene.params.forEach(function (pr) {
           var val = state.params[pr.key];
+          var label = pr.label || pr.key;
           html += '<div class="param">' +
-            '<div class="param-head"><span class="param-label">' + pr.key + '</span>' +
+            '<div class="param-head"><span class="param-label">' + label + '</span>' +
             '<span class="param-val">' + fmt(val) + '</span></div>' +
             '<div class="param-row">' +
             '<input type="range" min="' + pr.min + '" max="' + pr.max + '" step="' + pr.step +
-            '" value="' + val + '" data-key="' + pr.key + '">' +
-            '<button class="zero-btn" data-key="' + pr.key + '">归零</button>' +
-            '</div></div>';
+            '" value="' + val + '" data-key="' + pr.key + '">';
+          if (pr.min <= 0 && pr.max >= 0) {
+            html += '<button class="zero-btn" data-key="' + pr.key + '">归零</button>';
+          }
+          html += '</div>';
+          if (pr.presets && pr.presets.length) {
+            html += '<div class="presets">';
+            pr.presets.forEach(function (ps) {
+              var isNum = (typeof ps === 'number');
+              var lb = isNum ? fmt(ps) : ps.label;
+              var vv = isNum ? ps : ps.value;
+              html += '<button class="preset-btn" data-key="' + pr.key + '" data-val="' + vv + '">' + lb + '</button>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
         });
         panel.innerHTML = html;
+
+        function setParam(key, value, input) {
+          state.params[key] = value;
+          if (input) input.value = value;
+          var inp = panel.querySelector('input[data-key="' + key + '"]');
+          var lbl = inp.closest('.param').querySelector('.param-val');
+          lbl.textContent = fmt(state.params[key]);
+          updateReadout();
+          scheduleDraw();
+        }
 
         panel.querySelectorAll('input[type=range]').forEach(function (inp) {
           inp.addEventListener('input', function () {
             var k = inp.dataset.key;
-            state.params[k] = parseFloat(inp.value);
-            var lbl = inp.closest('.param').querySelector('.param-val');
-            lbl.textContent = fmt(state.params[k]);
-            updateReadout();
-            scheduleDraw();
+            setParam(k, parseFloat(inp.value), null);
           });
         });
         panel.querySelectorAll('.zero-btn').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var k = btn.dataset.key;
-            state.params[k] = 0;
-            var inp = panel.querySelector('input[data-key="' + k + '"]');
-            inp.value = 0;
-            var lbl = inp.closest('.param').querySelector('.param-val');
-            lbl.textContent = '0';
-            updateReadout();
-            scheduleDraw();
+            setParam(k, 0, null);
+          });
+        });
+        panel.querySelectorAll('.preset-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var k = btn.dataset.key;
+            setParam(k, parseFloat(btn.dataset.val), null);
           });
         });
       }
@@ -538,7 +1065,7 @@
         var conc = scene.conclude(state.params);
         var cEl = document.getElementById('conclude');
         cEl.textContent = conc;
-        var isWarn = conc.indexOf('无意义') >= 0 || conc.indexOf('退化') >= 0 || conc.indexOf('须') >= 0;
+        var isWarn = /退化|无意义|失效|临界|不存在|不是指数函数|须|无意义/.test(conc);
         cEl.className = 'conclude' + (isWarn ? ' warn' : '');
       }
 

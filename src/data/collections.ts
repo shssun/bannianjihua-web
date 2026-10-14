@@ -163,13 +163,8 @@ export const COLLECTIONS: Collection[] = [
     path: [
       {
         label: '看图辨形',
-        note: '拖动参数，看常见函数图象怎么变、位置怎么移',
+        note: '拖动参数看图象怎么变：函数与基本初等 / 数列与三角 / 解析几何，三章 12 个易误解场景（含临界退化徽标）',
         toolId: 'function-param-lab',
-      },
-      {
-        label: '（待建）',
-        note: '更多章节的易误解点',
-        todo: '等「高中数学易误解点全清单」调研后按可视化性排序补入',
       },
     ],
   },
