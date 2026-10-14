@@ -37,7 +37,7 @@ acceptance:
 - 关键规约仍在：`grep -q "批量删除" .workbuddy/memory/MEMORY.md` 且 `grep -q "ignore','pipe','pipe" .workbuddy/memory/MEMORY.md`
 - 部署关键信息仍在：`grep -q "bannianjihua-web" .workbuddy/memory/MEMORY.md`
 evidence: commit=(n/a，`.workbuddy/` 在 gitignore 内、不入版本库) | files=.workbuddy/memory/MEMORY.md | checks=wc-c:14467(<=18000),grep:批量删除=1,grep:stdio-ignore-pipe-pipe=1,grep:bannianjihua-web=3,grep:三件套=1,grep:basename=2,grep:execFileSync=1,grep:emptyOutDir=1,grep:loadCollections=1,grep:判据=7,grep:回填真源=1,grep:_src-tmp=2,grep:反证测试=1,章节数:15 | note=⚠️ 本项由我方自行执行（执行方对该目录不可见）。实际瘦身发生在 2026-10-14 20:08（17388 B → 13693 B）；我方本次在其基础上补两处：① 修正「≤13.5KB 上限」这一已被推翻的表述 → 改为 ≤18KB 并注明原前提已推翻；② 新增本轮确立的 3 条硬规则（push 只有我方 / push 前必看 origin/main..HEAD / 整点 automation 严禁实现 todo 项）。压缩质量经逐条核验：全部硬规则（三件套 / check-tools 规则 / 批量删除闸门 / stdio 规约 / 判据选型 / 沙箱坑）均保留，仅砍冗余叙述（章节 18→15）
-  - verify 2026-10-14T20:31:42+08:00 | by=backlog.mjs
+  - verify 2026-10-14T20:31:42+08:00 | by=team-lead | 3/3 acceptance 通过：`wc -c` = 14467（≤18000）；关键规约全在（`批量删除`=1、`ignore','pipe','pipe`=1、`bannianjihua-web`=3、`三件套`=1、`basename`=2、`execFileSync`=1、`emptyOutDir`=1、`loadCollections`=1、`判据`=7、`回填真源`=1、`_src-tmp`=2、`反证测试`=1，章节 15 节）| 注：本项前提（13.7KB 截断）已被推翻，改由我方执行；我方在既有压缩基础上补两处（订正 ≤13.5KB 表述 → ≤18KB、新增 3 条本轮硬规则）
 
 ## T-003 · 修复 scripts/lib/git-info.mjs 的 Windows 元字符隐患
 
@@ -119,7 +119,7 @@ evidence: commit=6958cd9 | files=public/tools/general/shuangpin-practice/index.h
 
 ## T-008 · 实现方案 C1：同屏轮换双人互测工具（零后端）
 
-status: done
+status: verified
 priority: P2
 area: public/tools/english/, src/data/tools/english/, src/data/collections.ts
 depends: —
@@ -131,6 +131,7 @@ acceptance:
 - 工具无对外域网络请求：`grep -nE "fetch\(['\"]https?:|XMLHttpRequest" public/tools/english/peer-turn-drill/index.html` 无输出
 - 手动走一遍：双方各产出 ≥1 轮后，`kind==='peer-turn'` 的记录条数 ≥ 2
 evidence: commit=b62766b | files=public/tools/english/peer-turn-drill/index.html,src/data/tools/english/peer-turn-drill.ts | checks=check-tools:exit0(17个工具,icap interactive 合法),tsc-b:exit0,grep-external:pass(零 https fetch/XMLHttpRequest,题库用同源相对路径 ../moear/tool/phrases.json),vite-build:exit0,manual:pass(浏览器实测两轮) | note=题库加载失败自动降级为内置 6 条示例题；IndexedDB 逻辑内联自 src/lib/storage/idb.ts（DB bannianjihua v1 / store records / keyPath id，export 去除、结构一字不改）；浏览器实测（vite dev server localhost:5173）：甲出题→乙答→通过+追问→互换，乙出题→甲答→优秀，evaluate 查询 IndexedDB 返回 {total:2, peerTurn:2, payloadKeys:[round,examiner,author,promptZh,hint,answer,referenceEn,score,followup]}，console 零 error | deviation=构建 outDir 用仓库内 gitignored 新目录 node_modules/.bc-t008（沙箱仅可写仓库内，行为等价），验证后已删；未动 collections.ts（spec 为条件句：不加集合则无校验义务）
+  - verify 2026-10-14T20:34:35+08:00 | by=team-lead | 4/4 acceptance 通过。① `check-tools` exit 0（18 工具 / 4 频道 / 4 集合 / 2 路径）。② `test -f public/tools/english/peer-turn-drill/index.html` 存在（19140 B）。③ 外域请求：原判据 grep 零命中；另做**更强审计** —— `https?://|WebSocket|EventSource|sendBeacon|importScripts|<script src=|<link href=|url(http` 全零命中，全文只有 1 处网络调用（第 223 行 `fetch('../moear/tool/phrases.json')`，**同源相对路径**）。④ **真浏览器跑通两轮**：自建 CDP 探针（headless Chrome 155 + 静态服务器 webroot=仓库 `public/`，与线上同相对路径），在真实页面上下文里模拟用户点选，**连续两次冷启动**结果一致 —— 第 1 轮出题方=甲/答题方=乙、第 2 轮出题方=乙/答题方=甲（**角色真的互换了**），`state.round` 1→2→3，题库 `pool.length=346`（**真题库而非 6 条降级题**），UI 记录区显示「共 2 轮」+2 个「👍 优秀」标签，读 IndexedDB 得 `bannianjihua/records` 共 2 条、`kind==='peer-turn'` **恰为 2 条**，字段与 spec 逐项吻合（`{id,toolId:'peer-turn-drill',kind,refId,payload{round,examiner,author,promptZh,hint{func,scene,tone},answer,referenceEn,score,followup},createdAt}`），**控制台零 error / 零 warning**。附注：证据由 `b62766b`（工具+注册表）+ `45bd8ad`（清单）承载；执行方自报的 outDir 偏离（改用仓库内 `node_modules/.bc-t008`）不影响判据
 
 ## T-009 · 实现方案 C2：单人 + 外部 AI 陪练工具（零后端）
 
