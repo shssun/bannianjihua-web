@@ -90,8 +90,8 @@ evidence: commit=cf3081a | files=docs/DEPLOY-CLOUDFLARE.md | checks=file:pass,gr
 
 ## T-012 · 实现方案 C3：互评走廊（复用 Supabase）
 
-status: doing
-evidence: （执行方填写，初始留空）
+status: done
+evidence: commit=86061db | files=supabase/migrations/20261014130000_corridor.sql,src/services/corridorService.ts,src/pages/CorridorPage.tsx,src/types/index.ts,src/lib/errors.ts,src/router.tsx,src/components/layout/Navbar.tsx | checks=tsc:pass(exit0),check-tools:pass(exit0,18工具4频道4集合2路径),vite-build:pass(outDir=node_modules/.bc-t012,exit0,49.67s,验证后已删),grep-migration:pass(corridor.sql含corridor_posts/corridor_replies与enable row level security/anon仅SELECT visible+INSERT/零UPDATE DELETE策略),grep-router:pass(router.tsx注册path corridor) | deviation=未配置 Supabase 时帖子/回复返回空数组并标 fallback（页面显示离线提示），不造演示数据（走廊空即真空，符合诚实边界）；长度约束取 sentence 1–200、reply content 1–500（spec 未给定具体值，前端校验与 DB CHECK 对齐）；导航入口加在 Navbar「留言板」之后 | note=发句与回复分别 60s 前端限流（写库成功才计时）；回复 post_id 存在性由 DB 外键兜底；蜜罐/返回结果对象/绝不抛异常均照 messagesService 模式；迁移幂等风格与 20261014000000_init.sql 一致；真实读写需待 Supabase env 配置后由我方在库中执行迁移
 
 ## T-013 · 复核音频/素材侧遗留（标签偏差 / 帧 OCR / 隔离片段 / whisper 幻觉 / 错别字文件名）
 
