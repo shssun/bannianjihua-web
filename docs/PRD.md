@@ -118,7 +118,7 @@ Logo(首页) | 文章(Blog) | 工具箱(Tools) | 研发计划(Roadmap) | 留言�
 1. 打开动作一律用真实 `<a>`，**不要用 `window.open`**（会被弹窗拦截，且中键/右键「新标签打开」失效）。
 2. `/tools/:id` 路由保留为**详情页**（工具信息 + 「打开工具」按钮 + 完整 URL 展示），仅作落地页与分享入口。
 3. 加工具的成本 = 丢一个 HTML 进 `public/tools/` + `src/data/tools.ts` 加一行。
-4. 多文件工具（带素材/数据/音轨）走镜像同步脚本，见 `scripts/sync-daily-english.mjs`。
+4. 多文件工具（带素材/数据/音轨）走镜像同步：通用同步器 `scripts/sync-tools.mjs` + 一工具一清单 `scripts/sync/<id>.json`。
 
 > 待确认：`logic-fallacy-cards` 产出是 PNG（可能需要无头 Chrome 生成）。若其运行依赖 Node/无头浏览器，则**无法在纯静态/浏览器端运行**，应改为「已生成图集 + 静态展示」或标注为「轻后端交互」，见 §9 Q3。
 

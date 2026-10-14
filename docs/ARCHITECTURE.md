@@ -642,7 +642,7 @@ sequenceDiagram
    - 工具产物是**完全独立的文档**，放 `public/tools/`，用真实 `<a target="_blank" rel="noopener noreferrer">` 打开。
    - 工具 URL **一律经 `lib/paths.ts` 的 `publicUrl()` 构造**，不要手拼 base 前缀（子路径部署会断链）。
    - **不做 iframe 嵌入，也不存在跨文档 postMessage 协议**（2026-10-11 起废弃并删除代码）。
-   - 多文件工具（带素材/数据/音轨）走镜像同步脚本：`scripts/sync-daily-english.mjs`，挂在 `prebuild`。
+   - 多文件工具（带素材/数据/音轨）走镜像同步：通用同步器 `scripts/sync-tools.mjs` + 一工具一清单 `scripts/sync/<id>.json`，挂在 `prebuild`。
 
 6. **数据访问层约定**
    - 所有 service 返回 `APIResult<T>`：`{ data, error, fallback? }`；**不抛异常**。
