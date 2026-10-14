@@ -193,28 +193,17 @@ export default function LearningPath({ collectionId, steps }: LearningPathProps)
                           </Box>
                         ) : null}
                       </Stack>
-                    ) : (
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        flexWrap="wrap"
-                        useFlexGap
-                        sx={{ mt: 1 }}
+                    ) : step.todo ? (
+                      // 缺口步：这里只放说明文案。「待建」状态一律由右侧状态区统一渲染，
+                      // 避免同一信息在同一行里出现两次。
+                      <Typography
+                        variant="body2"
+                        color="var(--muted)"
+                        sx={{ mt: 1, lineHeight: 1.6 }}
                       >
-                        {step.todo ? (
-                          <Typography variant="body2" color="var(--muted)">
-                            {step.todo}
-                          </Typography>
-                        ) : null}
-                        <Chip
-                          label="待建"
-                          size="small"
-                          variant="outlined"
-                          sx={{ borderColor: 'var(--border)' }}
-                        />
-                      </Stack>
-                    )}
+                        {step.todo}
+                      </Typography>
+                    ) : null}
                   </Box>
 
                   {/* 右侧：状态区 */}

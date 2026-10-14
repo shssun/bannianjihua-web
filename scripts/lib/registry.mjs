@@ -166,22 +166,32 @@ export function loadIcapLevelIds(repoRoot) {
  * ⚠️ 定位锚点必须是 `export const COLLECTIONS`：文件头 JSDoc 里也出现过
  * `COLLECTIONS` 字样，用 `indexOf('COLLECTIONS')` 会命中注释。
  *
+ * ⚠️ **解析失败一律抛异常，绝不静默返回空数组** —— 返回空数组会让调用方
+ * （`check-tools.mjs` 的集合 / 学习路径校验）把「解析不出来」当成「没有集合」，
+ * 于是校验整段失效而构建照样通过 —— 这正是本项目最忌讳的「假绿」。
+ *
+ * 已知限制：括号配对**不识别行注释与块注释**。`COLLECTIONS` 数组内目前没有注释；
+ * 若将来加注释且其中含不平衡引号，本函数会**抛出异常**（构建当场失败并说明原因），
+ * 而不是静默放行 —— 这是有意的保守设计。
+ *
  * @param {string} repoRoot 仓库根目录
- * @returns {Array<Record<string, unknown>>} 解析失败返回空数组
+ * @returns {Array<Record<string, unknown>>} 文件不存在时返回空数组（兼容集合机制之前的老提交）
+ * @throws {Error} 文件存在但无法结构化解析时
  */
 export function loadCollections(repoRoot) {
   const file = join(repoRoot, 'src', 'data', 'collections.ts');
   if (!existsSync(file)) {
+    // 集合机制引入之前的老提交不带这个文件，属合法情况。
     return [];
   }
   const text = readFileSync(file, 'utf8');
   const marker = text.indexOf('export const COLLECTIONS');
   if (marker === -1) {
-    return [];
+    throw new Error('找不到 `export const COLLECTIONS` 声明');
   }
   const start = text.indexOf('[', text.indexOf('=', marker));
   if (start === -1) {
-    return [];
+    throw new Error('`export const COLLECTIONS` 之后找不到数组字面量的左方括号');
   }
   let depth = 0;
   let quote = '';
@@ -211,13 +221,17 @@ export function loadCollections(repoRoot) {
     }
   }
   if (end === -1) {
-    return [];
+    throw new Error('括号配对失败（可能存在未闭合的引号，或数组字面量里混入了注释）');
   }
+  let parsed;
   try {
     // eslint-disable-next-line no-new-func
-    const parsed = Function(`"use strict"; return (${text.slice(start, end + 1)});`)();
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+    parsed = Function(`"use strict"; return (${text.slice(start, end + 1)});`)();
+  } catch (error) {
+    throw new Error(`数组字面量求值失败：${error.message}`);
   }
+  if (!Array.isArray(parsed)) {
+    throw new Error('`COLLECTIONS` 不是数组');
+  }
+  return parsed;
 }

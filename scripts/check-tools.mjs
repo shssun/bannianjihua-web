@@ -20,8 +20,10 @@
  *   | path[].toolId 存在于工具注册表                 | error |
  *   | path[].toolId 属于本集合                       | error |
  *   | path 缺口步必须有 todo                         | error |
+ *   | collections.ts 结构化解析成功（否则上述失效）  | error |
  *   | 有 entry 时文件名以 index.html 结尾            | warn  |
  *   | 同频道内 order 重复                            | warn  |
+ *   | 未解析到任何集合（集合/路径校验未生效）        | warn  |
  */
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -58,7 +60,20 @@ const channelIds = new Set(loadChannelIds(repoRoot));
 const collectionIds = new Set(loadCollectionIds(repoRoot));
 const icapIds = new Set(loadIcapLevelIds(repoRoot));
 const tools = loadToolRegistry(repoRoot);
-const collections = loadCollections(repoRoot);
+// 结构化读取集合（含 path 学习路径）。
+// ⚠️ 解析失败必须报错：静默当成「没有集合」会让下面的集合 / 路径校验**整段失效**，
+//    构建照样通过 —— 这是本项目最忌讳的「假绿」。
+let collections = [];
+try {
+  collections = loadCollections(repoRoot);
+} catch (error) {
+  errors.push(`src/data/collections.ts: 结构化解析失败 —— ${error.message}`);
+}
+if (collections.length === 0) {
+  warnings.push(
+    'src/data/collections.ts: 未解析到任何集合 —— 集合与学习路径的校验本次**未生效**',
+  );
+}
 
 // ---- id 唯一性（分组报告，避免同一冲突刷屏） ----
 const idToFiles = new Map();
