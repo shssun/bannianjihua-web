@@ -832,7 +832,7 @@
         }
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-        for (var gy = Math.ceil(yMin / yStep) * yStep; gy <= yMax; y += yStep) {
+        for (var gy = Math.ceil(yMin / yStep) * yStep; gy <= yMax; gy += yStep) {
           if (Math.abs(gy) < yStep * 0.01) continue;
           var gpy = CSS_H - (gy - yMin) / (yMax - yMin) * CSS_H;
           ctx.fillText(fmt(gy), x0 - 5, gpy);
