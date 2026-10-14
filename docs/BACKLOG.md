@@ -247,7 +247,7 @@ priority: P2
 area: public/tools/english/dragon-english-reader/, src/data/tools/english/dragon-english-reader.ts
 depends: —
 size: S
-spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html`（2,386,840 字节 / 12058 行，`<title>` = 「ドラゴン・イングリッシュ　中文精编」）**原样**落进站点成为工具。该文件**已实测真自包含**（零 `http(s)://` 外部引用、零 `fetch(`、零根绝对路径引用），属本项目「自包含单文件 → 原样拷、无同步清单」那一类，因此：(1) `mkdir -p public/tools/english/dragon-english-reader && cp` 该文件为 `public/tools/english/dragon-english-reader/index.html`（**内容不得做任何修改、压缩或美化**）；(2) 新建注册表 `src/data/tools/english/dragon-english-reader.ts`，**严格照抄** `src/data/tools/english/basic100-sentence-reader.ts` 的结构（import 类型 + 顶部注释说明内容源与重建方式 + `const tool: Tool` + `export default tool`），字段取值：`id: 'dragon-english-reader'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/dragon-english-reader/index.html'`、`createdAt: '2026-10-14'`；`name` 写「英文学习精编 · Dragon English」；`description` 说明它是竹冈广信《Dragon English》的中文精编阅读器（左侧目录树 + 全文检索 + 深浅色切换 + 阅读进度）；`tags` 含 '英语'、'阅读'、'离线'；`collections: ['books', 'dragon-english']`（**若 `dragon-english` 集合不存在则只写 `['books']`，不要新建集合**）；`icap: ['passive']`；`order` 取当前 english 频道未被占用的下一个值（先 `grep -h "order:" src/data/tools/english/*.ts` 查重）。**只新建这 2 个文件，不改任何既有文件**（注册表靠 `import.meta.glob` 自动收集，这是本项目已过 QA 的约定）。
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html`（2,386,840 字节 / 12058 行，`<title>` = 「ドラゴン・イングリッシュ　中文精编」）**原样**落进站点成为工具。该文件**已实测真自包含**（零 `http(s)://` 外部引用、零 `fetch(`、零根绝对路径引用），属本项目「自包含单文件 → 原样拷、无同步清单」那一类，因此：(1) `mkdir -p public/tools/english/dragon-english-reader && cp` 该文件为 `public/tools/english/dragon-english-reader/index.html`（**内容不得做任何修改、压缩或美化**）；(2) 新建注册表 `src/data/tools/english/dragon-english-reader.ts`，**严格照抄** `src/data/tools/english/basic100-sentence-reader.ts` 的结构（import 类型 + 顶部注释说明内容源与重建方式 + `const tool: Tool` + `export default tool`），字段取值：`id: 'dragon-english-reader'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/dragon-english-reader/index.html'`、`createdAt: '2026-10-14'`；`name` 写「英文学习精编 · Dragon English」；`description` 说明它是竹冈广信《Dragon English》的**全书精编阅读器，含 30 篇文档 / 464 个章节**（左侧目录树 + 全文检索 + 深浅色切换 + 阅读进度）—— **规模必须在描述里写明**，避免用户以为是小体量单篇（详见 T-020 第 3 条）；`tags` 含 '英语'、'阅读'、'离线'；`collections: ['books', 'dragon-english']`（**若 `dragon-english` 集合不存在则只写 `['books']`，不要新建集合**）；`icap: ['passive']`；`order` 取当前 english 频道未被占用的下一个值（先 `grep -h "order:" src/data/tools/english/*.ts` 查重）。**只新建这 2 个文件，不改任何既有文件**（注册表靠 `import.meta.glob` 自动收集，这是本项目已过 QA 的约定）。
 acceptance:
 - `test -f public/tools/english/dragon-english-reader/index.html` 且其 sha1 与源文件**逐字节相同**：源 `sha1sum "C:/Users/ZhuanZ1/Documents/WS/英文学习/英文学习精编.html"` 与站内 `sha1sum public/tools/english/dragon-english-reader/index.html` 输出一致（若因 `core.autocrlf` 导致差异，比对前两边都先 `tr -d '\r'` 再算 sha1）
 - `test -f src/data/tools/english/dragon-english-reader.ts` 且 `grep -n "id: 'dragon-english-reader'"` 命中
@@ -263,7 +263,7 @@ priority: P2
 area: public/tools/english/movie-line-quotecards/, src/data/tools/english/movie-line-quotecards.ts
 depends: —
 size: S
-spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/台词语音卡_v0.2.html`（139,227 字节，`<title>` = 「台词语音卡 v0.2 ｜ 背句优先版」）**原样**落进站点。该文件**已实测真自包含**（零外部引用 / 零 `fetch(` / 零根绝对路径），处理方式与 T-017 完全相同：(1) `mkdir -p public/tools/english/movie-line-quotecards && cp` 为 `index.html`（**内容零修改**）；(2) 新建 `src/data/tools/english/movie-line-quotecards.ts`，照抄 `basic100-sentence-reader.ts` 结构：`id: 'movie-line-quotecards'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/movie-line-quotecards/index.html'`、`createdAt: '2026-10-14'`；`name` 写「台词语音卡 · 背句优先」；`description` 说明它按「背句优先」组织影视台词，先记整句再定位片段；`collections` 填 `['books', 'movie-lines', 'dragon-english']` 中**实际存在**的项（先 `grep -n "id:" src/data/collections.ts` 确认，不存在的**不要写**）；`icap: ['active']`（读句跟读属 active 层）；`order` 查重后取值。**只新建 2 个文件，不改既有文件。**
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/台词语音卡_v0.2.html`（139,227 字节，`<title>` = 「台词语音卡 v0.2 ｜ 背句优先版」）**原样**落进站点。该文件**已实测真自包含**（零外部引用 / 零 `fetch(` / 零根绝对路径），处理方式与 T-017 完全相同：(1) `mkdir -p public/tools/english/movie-line-quotecards && cp` 为 `index.html`（**内容零修改**）；(2) 新建 `src/data/tools/english/movie-line-quotecards.ts`，照抄 `basic100-sentence-reader.ts` 结构：`id: 'movie-line-quotecards'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/movie-line-quotecards/index.html'`、`createdAt: '2026-10-14'`；`name` **不得**写「台词语音卡」这种暗示可听音的名字（实测该 HTML **零音频播放能力**：\`grep -c audio\` = 0、零 \`.mp3\`、零 \`<audio>\`），改为体现「语音标注笔记/阅读」性质，如「台词金句语音标注 · 阅读版」；`description` **必须写明它不含音频播放**，是从 md 生成的**静态阅读页**（10 句电影台词的连读/弱读/吞音标注），详见 T-020 第 1 条；`collections` 填 `['books', 'movie-lines', 'dragon-english']` 中**实际存在**的项（先 `grep -n "id:" src/data/collections.ts` 确认，不存在的**不要写**）；`icap: ['active']`（读句跟读属 active 层）；`order` 查重后取值。**只新建 2 个文件，不改既有文件。**
 acceptance:
 - `test -f public/tools/english/movie-line-quotecards/index.html` 且与源文件 sha1 一致（比对方法同 T-017，注意 CRLF）
 - `test -f src/data/tools/english/movie-line-quotecards.ts` 且 `grep -n "id: 'movie-line-quotecards'"` 命中
@@ -279,7 +279,7 @@ priority: P3
 area: public/tools/english/lockscreen-sentence-drill/, src/data/tools/english/lockscreen-sentence-drill.ts
 depends: —
 size: S
-spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/工具/锁屏背句_demo.html`（18,633 字节，`<title>` = 「锁屏背句 · 可行性原型 v0.1」）**原样**落进站点。该文件**已实测真自包含**，处理方式同 T-017：(1) `mkdir -p public/tools/english/lockscreen-sentence-drill && cp` 为 `index.html`（**内容零修改**）；(2) 新建注册表 `lockscreen-sentence-drill.ts`：`id: 'lockscreen-sentence-drill'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/lockscreen-sentence-drill/index.html'`、`createdAt: '2026-10-14'`；`name` 写「锁屏背句 · 可行性原型」；`description` **必须诚实标注这是可行性原型（demo）而非完成品**，说明它验证「锁屏状态下背句」这一交互形态；`icap: ['active']`；`order` 查重后取值。⚠️ 本项被老板明确为「上线后在使用过程中再打磨」，属**未打磨的原型**，因此 `version` 建议写 `'0.1.0'`（区别于正式工具的 `1.0.0`）。**只新建 2 个文件，不改既有文件。**
+spec: 把仓库外的 `C:/Users/ZhuanZ1/Documents/WS/英文学习/工具/锁屏背句_demo.html`（18,633 字节，`<title>` = 「锁屏背句 · 可行性原型 v0.1」）**原样**落进站点。该文件**已实测真自包含**，处理方式同 T-017：(1) `mkdir -p public/tools/english/lockscreen-sentence-drill && cp` 为 `index.html`（**内容零修改**）；(2) 新建注册表 `lockscreen-sentence-drill.ts`：`id: 'lockscreen-sentence-drill'`、`channel: 'english'`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/english/lockscreen-sentence-drill/index.html'`、`createdAt: '2026-10-14'`；`name` 写「锁屏背句 · 可行性原型」；`description` **必须写明它是页内模拟锁屏的判定原型 —— 不修改系统锁屏、不记忆进度**（实测：正文原话「左边是模拟锁屏」，\`grep -c localStorage\` = 0，仅靠 \`setInterval\` 在页面打开时计时），并在 `tags` 里加「原型」，详见 T-020 第 2 条；`icap: ['active']`；`order` 查重后取值。⚠️ 本项被老板明确为「上线后在使用过程中再打磨」，属**未打磨的原型**，因此 `version` 建议写 `'0.1.0'`（区别于正式工具的 `1.0.0`）。**只新建 2 个文件，不改既有文件。**
 acceptance:
 - `test -f public/tools/english/lockscreen-sentence-drill/index.html` 且与源文件 sha1 一致（比对方法同 T-017，注意 CRLF）
 - `test -f src/data/tools/english/lockscreen-sentence-drill.ts` 且 `grep -n "id: 'lockscreen-sentence-drill'"` 命中，且 `grep -n "version: '0.1.0'"` 命中
@@ -288,3 +288,56 @@ acceptance:
 - **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 evidence: （执行方填写，初始留空）
 
+
+## T-020 · 上线前修正 3 个新工具的「名称/描述诚实性」（我方调研发现）
+
+status: todo
+priority: P1
+area: src/data/tools/english/dragon-english-reader.ts, movie-line-quotecards.ts, lockscreen-sentence-drill.ts
+depends: —（**不阻塞**：本项是 T-017/T-018/T-019 的**伴随要求** —— 执行那三项时，注册文件的 name/description 必须直接按本项要求写，无需等三项全完成后再改一遍）
+size: S
+spec: 我方上线前调研（2026-10-14）实测这三个源 HTML 后，发现**注册表里的名称/描述会误导用户**，必须在上线时一并修正。**只改这三个注册文件的 name/description/tags 字段，不改 HTML 内容。**
+- **(1) 「台词语音卡」名不副实**：`台词语音卡_v0.2.html` 实测**内部零音频播放能力** —— `grep -c "audio"` = 0、`grep -c "\.mp3"` = 0、`grep -c "<audio"` = 0，全文件只有 1 处「播放」且出现在讲「用 PotPlayer 导出字幕」的正文里。它的真实形态是**从 `台词语音卡_v0.2.md` 生成的静态阅读页**（`const DOCS = [...]` 内联 1 个文档 / 13 个章节），内容是 10 句电影台词的**语音标注笔记**（连读/弱读/吞音）。→ 注册表 `name` **不得**写「台词语音卡」这种暗示可听音的名字，改为体现「台词语音标注笔记/阅读」性质（如「台词金句语音标注 · 阅读版」）；`description` 必须写清**它不含音频播放**，是纯文字标注阅读页。
+- **(2) 「锁屏背句」不能真的锁屏**：`锁屏背句_demo.html` 实测是**页内模拟**（正文原话「左边是模拟锁屏，右边是判定内核」），且**零 localStorage / 零定时器持久化**（`grep -c localStorage` = 0），`tick()` 靠 `setInterval(tick,10000)` 仅在页面打开时运行。它**不具备**真·锁屏背句能力，也不记忆进度。→ `name` 保留但 `description` 必须写明「**页内模拟锁屏的判定原型，不修改系统锁屏、不记忆进度**」，并在 `tags` 加「原型」。
+- **(3) 「英文学习精编」规模需说明**：`英文学习精编.html` 实测含 **30 个 h1 / 464 个 h2**（即约 30 篇文档、464 个章节），体量很大。`description` 应写明这是**全书精编**（含 30 篇文档、目录树 + 全文检索 + 深浅色），避免用户以为是小体量单篇。
+acceptance:
+- 三个注册文件均已存在（即 T-017/T-018/T-019 已完成）
+- `grep -n "audio\|音频播放\|可听" src/data/tools/english/movie-line-quotecards.ts` 的输出**必须**是「明确声明不含音频」的语境，**不得**出现暗示可播放的表述
+- `grep -n "模拟\|原型" src/data/tools/english/lockscreen-sentence-drill.ts` 命中，且 `description` 中明确写了「不修改系统锁屏」或等价表述
+- `grep -n "30\|464\|全书" src/data/tools/english/dragon-english-reader.ts` 命中，`description` 体现了规模
+- `node scripts/check-tools.mjs` 退出码 0
+- `npx tsc -b` 退出码 0
+evidence: （执行方填写，初始留空）
+
+## T-021 · 3 个新工具的移动端与深色主题适配核查（我方调研发现）
+
+status: todo
+priority: P2
+area: docs/, public/tools/english/{dragon-english-reader,movie-line-quotecards,lockscreen-sentence-drill}/index.html
+depends: T-017, T-018, T-019
+size: M
+spec: 我方调研发现这三个源 HTML **都是在本机 `file://` 环境下开发/自测的，从未在站点的真实部署环境里跑过**。站点有三个硬约束可能与它们冲突，需**逐项在真实浏览器里核查**（**只核查并报告，发现问题另开修复项；本项不修改 HTML 内容**，因为 HTML 是「源料库生成物」，改它等于改我的产物、会与源料库脱节）：
+- **(1) 深色主题冲突**：站点**默认深色**（MUI + CSS 变量 + Tailwind 三轨），而这三个 HTML 各自内嵌了自己的样式与**独立的深浅色切换**（精编 `grep -c 深色` = 2 / `浅色` = 1；语音卡与锁屏背句同样自带样式）。**风险**：工具打开后视觉与站点严重不一致，或用户的站点主题选择与工具内主题各说各话。
+- **(2) 子路径部署**：站点部署在 `https://shssun.github.io/bannianjihua-web/` **子路径**下。已实测三个文件**零根绝对路径引用**（`grep -c 'src="/'` = 0、零 `http(s)://`），所以**理论上安全**；但仍须在真实子路径下打开确认无 404。
+- **(3) `file://` 与 `https://` 的行为差异**：源 HTML 文档里写着「file:// 双击即开」。**`锁屏背句` 依赖 `window.SpeechRecognition || window.webkitSpeechRecognition`（Web Speech API）**，该 API **要求安全上下文**（HTTPS 或 localhost）；线上是 HTTPS 应可用，但**必须实测确认**，并确认它在 `r.onerror` 时给出的降级提示（「请用下方手动输入复述」）在真实浏览器里**确实可用**。
+acceptance:
+- 在真实浏览器中**逐个打开**这三个工具的线上 URL，记录：是否有 console 报错（贴出原文）、是否白屏、视觉是否与站点深色主题明显冲突
+- `锁屏背句` 必须实测**麦克风权限流程**：点击开始后是否弹出授权、拒绝后是否给出可用的手动输入降级路径（把实际观察到的行为写进 evidence）
+- 三个工具在**移动端视口**（如 375×812）下各截一张图存盘（**只存路径，不要读进上下文**），确认无横向溢出、无遮挡
+- 报告须明确列出：**哪些问题属于「可上线但需打磨」、哪些属于「阻塞上线」**
+evidence: （执行方填写，初始留空）
+
+## T-022 · 3 个新工具上线后补齐「源料库可重建性」文档
+
+status: todo
+priority: P2
+area: docs/BOOKS-SOURCE.md（新建）, src/data/tools/english/*.ts
+depends: T-017, T-018, T-019
+size: S
+spec: 这三个新工具与既有的「基本英文100」系列一样，**HTML 是从仓库外的源料库 `C:/Users/ZhuanZ1/Documents/WS/英文学习/` 生成的产物**。该目录**不是 git 仓库**（已实测 `fatal: not a git repository`），**没有任何版本保护**，一旦丢失就无法重建。而它承载的是**内容母版**：`内容/**/*.md`（约 1.1MB，含《基本英文100》《必修英文法100》《台词语音卡》的原始 Markdown + 附录 + 仿真题）+ `工具/*.py`（15 个生成脚本，含 `build_html.py` 20KB / `build_pure_dict.py` 29KB / `md2json.py` 10KB）。请**新建 `docs/BOOKS-SOURCE.md`** 并用**一张表**写清：每个站内工具 id ↔ 源 HTML 文件路径 ↔ 生成脚本 ↔ 内容源目录。**该文档只做「登记与重建说明」，不搬文件、不改文件。**
+acceptance:
+- `test -f docs/BOOKS-SOURCE.md`
+- 文档中每个新工具 id（`dragon-english-reader` / `movie-line-quotecards` / `lockscreen-sentence-drill`）都能在表里找到，且**三列齐全**（源 HTML 路径 / 生成脚本 / 内容源目录）
+- 文档含一节**明确的「源料库风险提示」**：写明该目录非 git 仓库、无版本保护、以及「重建 HTML 的唯一途径是修改 `内容/**/*.md` 后重跑 `工具/build_html.py`」这条链路
+- 文档中路径写法与实际一致（用 `ls` 抽查 ≥2 条路径存在）
+evidence: （执行方填写，初始留空）
