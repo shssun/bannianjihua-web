@@ -141,6 +141,48 @@ export interface MessageInput {
   turnstileToken?: string;
 }
 
+// ---------------- 互评走廊 ----------------
+
+/** 互评走廊帖子实体（corridor_posts）。 */
+export interface CorridorPost {
+  id: string;
+  /** 贴出的句子，1..200 */
+  sentence: string;
+  /** 发布时间（ISO） */
+  createdAt: string;
+  /** 可见状态 */
+  status: 'visible' | 'hidden';
+}
+
+/** 互评走廊回复实体（corridor_replies）。 */
+export interface CorridorReply {
+  id: string;
+  /** 所属帖子 id */
+  postId: string;
+  /** 回复内容，1..500 */
+  content: string;
+  /** 发布时间（ISO） */
+  createdAt: string;
+  /** 可见状态 */
+  status: 'visible' | 'hidden';
+}
+
+/** 互评走廊发帖入参。 */
+export interface CorridorPostInput {
+  sentence: string;
+  /** 蜜罐字段，非空即判机器人并静默丢弃 */
+  honeypot?: string;
+}
+
+/** 互评走廊回复入参。 */
+export interface CorridorReplyInput {
+  /** 目标帖子 id */
+  postId: string;
+  content: string;
+  /** 蜜罐字段，非空即判机器人并静默丢弃 */
+  honeypot?: string;
+}
+
 // ---------------- 统一返回 ----------------
 
 /**

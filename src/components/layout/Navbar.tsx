@@ -29,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: '工具箱', to: '/tools' },
   { label: '研发计划', to: '/roadmap' },
   { label: '留言板', to: '/message' },
+  { label: '互评走廊', to: '/corridor' },
   { label: '我的数据', to: '/data' },
   { label: '关于', to: '/about' },
 ];

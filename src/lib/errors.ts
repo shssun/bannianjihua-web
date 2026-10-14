@@ -29,3 +29,16 @@ export const MESSAGE_INVALID_CONTENT = '留言内容需为 1–500 字。';
 
 /** 留言昵称超长。 */
 export const MESSAGE_INVALID_NICKNAME = '昵称长度不能超过 30 字。';
+
+/** 互评走廊专用降级提示。 */
+export const CORRIDOR_BACKEND_NOT_CONFIGURED =
+  '后端未配置，互评走廊暂不可用。请配置 Supabase 环境变量后重试。';
+
+/** 互评走廊限流提示。 */
+export const CORRIDOR_RATE_LIMITED = '提交过于频繁，请 60 秒后再试。';
+
+/** 互评走廊句子为空或超长。 */
+export const CORRIDOR_INVALID_SENTENCE = '句子需为 1–200 字。';
+
+/** 互评走廊回复为空或超长。 */
+export const CORRIDOR_INVALID_REPLY = '回复内容需为 1–500 字。';
