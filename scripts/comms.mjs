@@ -28,6 +28,11 @@
  *      推导状态时取「时间戳最新的**状态承载**事件」，note 仅用于展示。
  *   ⚠️ 无法解析的事件行**绝不允许静默跳过**：`status` 会在末尾打印警告并列出 `文件:行号`。
  *
+ * 排序和平票（**确定性规则**，见 pickLatest / isLater）：
+ *   一律先比事件时间戳；**时间戳相同（同秒）时 OWNER-LOG 优先**（我方拥有最终发言权）；
+ *   同文件内再平票 → 行号更大者胜。即「后写的赢」，同秒则以我方为准 —— 这不是一条
+ *   需要记忆的规则，而是自然次序，故不存在「谁说了算」的僵局。
+ *
  * 命令：
  *   check              事件行格式 + verb 白名单 + id 唯一/单调 + 终态不可逆 + 卡内禁字。失败 → exit 1。
  *   status             对 TASKS.md 每个 id 推导状态，打印对齐表格 + 汇总 + 「待我方验收」清单。
@@ -974,16 +979,85 @@ function cmdSelftest() {
     assert(r.errors.some((e) => /不能为空/.test(e.msg)), `应检出空值：${JSON.stringify(r.errors)}`);
   });
 
-  // ⑫ 忽略行（# / > / 空行）不产生错误、也不产生事件
+  // ⑫ 忽略行（# / > / 空行 / markdown 水平分隔线）不产生错误、也不产生事件
   test('12 忽略行不报错', () => {
     const spec = fixture('s12', {
       tasks: '',
-      owner: '# 注释\n> 引用\n\n# 又一个注释\n',
+      owner: '# 注释\n> 引用\n\n# 又一个注释\n---\n***\n_ _ _\n',
       exec: '',
     });
     const r = runCheck(spec);
     assert(r.errors.length === 0, `忽略行不应报错：${JSON.stringify(r.errors)}`);
     assert(r.warnings.length === 0, `不应有告警（无卡片且仅注释行）：${JSON.stringify(r.warnings)}`);
+  });
+
+  // ⑬ OWNER-LOG：claim / blocked 合法（我方自办任务），done 非法（不在我方白名单）
+  test('13 OWNER-LOG claim 合法 / done 非法', () => {
+    const okSpec = fixture('s13a', {
+      tasks: `${card('T-001', '甲')}\n`,
+      owner: '2026-10-15T01:00:00Z | T-001 | claim | note=我方自办开工\n',
+      exec: '',
+    });
+    const r1 = runCheck(okSpec);
+    assert(r1.errors.length === 0, `OWNER-LOG 的 claim 应合法：${JSON.stringify(r1.errors)}`);
+
+    const badSpec = fixture('s13b', {
+      tasks: `${card('T-001', '甲')}\n`,
+      owner: '2026-10-15T01:00:00Z | T-001 | done | note=我方不该写 done\n',
+      exec: '',
+    });
+    const r2 = runCheck(badSpec);
+    assert(r2.errors.some((e) => /verb/.test(e.msg)), `OWNER-LOG 的 done 应非法：${JSON.stringify(r2.errors)}`);
+  });
+
+  // ⑭ 全局 `-` 事件：合法（配 note），不参与任务状态推导、不产生多余任务行
+  test('14 全局 - 事件不参与任务状态推导', () => {
+    const spec = fixture('s14', {
+      tasks: `${card('T-001', '甲')}\n${card('T-002', '乙')}\n`,
+      owner: [
+        '2026-10-15T01:00:00Z | T-001 | claim | note=开工',
+        '2026-10-15T02:00:00Z | - | note | kind=cutover | detail=沟通通道切换',
+      ].join('\n'),
+      exec: '',
+    });
+    const chk = runCheck(spec);
+    assert(chk.errors.length === 0, `全局 - note 应合法：${JSON.stringify(chk.errors)}`);
+
+    const r = runStatus(spec);
+    const byId = Object.fromEntries(r.rows.map((x) => [x.id, x.status]));
+    assert(r.rows.length === 2, `全局事件不应新增任务行：${JSON.stringify(r.rows.map((x) => x.id))}`);
+    assert(byId['T-001'] === 'doing', `T-001 应 doing：${byId['T-001']}`);
+    assert(byId['T-002'] === 'todo', `T-002 应 todo：${byId['T-002']}`);
+    assert(r.parseErrors.length === 0, `全局 - note 不应产生解析错误：${JSON.stringify(r.parseErrors)}`);
+  });
+
+  // ⑮ bug A：status 遇无法解析的行必须打印警告并列出 文件:行号（绝不静默跳过）
+  test('15 status 对无法解析的行打印警告并列出行号', () => {
+    const spec = fixture('s15', {
+      tasks: `${card('T-001', '甲')}\n`,
+      owner: '2026-10-15T01:00:00Z | T-001 | claim | note=开工\n',
+      exec: '2026-10-15T02:00:00Z | T-001 | done | commit=abc\nTHIS IS NOT AN EVENT LINE\n',
+    });
+    const rs = runStatus(spec);
+    assert(rs.parseErrors.length === 1, `应收集到 1 条解析错误：${JSON.stringify(rs.parseErrors)}`);
+    assert(
+      (rs.rows.find((x) => x.id === 'T-001') || {}).status === 'done',
+      'T-001 仍应据可解析事件推为 done',
+    );
+
+    const warns = [];
+    const origLog = console.log;
+    const origWarn = console.warn;
+    console.log = () => {};
+    console.warn = (...a) => warns.push(a.join(' '));
+    try {
+      cmdStatus(spec);
+    } finally {
+      console.log = origLog;
+      console.warn = origWarn;
+    }
+    assert(warns.some((l) => /无法解析/.test(l)), `应打印「无法解析」警告：${JSON.stringify(warns)}`);
+    assert(warns.some((l) => /EXEC-LOG\.md:2/.test(l)), `应列出 EXEC-LOG.md:2：${JSON.stringify(warns)}`);
   });
 
   // --- 输出 ---
