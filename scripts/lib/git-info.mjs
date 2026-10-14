@@ -8,7 +8,7 @@
  *
  * 返回：{ commit, commitFull, branch, subject }；完全无法判断时字段为 'unknown'。
  */
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join, isAbsolute } from 'node:path';
 
@@ -17,20 +17,23 @@ const UNKNOWN = 'unknown';
 /** 用 git 命令读取（最可靠，能正确处理 worktree / packed-refs）。失败返回 null。 */
 function viaGitCommand(rootDir) {
   try {
+    // ⚠️ 必须 execFileSync + 参数数组（不经 shell）：Windows 下 execSync 走 cmd.exe，
+    // `%s` 是 cmd 元字符，有被吞/被展开的隐患。
+    // ⚠️ stdio 必须显式为 ['ignore','pipe','pipe']：本机实测默认 stdio（stdin 也是
+    // 管道）会稳定 EBUSY；git 不读 stdin，此组合零副作用。
     const run = (args) =>
-      execSync(`git ${args}`, {
+      execFileSync('git', args, {
         cwd: rootDir,
-        stdio: ['ignore', 'pipe', 'ignore'],
-      })
-        .toString()
-        .trim();
+        stdio: ['ignore', 'pipe', 'pipe'],
+        encoding: 'utf8',
+      }).trim();
 
-    const commitFull = run('rev-parse HEAD');
+    const commitFull = run(['rev-parse', 'HEAD']);
     return {
       commitFull,
       commit: commitFull.slice(0, 7),
-      branch: run('rev-parse --abbrev-ref HEAD'),
-      subject: run('log -1 --pretty=%s'),
+      branch: run(['rev-parse', '--abbrev-ref', 'HEAD']),
+      subject: run(['log', '-1', '--pretty=%s']),
     };
   } catch {
     return null;
