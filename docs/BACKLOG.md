@@ -6,6 +6,38 @@
 > **`verified` 只能由我方（半年计划团队）在独立验证通过后写入** —— 执行方不得自行标 `verified`。
 > 协议细节与扫描流程见同目录的 `docs/AI-HANDOFF.md`（另一同事维护）。
 
+---
+
+## 📢 给执行方的当前指令
+
+> **本区块 + 下面的 `## T-xxx` 任务块 = 我方对你的唯一主通道。**
+> 我方对你说的一切（新任务 / 暂缓 / 边界澄清）都会写进本区块。**每次扫描请先读它，再按 `todo` 取活。**
+> `docs/EXEC-COMMS.md` 只作问答存档 —— **那条通道不保证被定时扫描到**（见协议 §7.1）。
+
+> **本轮（2026-10-14 20:45 更新）**
+>
+> 1. ✅ 你每 20 分钟轮询一次 → **一次可以连着做多项**，不必只做一个就停：按 `priority` 高者、再按 id 顺序取。但**每项单独一个 commit**，严禁多项混一个提交。
+> 2. ✅ 提交前自查 `status` 与 `evidence` 是否**成对更新**（历史上出现过「填了 evidence 忘改 status」→ 该项永远扫不到；现在 `scan` 已会报出 `staleDoing`）。若发现上一批漏改，**自己补正**即可，不必等我方。
+> 3. 🚫 **`T-013` / `T-014` / `T-015` 暂时不要领** —— 三者都依赖**仓库外**的「每日英语」源料（`D:/workspaces/每日英语*/`），而源料镜像与源侧改动由我方在 **`T-023`** 里做。等 `T-023` 变成 `verified` 再领，否则白跑一轮。这三项的 `depends` 已写明这一点。
+> 4. 📌 **本轮可以领的**：`T-021`（3 个新工具的移动端/深色/子路径核查）、`T-012`（C3 互评走廊，`depends: T-004` 已满足）；以及你手上在飞的 `T-009`。
+> 5. 🔒 重申两条铁律：**不要 `git push`**（协议 §6.2，你只 `commit`）；**`_src-tmp/` 只读、产出必须落正式目录**（协议 §6.1）。
+> 6. ⚠️ 本机验证构建用 `npx vite build --outDir <仓库外目录>`；不要跑 `npm run build` / `npm run ship`。
+> 7. 📣 **上一批回报**：`T-008`（C1 双人轮换互测）已由我方**独立复验 4/4 通过**并部署上线 —— 其中「手动走一遍」那条我没看自评，用真浏览器（headless Chrome + CDP 驱动）跑了两轮，确认**角色互换真的发生**（甲出题/乙答题 → 乙出题/甲答题）、真题库 346 条、`kind==='peer-turn'` 记录恰 2 条、控制台零报错。你的 `T-004` / `T-017` 亦已 verified。「漏改 status」一事不必再解释，已加固工具自动发现。
+
+---
+
+## 📋 候选新任务（**待老板拍板，暂不派发 —— 执行方请勿实现**）
+
+> 下面是**我方提案**，不是任务。等老板选定后才会改写成正式的 `## T-xxx` 块并给出 `acceptance`。
+>
+> 1. `/tools` 列表页加「搜索 + 频道/集合筛选」（工具已达 18 个，纯靠翻找的成本变高）
+> 2. 路由级 `<title>` / `<meta description>`（当前 SPA 全站同一标题，影响 SEO 与分享卡片）
+> 3. `/roadmap` 与 `docs/BACKLOG.md` 打通（现在两处手工维护，容易漂移）
+> 4. `/blog` 内容填充（站点定位是「blog + 工具箱」，目前博客只有骨架；内容源可取自公众号文章）
+> 5. 全站可访问性基线与移动端验收清单（键盘可达 / 对比度 / `aria` / 触控目标尺寸）
+
+---
+
 ## T-001 · 补 GitHub Actions 定时探活（防 Supabase 免费版被暂停）
 
 status: blocked
@@ -198,9 +230,9 @@ evidence: （执行方填写，初始留空）
 status: todo
 priority: P3
 area: docs/
-depends: —
+depends: T-023
 size: L
-spec: 音频/素材侧（moear 工具链，工作目录 `D:/workspaces/每日英语台词/`，**不进仓库**）据前期同事反馈存在 5 类系统性遗留，但本清单作者**未能一手复核**具体数量与位置，故本项先「核实 + 登记」，**先不做修复**：① 标签表系统性偏差（`_taxonomy/tags.json`、`_taxonomy/build_tags.py`），据称约 3 处；② 高危单元需靠帧 OCR 定谳（`_audit/_frames_a_manifest.json`、`_audit/frame_audit_b_meta.json`、`_audit/asr_doubt.json`），据称约 72 条；③ 隔离片段待决定去留（`_orphan_voices/`，含 `_moved.json`），据称约 8 条；④ whisper 转写疑似幻觉（`_logs/1_transcribe.log`、`_audit/asr_doubt.*`），据称约 26 条；⑤ 错别字文件名（散在 `D:/workspaces/每日英语台词/*.mp4`），据称约 25 个。产出 `docs/AUDIO-LEGACY-AUDIT.md`：**用命令实测**每个类别的真实数量与代表文件、标注来源，凡信息不足处写「待确认」，**不得直接沿用上述未复核数字**；并给出每类的处置建议（去 / 留 / 改）。源目录在仓库外，本项只产出文档，不修改素材。
+spec: ⚠️ **暂缓领取：本项依赖仓库外源料，我方正在 `T-023` 里做镜像；`T-023` 变 `verified` 后本条即可正常领。** 音频/素材侧（moear 工具链，工作目录 `D:/workspaces/每日英语台词/`，**不进仓库**）据前期同事反馈存在 5 类系统性遗留，但本清单作者**未能一手复核**具体数量与位置，故本项先「核实 + 登记」，**先不做修复**：① 标签表系统性偏差（`_taxonomy/tags.json`、`_taxonomy/build_tags.py`），据称约 3 处；② 高危单元需靠帧 OCR 定谳（`_audit/_frames_a_manifest.json`、`_audit/frame_audit_b_meta.json`、`_audit/asr_doubt.json`），据称约 72 条；③ 隔离片段待决定去留（`_orphan_voices/`，含 `_moved.json`），据称约 8 条；④ whisper 转写疑似幻觉（`_logs/1_transcribe.log`、`_audit/asr_doubt.*`），据称约 26 条；⑤ 错别字文件名（散在 `D:/workspaces/每日英语台词/*.mp4`），据称约 25 个。产出 `docs/AUDIO-LEGACY-AUDIT.md`：**用命令实测**每个类别的真实数量与代表文件、标注来源，凡信息不足处写「待确认」，**不得直接沿用上述未复核数字**；并给出每类的处置建议（去 / 留 / 改）。源目录在仓库外，本项只产出文档，不修改素材。
 acceptance:
 - `test -f docs/AUDIO-LEGACY-AUDIT.md`
 - 文档含 ≥5 个类别小节且每节给出「数量 + 定位命令 + 代表文件」：`test $(grep -c "^## " docs/AUDIO-LEGACY-AUDIT.md) -ge 5`
@@ -212,9 +244,9 @@ evidence: （执行方填写，初始留空）
 status: todo
 priority: P3
 area: public/tools/english/movie-line-shadowing/, D:/workspaces/每日英语/
-depends: —
+depends: T-023
 size: M
-spec: `movie-line-shadowing` 工具目前内容只有 **11 条 demo**：`public/tools/english/movie-line-shadowing/tool/data.json` 的 `items` 数组实测长度 = 11（而源目录 `D:/workspaces/每日英语/` 的成品素材多于 11 条）。需在**源工作目录**按既有管线补足条目（转写 + 中文 + TTS 配音等），再经 `npm run sync:tools` 增量同步进站（同步判据是「大小 + 内容 sha1」双判据，不会误判）。本项属素材生产，不写新代码；若某条素材缺中文/配音，需先在源侧补齐再同步。目标条数由老板给定（若未给定，以「源目录已就绪的成品条数」为准，并在 evidence 报告实际数字）。
+spec: ⚠️ **暂缓领取：本项要在仓库外源目录里生产素材，我方正在 `T-023` 里做镜像与源侧准备；`T-023` 变 `verified` 后本条即可正常领。** `movie-line-shadowing` 工具目前内容只有 **11 条 demo**：`public/tools/english/movie-line-shadowing/tool/data.json` 的 `items` 数组实测长度 = 11（而源目录 `D:/workspaces/每日英语/` 的成品素材多于 11 条）。需在**源工作目录**按既有管线补足条目（转写 + 中文 + TTS 配音等），再经 `npm run sync:tools` 增量同步进站（同步判据是「大小 + 内容 sha1」双判据，不会误判）。本项属素材生产，不写新代码；若某条素材缺中文/配音，需先在源侧补齐再同步。目标条数由老板给定（若未给定，以「源目录已就绪的成品条数」为准，并在 evidence 报告实际数字）。
 acceptance:
 - 条数确已超过 demo：`node -e "const d=require('./public/tools/english/movie-line-shadowing/tool/data.json'); if(d.items.length<=11){console.error('仍为 demo 条数'); process.exit(1)}"`
 - `npm run sync:tools` 退出码 0（源目标 sha1 一致）
@@ -226,9 +258,9 @@ evidence: （执行方填写，初始留空）
 status: todo
 priority: P3
 area: scripts/sync-tools.mjs, scripts/sync/movie-line-shadowing.json, src/data/tools/english/movie-line-shadowing.ts, public/tools/english/movie-line-shadowing/
-depends: —
+depends: T-023
 size: M
-spec: 其它工具入口都是 `public/tools/<频道>/<id>/index.html`，唯独 `movie-line-shadowing` 因源目录多一层 `tool/` 而变成 `public/tools/english/movie-line-shadowing/tool/index.html`（入口 `entry: 'tools/english/movie-line-shadowing/tool/index.html'`），URL 比别的工具深一层。给通用同步器 `scripts/sync-tools.mjs` 增加清单字段 `stripPrefix`（如 `"stripPrefix": "tool/"`），把匹配到的源相对路径去掉该前缀后再映射到目标；在 `scripts/sync/movie-line-shadowing.json` 里启用它，使产物落到 `.../movie-line-shadowing/index.html`。⚠️ **关键坑**：该工具 HTML 内部用 `mediaUrl(file){ return '../' + encodeURIComponent(file) }`（`tool/index.html` 约第 288 行）引用**上一层**的 `.mp4`；产物上移一层后会指向错误位置，必须**同时**把**源**目录里该工具 HTML 的 `'../'` 改成 `'./'`（改源再同步），否则视频全 404。改完更新 `Tool.entry`。`stripPrefix` 需与既有 `rename`（精确映射）/ `required`（按**源**路径判定）共存，且不影响其它清单。
+spec: ⚠️ **暂缓领取：本项必须与**源侧**改动（源 HTML 里 `mediaUrl()` 的 `'../'` → `'./'`）**同时生效**，否则线上视频全 404。源侧改动由我方在 `T-023` 里备好并控制时序；`T-023` 变 `verified` 后本条即可正常领（届时仓库内侧与源侧会一次性落地）。** 其它工具入口都是 `public/tools/<频道>/<id>/index.html`，唯独 `movie-line-shadowing` 因源目录多一层 `tool/` 而变成 `public/tools/english/movie-line-shadowing/tool/index.html`（入口 `entry: 'tools/english/movie-line-shadowing/tool/index.html'`），URL 比别的工具深一层。给通用同步器 `scripts/sync-tools.mjs` 增加清单字段 `stripPrefix`（如 `"stripPrefix": "tool/"`），把匹配到的源相对路径去掉该前缀后再映射到目标；在 `scripts/sync/movie-line-shadowing.json` 里启用它，使产物落到 `.../movie-line-shadowing/index.html`。⚠️ **关键坑**：该工具 HTML 内部用 `mediaUrl(file){ return '../' + encodeURIComponent(file) }`（`tool/index.html` 约第 288 行）引用**上一层**的 `.mp4`；产物上移一层后会指向错误位置，必须**同时**把**源**目录里该工具 HTML 的 `'../'` 改成 `'./'`（改源再同步），否则视频全 404。改完更新 `Tool.entry`。`stripPrefix` 需与既有 `rename`（精确映射）/ `required`（按**源**路径判定）共存，且不影响其它清单。
 acceptance:
 - 新字段已实现并在清单启用：`grep -q "stripPrefix" scripts/sync-tools.mjs` 且 `grep -q "stripPrefix" scripts/sync/movie-line-shadowing.json`
 - 产物已上移：`test -f public/tools/english/movie-line-shadowing/index.html` 且 `test ! -d public/tools/english/movie-line-shadowing/tool`
@@ -359,3 +391,21 @@ acceptance:
 - 文档中路径写法与实际一致（用 `ls` 抽查 ≥2 条路径存在）
 evidence: commit=93e4192 | files=docs/BOOKS-SOURCE.md | checks=file:pass,table:pass(6 工具 id 全覆盖且三列齐全,含既有 basic100 系列 3 个 + 新上线 3 个),grep-风险提示:pass(§2 明确非 git 仓库/无版本保护/唯一重建链路),path-spot-check:pass(抽查 内容/基本英文100_高考版、数据/build/ecdict.csv、工具/锁屏背句_demo.html 均 Test-Path True) | note=生成脚本与参数逐一核对源料库 归档说明.md §三（权威清单），未沿用注册表注释的笼统写法；lockscreen-sentence-drill 据实标「无生成脚本（手工维护原型）」；文档未搬未改任何源文件
   - verify 2026-10-14T19:58:15+08:00 | by=team-lead | 4/4 acceptance 通过：BOOKS-SOURCE.md 存在；3 个新工具 id 三列齐全；§2 风险提示含「非 git 仓库（git rev-parse 实测 fatal: not a git repository）」「无版本保护」「唯一重建链路」；抽查 9 条路径全部存在。附注：§2 写「15 个生成脚本 / build_pure_dict.py 29KB」与实测（13 个 / 35620B）不符，属非验收范围的事实性小错，建议后续订正
+
+## T-023 · 把「每日英语」源料按需镜像进 `_src-tmp/` 并备好源侧改动（**我方自行执行，执行方请跳过**）
+
+status: doing
+priority: P1
+area: scripts/src-tmp-sync.mjs, _src-tmp/, D:/workspaces/每日英语/, D:/workspaces/每日英语台词/, docs/
+depends: —
+size: M
+spec: `T-013` / `T-014` / `T-015` 三项**全部卡在同一个根因**上：它们都要读写**仓库外**的「每日英语」源料（`D:/workspaces/每日英语台词/` 约 375MB，含 394 个 `.mp4` + `audio/` + `audio_norm/`；`D:/workspaces/每日英语/` 约 26MB，含 11 个 `.mp4` + `tool/` + `docs/` + `_qa/` + `_tts_logs/`），而执行方**只有本仓库的可见性** → 领了也只能空跑一轮。本项由**我方**执行，把源料「变得可见」并把源侧改动准备好。(1) **扩展 `scripts/src-tmp-sync.mjs` 支持多个具名源根**（当前只支持单一源根 `C:/Users/ZhuanZ1/Documents/WS/英文学习/`），新增「每日英语」与「每日英语台词」两个具名源。(2) 按需镜像**文本类**文件：`每日英语台词/{_audit,_logs,_taxonomy,_orphan_voices,_zh,_run_all.sh,_run_tts.sh,_preview.html}` 与 `每日英语/{tool/*.py,tool/*.json,tool/index.html,tool/serve.py,docs/,_qa/,_tts_logs/}`；**一律排除** `.mp4` / `audio*/` / 图片帧等二进制大件（镜像是「让人读得懂生成链路」，不是搬素材）。(3) 刷新基准清单并跑**三方比对**（真源 / 基准 / 镜像磁盘）确认一致；`_manifest.json` 需能区分多个源根。(4) 在 `docs/AI-HANDOFF.md` §6.1 登记新的镜像范围与两个源根的真源路径。(5) **备好 `T-015` 所需的源侧改动**：`D:/workspaces/每日英语/tool/index.html` 里 `mediaUrl()` 用的 `'../'` 要改成 `'./'` —— 该改动**必须与 T-015 的仓库内侧改动同时生效**，否则线上视频全 404；本项只负责「改好并验证」，**具体落地时序由我方把关**。(6) 本项完成后解除 `T-013` / `T-014` / `T-015` 的 `depends` 门禁（`T-014` 的**素材生产**能否交给执行方，届时再评估：它需要 ffmpeg/whisper/TTS 能力，且 `_src-tmp/` 只读，很可能仍由我方做）。
+acceptance:
+- 两个具名源已镜像：`test -d "_src-tmp/每日英语"` 且 `test -d "_src-tmp/每日英语台词"`
+- 镜像内**零大件二进制**：`! find "_src-tmp/每日英语" "_src-tmp/每日英语台词" -type f \( -name '*.mp4' -o -name '*.mp3' -o -name '*.wav' -o -name '*.png' -o -name '*.jpg' \) | grep -q .`
+- 镜像总体积受控：`du -sm _src-tmp | awk '{exit !($1 < 40)}'`
+- 三方比对通过：`npm run src-tmp:check` 退出码 0（且刻意改一次镜像能报出「镜像被直接改动」= 判据有效）
+- 新源根已登记：`grep -q "每日英语" docs/AI-HANDOFF.md`
+- 门禁已解除：`T-013` / `T-014` / `T-015` 的 `depends` 不再指向 `T-023`（`grep -c "depends: T-023" docs/BACKLOG.md` 输出 0）
+evidence: （初始留空 —— 本项由我方自行执行，完成后由我方填写）
+

@@ -409,6 +409,25 @@ _src-tmp/
 > 我方通过清单下发任务与验收标准，执行方通过 `status`/`evidence` 回传结果，
 > 双方不存在其它隐藏通道；所有需要对齐的信息都必须落在清单或 git 提交里。
 
+### 7.1 通道优先级（2026-10-14 更新）
+
+**执行方现在有 20 分钟的定时轮询**（每 20 分钟扫一次 `docs/BACKLOG.md`）。
+
+| 通道 | 用途 | 谁写 | 优先级 |
+|---|---|---|---|
+| **`docs/BACKLOG.md` 顶部「📢 给执行方的当前指令」区块** | 我方对执行方的一切**指令/变更/暂缓/边界澄清** | 我方 | ⭐ **主通道** |
+| `docs/BACKLOG.md` 的 `## T-xxx` 任务块 | 任务本体（`spec`/`acceptance`/`status`/`evidence`） | 双方各写各的字段 | ⭐ **主通道** |
+| `docs/EXEC-COMMS.md` | **问答存档**（提问与答复的记录） | 双方 | 存档（**不保证被定时读到**） |
+
+⚠️ **结论**：凡是「希望执行方**行动**」的内容，**必须写进 `docs/BACKLOG.md`**。
+只写在 `EXEC-COMMS.md` 里有可能被漏读 —— 那次 20 分钟的扫描只认清单。
+
+### 7.2 主动 / 被动（谁在等谁）
+
+- **我方是主动方**：负责拆任务、下发指令、独立验证、部署。**执行方做完一批就停**，等下一次 20 分钟轮询或新指令。
+- **推论：清单没活 = 执行方空转。** 所以保持 `todo` 队列不为空是**我方的责任**；
+  当下游被仓库外依赖卡住时，应在清单里**显式登记我方自己的前置项**（如 `T-023`）并给下游任务加 `depends`，而不是让执行方空跑一轮。
+
 ---
 
 ## 8. 给执行方的开场白（可直接复制）
@@ -416,17 +435,21 @@ _src-tmp/
 ```
 你是本仓库（半年计划 bannianjihua_web，纯静态站点）的实现执行方，只负责写代码。先读 docs/AI-HANDOFF.md（协议），再读 docs/BACKLOG.md（任务清单），按此顺序。二者不符时以 AI-HANDOFF.md 为准。
 
+你每 20 分钟会被唤起一次去扫 docs/BACKLOG.md，所以：
+0. ⭐ 每次扫描**先读清单顶部那个「📢 给执行方的当前指令」区块** —— 我方对你说的一切（新任务、暂缓、边界澄清）都写在那里。读完再按 todo 取活。
+   然后**可以连着做多项**，不必只做一个就停：按 priority 高者、再按 id 顺序取。
+
 规则：
-1. 一次只做一个任务（或 depends 允许的连续几个），严禁把多个任务混进一个 commit。
-2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 evidence 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。status 与 evidence 必须一起改，别只填 evidence 忘了改 status。
+1. 一个任务一个 commit，严禁把多个任务混进一个 commit。（可以连做多项，但每项单独提交。）
+2. 任务从 todo 改成 doing 后开工；完成后改成 done，并在 evidence 里按单行格式写清：commit= | files= | checks= | note=（校验命令要真跑、写真实结果）。status 与 evidence 必须一起改，别只填 evidence 忘了改 status。若你发现上一批漏改了 status，自己补正即可。
 3. 🔒 不要 git push —— 你只 git commit，把提交留在本地即可。push 是部署动作，由我方独立复核通过后执行。若你自行 push，未经复核的代码就上线了，复核就失去了意义。
 4. 你永远不能把 status 写成 verified —— done 只是"你自认为完成"，verified 只能由我方独立验证后填。不得修改 spec/acceptance/id 等字段。
 5. 遵守硬约束：纯静态、无服务器端进程；新增工具只新建文件、不改既有文件，且 node scripts/check-tools.mjs 必须通过。
 6. 本机不要跑 npm run build / npm run ship（会触发删除配额杀进程）；验证构建用 npx vite build --outDir ../_buildcheck。
 7. 不确定就标 blocked 并在 evidence 的 note= 写清原因，不要猜着改。不要动 .workbuddy/。_src-tmp/ 是只读参考区，禁止写入。
 8. 提交信息用中文，格式 feat|fix|chore|docs(scope): 描述。
-9. 有疑问、被卡住、或发现协议本身有问题，写进 docs/EXEC-COMMS.md 的登记表（我方会在那里回复）。
-现在开始：先打开 docs/BACKLOG.md，从中认领一个 status=todo 且 depends 已满足的任务（清单里有多项，先按 priority 高者、再按 id 顺序取）。
+9. **想让某件事进入我方的视野，写进 docs/BACKLOG.md 顶部的指令区块或写成一条新的待办** —— 只写在 docs/EXEC-COMMS.md 里可能被漏读（那条通道不保证被定时扫描）。EXEC-COMMS.md 用来存档问答。
+现在开始：读 docs/BACKLOG.md 顶部的「📢 给执行方的当前指令」区块 → 认领 status=todo 且 depends 已满足的任务（priority 高者优先、再按 id 顺序）→ 可连续做多项。
 ```
 
 ---
