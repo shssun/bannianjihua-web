@@ -37,7 +37,8 @@
  *   check              事件行格式 + verb 白名单 + id 唯一/单调 + 终态不可逆 + 卡内禁字。失败 → exit 1。
  *   status             对 TASKS.md 每个 id 推导状态，打印对齐表格 + 汇总 + 「待我方验收」清单。
  *   append-only        对三个文件跑 `git diff`，检查是否删除/改写了任何非空行。有则 exit 1。
- *                      --base <ref>（默认 HEAD）。
+ *                      --base <ref>（默认 HEAD）。未跟踪文件**不计入通过**，只告警跳过
+ *                      （避免对不在版本控制里的文件给出「纯追加」假绿）。
  *   selftest           在 os.tmpdir() 造 fixture，断言全部校验/推导逻辑可被检出。
  *
  * 零依赖：仅使用 Node 内置模块（node:fs / node:path / node:process / node:os / node:child_process / node:url）。
@@ -714,15 +715,41 @@ function analyzeDiff(relPath, diffText) {
 }
 
 /**
- * 对若干文件跑 git diff，检测删除 / 改写。
+ * 判断某文件是否**被 git 跟踪**（未跟踪的文件无从谈「纯追加」，不能给假绿）。
+ * @param {string} rel 仓库相对路径
+ * @param {string} cwd 仓库根
+ * @returns {boolean}
+ */
+function isTracked(rel, cwd) {
+  try {
+    execFileSync('git', ['ls-files', '--error-unmatch', '--', rel], {
+      cwd,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      encoding: 'utf8',
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 对若干文件跑 git diff，检测删除 / 改写；**先剔除未跟踪文件**（对其无法判定追加）。
  * @param {{base:string, cwd:string, relFiles:string[]}} opts
- * @returns {{violations:Array<{file:string,line:string}>, errors:Array<{file:string,msg:string}>}}
+ * @returns {{violations:Array<{file:string,line:string}>, errors:Array<{file:string,msg:string}>, tracked:string[], untracked:string[]}}
  */
 function runAppendOnly(opts) {
   const { base, cwd, relFiles } = opts;
   const violations = [];
   const errors = [];
+  const tracked = [];
+  const untracked = [];
   for (const rel of relFiles) {
+    if (!isTracked(rel, cwd)) {
+      untracked.push(rel); // 未跟踪：不计入通过，单独告警
+      continue;
+    }
+    tracked.push(rel);
     try {
       const out = execFileSync('git', ['diff', '--unified=0', base, '--', rel], {
         cwd,
@@ -735,11 +762,15 @@ function runAppendOnly(opts) {
       errors.push({ file: rel, msg });
     }
   }
-  return { violations, errors };
+  return { violations, errors, tracked, untracked };
 }
 
-/** append-only 命令入口。 */
-function cmdAppendOnly(argv) {
+/**
+ * append-only 命令入口。
+ * @param {string[]} argv
+ * @param {{cwd:string, relFiles:string[]}} [ctx] 默认针对仓库根的三文件（测试可覆盖）
+ */
+function cmdAppendOnly(argv, ctx = { cwd: repoRoot, relFiles: [REL.tasks, REL.owner, REL.exec] }) {
   let base = 'HEAD';
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
@@ -751,10 +782,10 @@ function cmdAppendOnly(argv) {
     }
   }
 
-  const { violations, errors } = runAppendOnly({
+  const { violations, errors, tracked, untracked } = runAppendOnly({
     base,
-    cwd: repoRoot,
-    relFiles: [REL.tasks, REL.owner, REL.exec],
+    cwd: ctx.cwd,
+    relFiles: ctx.relFiles,
   });
 
   if (errors.length > 0) {
@@ -762,6 +793,11 @@ function cmdAppendOnly(argv) {
     for (const e of errors) console.error(`  ${e.file}: ${e.msg}`);
     process.exitCode = 1;
     return;
+  }
+
+  // 未跟踪文件：如实告警，绝不混入「纯追加」结论
+  for (const f of untracked) {
+    console.warn(`${TAG} ⚠️ ${f} 未被 git 跟踪，跳过纯追加校验`);
   }
 
   if (violations.length > 0) {
@@ -773,7 +809,13 @@ function cmdAppendOnly(argv) {
     return;
   }
 
-  console.log(`${TAG} ✅ 三个文件均为纯追加`);
+  if (untracked.length === 0) {
+    console.log(`${TAG} ✅ 三个文件均为纯追加`);
+  } else if (tracked.length === 0) {
+    console.warn(`${TAG} ⚠️ 没有任何文件被 git 跟踪，无法校验纯追加（结论不成立）`);
+  } else {
+    console.log(`${TAG} ✅ 已跟踪的文件均为纯追加（${untracked.length} 个未跟踪，已跳过）`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1060,6 +1102,46 @@ function cmdSelftest() {
     assert(warns.some((l) => /EXEC-LOG\.md:2/.test(l)), `应列出 EXEC-LOG.md:2：${JSON.stringify(warns)}`);
   });
 
+  // ⑯ append-only：未跟踪文件不得给「纯追加」假绿
+  test('16 append-only 未跟踪文件不假绿', () => {
+    const dir = p('s16');
+    mkdirSync(dir, { recursive: true });
+    // 仅 OWNER-LOG.md 被 git 跟踪；TASKS.md / EXEC-LOG.md 故意不跟踪
+    const git = initGitRepo(dir, { 'OWNER-LOG.md': '# h\n' });
+    assert(git !== null, 'git 不可用');
+    writeFileSync(join(dir, 'TASKS.md'), 'a\n'); // 已创建但未 add/commit → 未跟踪
+
+    const out = [];
+    const warns = [];
+    const origLog = console.log;
+    const origWarn = console.warn;
+    const origCode = process.exitCode;
+    console.log = (...a) => out.push(a.join(' '));
+    console.warn = (...a) => warns.push(a.join(' '));
+    try {
+      process.exitCode = 0;
+      cmdAppendOnly([], {
+        cwd: dir,
+        relFiles: ['TASKS.md', 'OWNER-LOG.md', 'EXEC-LOG.md'],
+      });
+    } finally {
+      console.log = origLog;
+      console.warn = origWarn;
+      process.exitCode = origCode;
+    }
+
+    const all = [...out, ...warns].join('\n');
+    assert(/未被 git 跟踪/.test(all), `应提示「未被 git 跟踪」：${all}`);
+    assert(
+      !/三个文件均为纯追加/.test(all),
+      `不得出现无条件的「三个文件均为纯追加」假绿：${all}`,
+    );
+    assert(
+      /已跟踪的文件均为纯追加/.test(all) && /2 个未跟踪/.test(all),
+      `应收窄措辞并给出未跟踪计数：${all}`,
+    );
+  });
+
   // --- 输出 ---
   const total = tests.length;
   const passed = tests.filter((t) => t.ok).length;
@@ -1112,7 +1194,8 @@ function initGitRepo(dir, files) {
 const USAGE = `${TAG} 用法：node scripts/comms.mjs <cmd>
   check                     校验三文件（事件格式 / verb 白名单 / id 唯一且单调 / 终态不可逆 / 卡内禁字）
   status                    由两条日志推导每个任务的状态，打印表格 + 汇总 + 待验收清单
-  append-only [--base ref]  检查三文件是否纯追加（默认 base=HEAD），有删除/改写 → exit 1
+  append-only [--base ref]  检查三文件是否纯追加（默认 base=HEAD），有删除/改写 → exit 1；
+                            未跟踪文件只告警跳过、不计入「纯追加」结论
   selftest                  在系统临时目录自测（全部通过 exit 0）`;
 
 /**
