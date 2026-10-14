@@ -167,7 +167,7 @@ evidence: commit=b62766b | files=public/tools/english/peer-turn-drill/index.html
 
 ## T-009 · 实现方案 C2：单人 + 外部 AI 陪练工具（零后端）
 
-status: todo
+status: done
 priority: P2
 area: public/tools/english/, src/data/tools/english/
 depends: —
@@ -178,7 +178,7 @@ acceptance:
 - `test -f public/tools/english/ai-sparring/index.html`
 - 工具无对外域网络请求：`grep -nE "fetch\(['\"]https?:|XMLHttpRequest" public/tools/english/ai-sparring/index.html` 无输出
 - 手动走一遍：完成 ≥1 轮（题面 → 追问 → 作答）后，`kind==='ai-sparring'` 的记录能被读出
-evidence: （执行方填写，初始留空）
+evidence: commit=236dc7a | files=public/tools/english/ai-sparring/index.html,src/data/tools/english/ai-sparring.ts | checks=check-tools:pass(exit0,18工具4频道4集合),grep-external:pass(acceptance 原判据零命中,且全文无任何 fetch/XHR),tsc-b:pass(exit0),vite-build:pass(outDir=node_modules/.bc-t009,exit0,67s,验证后已删),browser:pass(vite dev localhost:5173 真浏览器走查2轮,roundCount=2,console 0 error,IDB 直读 ai-sparring 恰2条且 LearnerRecord 结构 allValidShape=true) | deviation=构建验证用仓库内 gitignored 新空目录 node_modules/.bc-t009 替代 ../_buildcheck（沙箱只可写仓库内，新空目录不触发 emptyOutDir，行为等价）；题库未走相对 fetch，从 moear phrases.json 抽 7 个题面字段精简内联（346 条约 42KB，真单文件自包含、断网可用） | note=工具不调用任何 AI/网络 API，对话在外部 LLM 完成后粘回；IDB 内联自 src/lib/storage/idb.ts（DB bannianjihua v1/store records/keyPath id，export 去除逻辑不改），记录 {id,toolId:ai-sparring,kind:ai-sparring,refId,payload{phrase,followUp,answer},createdAt}，主站「我的数据」可导出；实施期间并行会话两次全量写回覆盖 doing 标记，已在其提交 eace0f6 落定后重标，代码文件因路径独立未受影响
 
 ## T-010 · 清退已废弃脚本 scripts/sync-daily-english.mjs 及其失效文档引用
 
