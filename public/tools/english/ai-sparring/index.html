@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 陪练轮次记录 · 外部 LLM 搭子</title>
+<style>
+  :root{
+    --bg:#0f1420;--card:#1a2130;--card2:#212a3d;--fg:#e8ecf4;--muted:#8b95a8;
+    --accent:#5b8cff;--good:#3ecf8e;--warn:#f5a623;--bad:#ff6b6b;--border:#2c3548;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:15px/1.7 -apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;padding:24px 16px 60px}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:1.35rem;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+  .card h2{font-size:1rem;margin-bottom:10px}
+  .muted{color:var(--muted)}
+  label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+  input[type=text],textarea,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--fg);padding:9px 12px;font:inherit}
+  textarea{min-height:84px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>*{flex:1}
+  button{background:var(--accent);border:none;border-radius:8px;color:#fff;font:inherit;font-weight:600;padding:10px 20px;cursor:pointer;margin-top:14px}
+  button.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:400}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .step{font-size:.75rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:6px}
+  .tag{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:1px 10px;font-size:.75rem;color:var(--muted);margin:2px 4px 2px 0}
+  .zh{font-size:1.2rem;font-weight:700;display:block;margin-bottom:6px}
+  .ref{background:var(--card2);border-radius:8px;padding:12px 14px;margin-top:10px;display:none}
+  .ref.on{display:block}
+  .ref .en{font-size:1.1rem;font-weight:700;color:var(--good)}
+  .prompt-box{background:var(--card2);border-left:3px solid var(--accent);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.9rem;white-space:pre-wrap}
+  .status-bar{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-bottom:14px}
+  .status-bar b{color:var(--fg)}
+  .log-item{border-top:1px solid var(--border);padding:10px ;font-size:.85rem}
+  .log-item:first-of-type{border-top:none;padding-top:0}
+  .log-item .meta{color:var(--muted);font-size:.75rem;margin-bottom:4px}
+  .log-item .qa{margin:4px 0}
+  .log-item .qa b{color:var(--accent)}
+  .log-item .ans b{color:var(--good)}
+  .log-item .refline{color:var(--muted);font-size:.8rem;margin-top:4px}
+  .del{background:none;color:var(--muted);padding:0;margin:0;font-weight:400;font-size:.75rem;text-decoration:underline;float:right}
+  .msg{font-size:.85rem;margin-top:10px;min-height:1.2em}
+  .msg.ok{color:var(--good)}.msg.err{color:var(--bad)}
+  .banner{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);color:var(--warn);border-radius:8px;padding:10px 14px;font-size:.85rem;margin-bottom:14px;display:none}
+  .banner.on{display:block}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💬 AI 陪练轮次记录 · 外部 LLM 搭子</h1>
+  <div class="sub">工具只负责<strong>出题 + 记录</strong>，不内置 AI、不联网：把题面指令复制给任意外部 AI（ChatGPT / 豆包 / Kimi 等），把它的追问粘回来，写下你的作答，本轮自动存入浏览器本地（可在主站「我的数据」导出）。</div>
+
+  <div id="idbBanner" class="banner">当前浏览器禁用了本地存储（隐私模式等），轮次将无法保存；本页仍可练习，但不会留记录。</div>
+
+  <div class="status-bar">
+    <span>已完成轮次：<b id="roundCount">0</b></span>
+    <span>题库：<b id="bankCount">0</b> 条（取自 moear 短语库）</span>
+  </div>
+
+  <div class="card">
+    <div class="step">第 1 步 · 抽题面</div>
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:2">
+        <label for="diffSel">难度筛选</label>
+        <select id="diffSel">
+          <option value="0">全部难度</option>
+          <option value="1">难度 1</option>
+          <option value="2">难度 2</option>
+          <option value="3">难度 3</option>
+          <option value="4">难度 4</option>
+          <option value="5">难度 5</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <button id="nextBtn" style="margin-top:0;width:100%">换一道题</button>
+      </div>
+    </div>
+    <div id="phraseBox" style="margin-top:14px">
+      <span class="zh" id="zhText">点击「换一道题」开始。</span>
+      <div id="tagsLine"></div>
+    </div>
+    <button id="refToggle" class="ghost" style="display:none">查看参考英文（作答后再看）</button>
+    <div id="refBox" class="ref"><span class="en" id="enText"></span></div>
+  </div>
+
+  <div class="card" id="step2Card" style="display:none">
+    <div class="step">第 2 步 · 复制指令给外部 AI</div>
+    <div class="prompt-box" id="promptText"></div>
+    <button id="copyBtn">复制题面指令</button>
+    <span id="copyMsg" class="muted" style="font-size:.8rem;margin-left:10px"></span>
+  </div>
+
+  <div class="card" id="step3Card" style="display:none">
+    <div class="step">第 3 步 · 粘回追问 + 写下你的作答</div>
+    <label for="followUp">外部 AI 对你的追问（粘贴）</label>
+    <textarea id="followUp" placeholder="把 AI 的追问原样粘到这里，例如：Who are you talking to? What do you really want them to do?"></textarea>
+    <label for="answer">你的英文作答</label>
+    <textarea id="answer" placeholder="用英文回答 AI 的追问，尽量自己说出那句话……"></textarea>
+    <button id="saveBtn">保存本轮</button>
+    <div id="saveMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="logCard" style="display:none">
+    <h2>本机轮次记录</h2>
+    <div id="logList"></div>
+  </div>
+
+  <footer>零后端 · 单文件自包含 · 记录存于同 origin IndexedDB（db=bannianjihua / store=records，kind=ai-sparring）</footer>
+</div>
+
+<script>
+'use strict';
+/* ===== 内联精简题库（源自 public/tools/english/moear/tool/phrases.json，仅保留题面所需字段） ===== */
+var PHRASES = [{"id":"im-flattered","en":"I'm flattered.","zh":"我很受宠若惊。","d":1,"f":["表达感谢","示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"im-speechless","en":"I'm speechless.","zh":"我无语了（震惊到说不出话）。","d":1,"f":["惊讶","抱怨吐槽"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"a-promise-is-a-promise","en":"A promise is a promise.","zh":"一诺千金，说到就要做到。","d":3,"f":["承诺保证"],"s":["日常寒暄","朋友聚会"],"t":"formal"},{"id":"actions-speak-louder-than-words","en":"Actions speak louder than words.","zh":"事实胜于雄辩。","d":4,"f":["劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"be-my-guest","en":"Be my guest.","zh":"请便，别客气。","d":2,"f":["许可","示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"be-there-or-be-square","en":"Be there or be square.","zh":"不见不散（不来就不够朋友）。","d":4,"f":["承诺保证"],"s":["朋友聚会","日常寒暄"],"t":"friendly"},{"id":"better-late-than-never","en":"Better late than never.","zh":"迟做总比不做好。","d":3,"f":["安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"buckle-up","en":"Buckle up.","zh":"系好安全带（准备好）。","d":1,"f":["劝告建议","警告威胁"],"s":["交通出行"],"t":"urgent"},{"id":"can-i-ask-you-a-favor","en":"Can I ask you a favor?","zh":"能请你帮个忙吗？","d":3,"f":["请求"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"cheapskate","en":"Cheapskate.","zh":"小气鬼，铁公鸡。","d":4,"f":["抱怨吐槽"],"s":["朋友聚会","金钱往来"],"t":"confrontational"},{"id":"chill-out","en":"Chill out.","zh":"放松点，别激动。","d":1,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"count-me-in","en":"Count me in.","zh":"算我一个。","d":2,"f":["承诺保证"],"s":["朋友聚会","日常寒暄"],"t":"friendly"},{"id":"cut-in-front-of-someone","en":"Cut in front of someone.","zh":"（在某人前面）插队。","d":3,"f":["抱怨吐槽"],"s":["交通出行","购物消费","冲突争吵"],"t":"neutral"},{"id":"cut-it-out","en":"Cut it out.","zh":"住手，别闹了。","d":2,"f":["警告威胁"],"s":["家庭","朋友聚会","冲突争吵"],"t":"confrontational"},{"id":"did-you-miss-me","en":"Did you miss me?","zh":"你想我了吗？","d":2,"f":["问候寒暄","表达爱意"],"s":["约会亲密","日常寒暄"],"t":"affectionate"},{"id":"go-dutch","en":"Go Dutch.","zh":"AA 制，各付各的。","d":4,"f":["劝告建议"],"s":["酒吧餐厅","金钱往来","约会亲密"],"t":"neutral"},{"id":"do-you-have-a-minute","en":"Do you have a minute?","zh":"能耽误你一会儿吗？","d":3,"f":["请求"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"that-doesnt-ring-a-bell","en":"That doesn't ring a bell.","zh":"没印象，想不起来。","d":3,"f":["质疑不信"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"dont-be-a-stranger","en":"Don't be a stranger.","zh":"别断了联系，常来。","d":3,"f":["道别","问候寒暄"],"s":["离别送行","日常寒暄"],"t":"friendly"},{"id":"dont-be-naive","en":"Don't be naive.","zh":"别天真了。","d":2,"f":["劝告建议"],"s":["日常寒暄","冲突争吵"],"t":"confrontational"},{"id":"dont-get-me-wrong","en":"Don't get me wrong.","zh":"别误会我。","d":2,"f":["道歉"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"dont-get-cocky","en":"Don't get cocky.","zh":"别得意忘形。","d":3,"f":["警告威胁","劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"confrontational"},{"id":"dont-have-a-cow","en":"Don't have a cow.","zh":"别大惊小怪，别激动。","d":4,"f":["安慰鼓励","劝告建议"],"s":["家庭","日常寒暄"],"t":"neutral"},{"id":"dont-put-words-into-my-mouth","en":"Don't put words into my mouth.","zh":"别把你的话硬塞给我（别曲解我的意思）。","d":3,"f":["抱怨吐槽","质疑不信"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"dont-rush-me","en":"Don't rush me.","zh":"别催我。","d":2,"f":["拒绝","抱怨吐槽"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"dont-settle","en":"Don't settle.","zh":"别将就。","d":1,"f":["劝告建议","安慰鼓励"],"s":["约会亲密","日常寒暄"],"t":"neutral"},{"id":"dont-stay-up-too-late","en":"Don't stay up too late.","zh":"别熬太晚。","d":3,"f":["劝告建议"],"s":["家庭","日常寒暄"],"t":"affectionate"},{"id":"dont-take-it-for-granted","en":"Don't take it for granted.","zh":"别把这当成理所当然。","d":3,"f":["劝告建议"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"down-the-hatch","en":"Down the hatch.","zh":"干杯，一口闷。","d":3,"f":["示好赞美"],"s":["酒吧餐厅","朋友聚会"],"t":"friendly"},{"id":"easier-said-than-done","en":"Easier said than done.","zh":"说来容易做来难。","d":3,"f":["抱怨吐槽"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"easy-peasy","en":"Easy-peasy.","zh":"小菜一碟，简单得很。","d":1,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"every-dog-has-its-day","en":"Every dog has its day.","zh":"人人都有得意的一天。","d":4,"f":["安慰鼓励"],"s":["日常寒暄"],"t":"neutral"},{"id":"fair-and-square","en":"Fair and square.","zh":"光明正大，公平公正。","d":3,"f":["承诺保证"],"s":["朋友聚会","职场办公"],"t":"neutral"},{"id":"fair-enough","en":"Fair enough.","zh":"好吧，行吧。","d":1,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"fair-point","en":"Fair point.","zh":"说得有道理。","d":1,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"a-fish-out-of-water","en":"A fish out of water.","zh":"如鱼离水，浑身不自在。","d":3,"f":["抱怨吐槽"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"give-me-a-break","en":"Give me a break.","zh":"得了吧，别逗了。","d":2,"f":["质疑不信","抱怨吐槽"],"s":["日常寒暄","冲突争吵"],"t":"sarcastic"},{"id":"hard-to-say","en":"Hard to say.","zh":"很难说。","d":2,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"hear-me-out","en":"Hear me out.","zh":"听我把话说完。","d":2,"f":["请求"],"s":["冲突争吵","日常寒暄"],"t":"urgent"},{"id":"his-bark-is-worse-than-his-bite","en":"His bark is worse than his bite.","zh":"雷声大雨点小（嘴凶心软）。","d":5,"f":["安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"hold-your-horses","en":"Hold your horses.","zh":"稍安勿躁，别急。","d":4,"f":["劝告建议"],"s":["日常寒暄","交通出行"],"t":"neutral"},{"id":"i-can-tell","en":"I can tell.","zh":"我看得出来。","d":2,"f":["安慰鼓励"],"s":["日常寒暄","约会亲密"],"t":"neutral"},{"id":"i-dont-blame-you","en":"I don't blame you.","zh":"我不怪你。","d":2,"f":["安慰鼓励"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"i-dont-care-anymore","en":"I don't care anymore.","zh":"我不在乎了。","d":2,"f":["表示无所谓"],"s":["约会亲密","冲突争吵","日常寒暄"],"t":"neutral"},{"id":"i-dont-give-a-shit","en":"I don't give a shit.","zh":"我才不在乎呢（粗口）。","d":3,"f":["表示无所谓","抱怨吐槽"],"s":["朋友聚会","冲突争吵"],"t":"confrontational"},{"id":"i-dont-have-all-day","en":"I don't have all day.","zh":"我没工夫耗着。","d":3,"f":["催促"],"s":["职场办公","交通出行"],"t":"urgent"},{"id":"i-got-my-period","en":"I got my period.","zh":"我来例假了。","d":2,"f":["抱怨吐槽"],"s":["约会亲密","家庭","日常寒暄"],"t":"neutral"},{"id":"i-have-your-back","en":"I have your back.","zh":"我挺你，我支持你。","d":2,"f":["承诺保证","安慰鼓励"],"s":["朋友聚会","职场办公"],"t":"friendly"},{"id":"i-kid-you-not","en":"I kid you not.","zh":"我没骗你，说真的。","d":3,"f":["承诺保证"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"i-screwed-up","en":"I screwed up.","zh":"我搞砸了。","d":2,"f":["道歉"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"i-told-you-so","en":"I told you so.","zh":"我早说过了吧。","d":2,"f":["反问讽刺","抱怨吐槽"],"s":["日常寒暄","家庭"],"t":"sarcastic"},{"id":"i-was-blown-away","en":"I was blown away.","zh":"我被震撼到了。","d":3,"f":["惊讶","示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"i-wasnt-born-yesterday","en":"I wasn't born yesterday.","zh":"我又不是三岁小孩。","d":3,"f":["质疑不信","抱怨吐槽"],"s":["日常寒暄","冲突争吵"],"t":"confrontational"},{"id":"ill-keep-that-in-mind","en":"I'll keep that in mind.","zh":"我会记在心上的。","d":3,"f":["承诺保证","表达感谢"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"im-all-ears","en":"I'm all ears.","zh":"我洗耳恭听。","d":3,"f":["承诺保证"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"im-torn","en":"I'm torn.","zh":"我很纠结，难以抉择。","d":1,"f":["抱怨吐槽"],"s":["约会亲密","职场办公"],"t":"neutral"},{"id":"ive-been-around","en":"I've been around.","zh":"我见过世面，是过来人。","d":3,"f":["表示无所谓"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"ive-heard-so-much-about-you","en":"I've heard so much about you.","zh":"久仰大名。","d":3,"f":["问候寒暄","示好赞美"],"s":["日常寒暄","职场办公"],"t":"formal"},{"id":"in-a-nutshell","en":"In a nutshell.","zh":"简而言之。","d":3,"f":["表示无所谓"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"it-is-what-it-is","en":"It is what it is.","zh":"事实就是这样，就这样吧。","d":3,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"its-not-fair","en":"It's not fair.","zh":"这不公平。","d":2,"f":["抱怨吐槽"],"s":["家庭","日常寒暄","冲突争吵"],"t":"confrontational"},{"id":"its-the-other-way-around","en":"It's the other way around.","zh":"正好反过来。","d":3,"f":["质疑不信"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"its-the-thought-that-counts","en":"It's the thought that counts.","zh":"心意最重要。","d":3,"f":["安慰鼓励","表达感谢"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"just-a-hunch","en":"Just a hunch.","zh":"只是直觉。","d":2,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"just-browsing","en":"Just browsing.","zh":"只是随便看看。","d":1,"f":["表示无所谓"],"s":["购物消费"],"t":"neutral"},{"id":"ladies-first","en":"Ladies first.","zh":"女士优先。","d":1,"f":["示好赞美"],"s":["日常寒暄","朋友聚会","职场办公"],"t":"formal"},{"id":"leave-no-stone-unturned","en":"Leave no stone unturned.","zh":"不遗余力，想尽一切办法。","d":5,"f":["承诺保证"],"s":["职场办公","日常寒暄"],"t":"formal"},{"id":"let-it-slide","en":"Let it slide.","zh":"算了，放它一马。","d":2,"f":["表示无所谓"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"let-me-sleep-on-it","en":"Let me sleep on it.","zh":"让我考虑一晚上。","d":3,"f":["请求"],"s":["职场办公","购物消费"],"t":"neutral"},{"id":"look-on-the-bright-side","en":"Look on the bright side.","zh":"往好处想。","d":3,"f":["安慰鼓励","劝告建议"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"low-key","en":"Low-key.","zh":"低调点，悄悄地。","d":3,"f":["劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"lucky-you","en":"Lucky you.","zh":"你真幸运。","d":1,"f":["示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"make-a-scene","en":"Make a scene.","zh":"大吵大闹，当众出丑。","d":2,"f":["抱怨吐槽"],"s":["酒吧餐厅","冲突争吵"],"t":"neutral"},{"id":"mind-your-own-business","en":"Mind your own business.","zh":"管好你自己的事，少管闲事。","d":2,"f":["拒绝","警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"mums-the-word","en":"Mum's the word.","zh":"守口如瓶，保密。","d":3,"f":["承诺保证"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"nice-try","en":"Nice try.","zh":"想得美（别白费力气了）。","d":1,"f":["反问讽刺"],"s":["日常寒暄","朋友聚会"],"t":"sarcastic"},{"id":"no-one-can-replace-you","en":"No one can replace you.","zh":"没人能取代你。","d":3,"f":["表达爱意","安慰鼓励"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"no-take-backs","en":"No take-backs.","zh":"不许反悔。","d":1,"f":["承诺保证"],"s":["朋友聚会","家庭"],"t":"neutral"},{"id":"out-of-sorts","en":"Out of sorts.","zh":"不太舒服，心情不好。","d":3,"f":["抱怨吐槽"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"play-dirty","en":"Play dirty.","zh":"耍阴招。","d":3,"f":["抱怨吐槽","警告威胁"],"s":["冲突争吵","职场办公"],"t":"confrontational"},{"id":"practice-makes-perfect","en":"Practice makes perfect.","zh":"熟能生巧。","d":3,"f":["安慰鼓励","劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"pull-over","en":"Pull over.","zh":"靠边停车。","d":1,"f":["请求","警告威胁"],"s":["交通出行"],"t":"urgent"},{"id":"put-yourself-in-my-shoes","en":"Put yourself in my shoes.","zh":"设身处地为我想想。","d":3,"f":["请求"],"s":["冲突争吵","日常寒暄"],"t":"neutral"},{"id":"says-who","en":"Says who?","zh":"谁说的？","d":1,"f":["质疑不信"],"s":["冲突争吵","朋友聚会"],"t":"confrontational"},{"id":"spoiler-alert","en":"Spoiler alert.","zh":"剧透预警。","d":3,"f":["警告威胁"],"s":["朋友聚会","日常寒暄"],"t":"neutral"},{"id":"stand-someone-up","en":"Stand someone up.","zh":"放某人鸽子。","d":3,"f":["抱怨吐槽"],"s":["约会亲密","朋友聚会"],"t":"neutral"},{"id":"stay-strong","en":"Stay strong.","zh":"坚强点。","d":1,"f":["安慰鼓励"],"s":["安慰疗伤","家庭"],"t":"friendly"},{"id":"that-makes-two-of-us","en":"That makes two of us.","zh":"我也一样（我也有同感）。","d":3,"f":["安慰鼓励"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"take-advantage-of-me","en":"Take advantage of me.","zh":"占我便宜，利用我。","d":2,"f":["抱怨吐槽"],"s":["职场办公","冲突争吵"],"t":"confrontational"},{"id":"it-takes-days","en":"It takes days.","zh":"需要好几天。","d":2,"f":["表示无所谓"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"take-my-word-for-it","en":"Take my word for it.","zh":"相信我的话，听我的准没错。","d":3,"f":["承诺保证","劝告建议"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"tell-me-about-it","en":"Tell me about it.","zh":"可不是嘛（我深有同感）。","d":3,"f":["抱怨吐槽"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"the-clock-is-ticking","en":"The clock is ticking.","zh":"时间不多了。","d":2,"f":["催促","警告威胁"],"s":["职场办公","紧急状况"],"t":"urgent"},{"id":"the-heart-wants-what-the-heart-wants","en":"The heart wants what the heart wants.","zh":"心之所向，情难自禁。","d":5,"f":["表示无所谓"],"s":["约会亲密","日常寒暄"],"t":"neutral"},{"id":"theres-gotta-be-a-way","en":"There's gotta be a way.","zh":"总会有办法的。","d":3,"f":["安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"neutral"},{"id":"things-will-work-out","en":"Things will work out.","zh":"事情会好起来的。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","家庭"],"t":"friendly"},{"id":"this-is-so-messed-up","en":"This is so messed up.","zh":"这太离谱了，一团糟。","d":3,"f":["抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"time-flies","en":"Time flies.","zh":"时光飞逝。","d":1,"f":["惊讶"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"trick-or-treat","en":"Trick or treat.","zh":"不给糖就捣蛋。","d":3,"f":["请求","警告威胁"],"s":["日常寒暄","家庭"],"t":"friendly"},{"id":"two-heads-are-better-than-one","en":"Two heads are better than one.","zh":"两人智慧胜一人（三个臭皮匠顶个诸葛亮）。","d":5,"f":["劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"well-get-through-this-together","en":"We'll get through this together.","zh":"我们会一起挺过去的。","d":3,"f":["安慰鼓励","承诺保证"],"s":["安慰疗伤","家庭"],"t":"affectionate"},{"id":"well-see-about-that","en":"We'll see about that.","zh":"那走着瞧吧。","d":2,"f":["质疑不信","警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"what-a-coincidence","en":"What a coincidence.","zh":"真巧啊。","d":2,"f":["惊讶"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"what-am-i-to-you","en":"What am I to you?","zh":"我对你来说算什么？","d":3,"f":["质疑不信"],"s":["约会亲密","冲突争吵"],"t":"confrontational"},{"id":"what-brings-you-here","en":"What brings you here?","zh":"什么风把你吹来了？","d":2,"f":["问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"what-do-you-do-for-a-living","en":"What do you do for a living?","zh":"你是做什么工作的？","d":3,"f":["问候寒暄"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"whatever-it-takes","en":"Whatever it takes.","zh":"不惜一切代价。","d":2,"f":["承诺保证"],"s":["职场办公","日常寒暄"],"t":"urgent"},{"id":"where-have-you-been","en":"Where have you been?","zh":"你去哪儿了？","d":2,"f":["问候寒暄"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"where-theres-smoke-theres-fire","en":"Where there's smoke, there's fire.","zh":"无风不起浪。","d":5,"f":["质疑不信"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"why-are-you-so-upset","en":"Why are you so upset?","zh":"你为什么这么生气？","d":3,"f":["问候寒暄","安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"neutral"},{"id":"wrap-it-up","en":"Wrap it up.","zh":"收尾吧，到此为止。","d":2,"f":["催促"],"s":["职场办公","日常寒暄"],"t":"urgent"},{"id":"you-are-just-in-time","en":"You are just in time.","zh":"你来得正好。","d":3,"f":["问候寒暄","表达感谢"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"you-are-out-of-line","en":"You are out of line.","zh":"你太过分了，你越界了。","d":3,"f":["警告威胁","抱怨吐槽"],"s":["冲突争吵","职场办公"],"t":"confrontational"},{"id":"you-attract-me","en":"You attract me.","zh":"你吸引了我。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"you-can-count-on-me","en":"You can count on me.","zh":"你可以信赖我。","d":3,"f":["承诺保证"],"s":["朋友聚会","职场办公"],"t":"friendly"},{"id":"you-gotta-be-kidding-me","en":"You gotta be kidding me.","zh":"你在逗我吧。","d":3,"f":["质疑不信","惊讶"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"you-have-my-word","en":"You have my word.","zh":"我向你保证。","d":2,"f":["承诺保证"],"s":["日常寒暄","职场办公"],"t":"formal"},{"id":"youll-get-used-to-it","en":"You'll get used to it.","zh":"你会习惯的。","d":3,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"youre-in-my-heart","en":"You're in my heart.","zh":"你在我心里。","d":2,"f":["表达爱意"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"no-pain-no-gain","en":"No pain, no gain.","zh":"一分耕耘一分收获。","d":3,"f":["劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"not-a-penny","en":"Not a penny.","zh":"一分钱（都没有／不给）。","d":2,"f":["拒绝","表示无所谓"],"s":["金钱往来"],"t":"neutral"},{"id":"anything-is-possible","en":"Anything is possible.","zh":"一切皆有可能。","d":2,"f":["安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"everything-will-be-alright","en":"Everything will be alright.","zh":"一切都会好起来的。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤"],"t":"friendly"},{"id":"all-the-best","en":"All the best.","zh":"一切顺利。","d":2,"f":["问候寒暄"],"s":["离别送行","日常寒暄"],"t":"friendly"},{"id":"love-at-first-sight","en":"Love at first sight.","zh":"一见钟情。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"its-a-deal","en":"It's a deal.","zh":"一言为定。","d":2,"f":["承诺保证"],"s":["朋友聚会","金钱往来"],"t":"neutral"},{"id":"have-a-safe-trip","en":"Have a safe trip.","zh":"一路顺风。","d":2,"f":["道别"],"s":["离别送行","交通出行"],"t":"friendly"},{"id":"may-everything-go-your-way","en":"May everything go your way.","zh":"万事胜意。","d":3,"f":["问候寒暄"],"s":["日常寒暄"],"t":"formal"},{"id":"its-snowing","en":"It's snowing.","zh":"下雪了。","d":1,"f":["问候寒暄"],"s":["日常寒暄"],"t":"neutral"},{"id":"i-dont-care","en":"I don't care.","zh":"不在乎。","d":2,"f":["表示无所谓"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"do-or-die","en":"Do or die.","zh":"不成功便成仁。","d":3,"f":["承诺保证"],"s":["职场办公"],"t":"urgent"},{"id":"dont-lose-hope","en":"Don't lose hope.","zh":"不要失去信心。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤"],"t":"friendly"},{"id":"dont-live-in-the-past","en":"Don't live in the past.","zh":"不要活在过去。","d":3,"f":["劝告建议","安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"neutral"},{"id":"dont-leave-me","en":"Don't leave me.","zh":"不要离开。","d":2,"f":["请求","表达爱意"],"s":["约会亲密","离别送行"],"t":"affectionate"},{"id":"why-are-you-unhappy","en":"Why are you unhappy?","zh":"为什么不高兴？","d":2,"f":["问候寒暄","安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"im-used-to-it","en":"I'm used to it.","zh":"习惯了。","d":2,"f":["表示无所谓"],"s":["日常寒暄"],"t":"neutral"},{"id":"people-change","en":"People change.","zh":"人会变的。","d":1,"f":["表示无所谓"],"s":["日常寒暄","约会亲密"],"t":"neutral"},{"id":"nobodys-perfect","en":"Nobody's perfect.","zh":"人无完人。","d":1,"f":["安慰鼓励"],"s":["日常寒暄"],"t":"neutral"},{"id":"life-is-short","en":"Life is short.","zh":"人生苦短。","d":2,"f":["劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"start-over","en":"Start over.","zh":"重新开始。","d":1,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","安慰疗伤"],"t":"neutral"},{"id":"this-too-shall-pass","en":"This too shall pass.","zh":"会过去的。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤"],"t":"friendly"},{"id":"keep-a-low-profile","en":"Keep a low profile.","zh":"低调。","d":2,"f":["劝告建议"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"stop-it","en":"Stop it.","zh":"住手吧。","d":1,"f":["警告威胁"],"s":["冲突争吵","家庭"],"t":"confrontational"},{"id":"you-must-be-happy","en":"You must be happy.","zh":"你一定要快乐。","d":2,"f":["安慰鼓励","表达爱意"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"you-silly-goose","en":"You silly goose.","zh":"你个憨憨，小傻瓜。","d":2,"f":["抱怨吐槽"],"s":["朋友聚会","约会亲密"],"t":"affectionate"},{"id":"what-do-you-mean","en":"What do you mean?","zh":"你什么意思？","d":2,"f":["质疑不信"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"you-are-nothing","en":"You are nothing.","zh":"你什么都不是。","d":2,"f":["警告威胁","抱怨吐槽"],"s":["冲突争吵"],"t":"confrontational"},{"id":"who-do-you-think-you-are","en":"Who do you think you are?","zh":"你以为你是谁？","d":3,"f":["质疑不信","警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"dont-even-think-about-it","en":"Don't even think about it.","zh":"你休想。","d":3,"f":["拒绝"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"you-broke-my-heart","en":"You broke my heart.","zh":"你伤了我的心。","d":2,"f":["抱怨吐槽"],"s":["约会亲密","冲突争吵"],"t":"neutral"},{"id":"you-deserve-better","en":"You deserve better.","zh":"你值得更好的。","d":2,"f":["安慰鼓励"],"s":["约会亲密","安慰疗伤"],"t":"friendly"},{"id":"you-must-be-kidding","en":"You must be kidding.","zh":"你是在开玩笑吧。","d":2,"f":["质疑不信"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"name-your-price","en":"Name your price.","zh":"你出个价吧。","d":2,"f":["请求"],"s":["购物消费","金钱往来"],"t":"neutral"},{"id":"you-can-do-it","en":"You can do it.","zh":"你可以的。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"you-can-trust-me","en":"You can trust me.","zh":"你可以相信我。","d":2,"f":["承诺保证"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"do-you-have-any-regrets","en":"Do you have any regrets?","zh":"你后悔过吗？","d":3,"f":["问候寒暄"],"s":["日常寒暄","约会亲密"],"t":"neutral"},{"id":"are-you-telling-me-what-to-do","en":"Are you telling me what to do?","zh":"你在教我做事？","d":3,"f":["质疑不信","抱怨吐槽"],"s":["冲突争吵","职场办公"],"t":"confrontational"},{"id":"you-are-so-beautiful","en":"You are so beautiful.","zh":"你太美了。","d":2,"f":["示好赞美","表达爱意"],"s":["约会亲密","朋友聚会"],"t":"affectionate"},{"id":"youve-gone-too-far","en":"You've gone too far.","zh":"你太过分了。","d":2,"f":["抱怨吐槽","警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"how-dare-you","en":"How dare you!","zh":"你好大的胆子！","d":2,"f":["警告威胁","惊讶"],"s":["冲突争吵"],"t":"confrontational"},{"id":"you-complete-me","en":"You complete me.","zh":"你完整了我的人生。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"whats-the-matter","en":"What's the matter?","zh":"你怎么了？","d":2,"f":["问候寒暄","安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"neutral"},{"id":"in-your-dreams","en":"In your dreams.","zh":"你想得美。","d":2,"f":["拒绝","反问讽刺"],"s":["日常寒暄","朋友聚会"],"t":"sarcastic"},{"id":"what-do-you-know","en":"What do you know?","zh":"你懂啥？","d":2,"f":["质疑不信","抱怨吐槽"],"s":["冲突争吵","朋友聚会"],"t":"confrontational"},{"id":"your-fly-is-open","en":"Your fly is open.","zh":"你拉链开了。","d":2,"f":["警告威胁"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"you-are-one-in-a-million","en":"You are one in a million.","zh":"你是万里挑一。","d":4,"f":["示好赞美"],"s":["约会亲密","日常寒暄"],"t":"affectionate"},{"id":"are-you-stupid","en":"Are you stupid?","zh":"你是不是傻？","d":2,"f":["抱怨吐槽","质疑不信"],"s":["冲突争吵","朋友聚会"],"t":"confrontational"},{"id":"you-are-the-one-i-care-about-most","en":"You are the one I care about most.","zh":"你是我最在乎的人。","d":3,"f":["表达爱意"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"you-are-my-hero","en":"You are my hero.","zh":"你是我的英雄。","d":2,"f":["示好赞美","表达爱意"],"s":["家庭","日常寒暄"],"t":"affectionate"},{"id":"you-are-the-best","en":"You are the best.","zh":"你是最棒的。","d":2,"f":["示好赞美","安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"youre-amazing","en":"You're amazing.","zh":"你真了不起。","d":1,"f":["示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"youre-a-genius","en":"You're a genius.","zh":"你真是个天才。","d":2,"f":["示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"youre-so-beautiful","en":"You're so beautiful.","zh":"你真美。","d":2,"f":["示好赞美","表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"youre-so-charming","en":"You're so charming.","zh":"你真迷人。","d":2,"f":["示好赞美","表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"you-promised-me","en":"You promised me.","zh":"你答应过我的。","d":2,"f":["抱怨吐槽","质疑不信"],"s":["冲突争吵","约会亲密"],"t":"confrontational"},{"id":"you-made-my-day","en":"You made my day.","zh":"你给了我美好的一天。","d":2,"f":["表达感谢","示好赞美"],"s":["日常寒暄","约会亲密"],"t":"friendly"},{"id":"your-translation-is-spot-on","en":"Your translation is spot on.","zh":"你翻译绝了。","d":3,"f":["示好赞美"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"you-make-me-want-to-be-a-better-person","en":"You make me want to be a better person.","zh":"你让我成为更好的人。","d":5,"f":["表达爱意","表达感谢"],"s":["约会亲密"],"t":"affectionate"},{"id":"you-fascinate-me","en":"You fascinate me.","zh":"你让我着迷。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"its-up-to-you","en":"It's up to you.","zh":"你说了算。","d":2,"f":["表示无所谓","许可"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"you-tell-me","en":"You tell me.","zh":"你说呢？","d":2,"f":["反问讽刺"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"do-you-still-remember-me","en":"Do you still remember me?","zh":"你还记得我吗？","d":3,"f":["问候寒暄"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"you-raise-me-up","en":"You raise me up.","zh":"你鼓舞了我。","d":2,"f":["表达感谢","示好赞美"],"s":["安慰疗伤","日常寒暄"],"t":"affectionate"},{"id":"believe-it-or-not","en":"Believe it or not.","zh":"信不信由你。","d":2,"f":["质疑不信","表示无所谓"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"just-be-yourself","en":"Just be yourself.","zh":"做你自己就好。","d":2,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","安慰疗伤"],"t":"friendly"},{"id":"go-all-out","en":"Go all out.","zh":"全力以赴。","d":2,"f":["安慰鼓励","劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"keep-it-up","en":"Keep it up.","zh":"再接再厉。","d":2,"f":["安慰鼓励","示好赞美"],"s":["职场办公","日常寒暄"],"t":"friendly"},{"id":"dont-cry","en":"Don't cry.","zh":"别哭了。","d":1,"f":["安慰鼓励"],"s":["安慰疗伤","家庭"],"t":"friendly"},{"id":"dont-make-a-fuss","en":"Don't make a fuss.","zh":"别大惊小怪。","d":2,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"dont-take-it-to-heart","en":"Don't take it to heart.","zh":"别太往心里去。","d":3,"f":["安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"dont-mention-it","en":"Don't mention it.","zh":"别客气。","d":2,"f":["示好赞美"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"dont-be-afraid","en":"Don't be afraid.","zh":"别害怕。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","紧急状况"],"t":"friendly"},{"id":"dont-judge-me","en":"Don't judge me.","zh":"别对我评头论足。","d":2,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"dont-take-it-personally","en":"Don't take it personally.","zh":"别往心里去。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","职场办公"],"t":"friendly"},{"id":"dont-push-your-luck","en":"Don't push your luck.","zh":"别得寸进尺。","d":3,"f":["警告威胁"],"s":["冲突争吵","朋友聚会"],"t":"confrontational"},{"id":"dont-mess-with-me","en":"Don't mess with me.","zh":"别惹我。","d":2,"f":["警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"dont-rub-it-in","en":"Don't rub it in.","zh":"别戳我痛处。","d":3,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","约会亲密"],"t":"confrontational"},{"id":"dont-take-it-out-on-me","en":"Don't take it out on me.","zh":"别拿我出气。","d":3,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","家庭"],"t":"confrontational"},{"id":"dont-worry-about-it","en":"Don't worry about it.","zh":"别放在心上。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"dont-patronize-me","en":"Don't patronize me.","zh":"别敷衍我。","d":3,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","约会亲密"],"t":"confrontational"},{"id":"dont-be-mad-at-me","en":"Don't be mad at me.","zh":"别生我的气。","d":3,"f":["道歉","请求"],"s":["约会亲密","家庭"],"t":"neutral"},{"id":"dont-look-at-me-like-that","en":"Don't look at me like that.","zh":"别用那种眼神看我。","d":3,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"what-on-earth-happened","en":"What on earth happened?","zh":"到底怎么了？","d":2,"f":["问候寒暄","质疑不信"],"s":["安慰疗伤","日常寒暄"],"t":"urgent"},{"id":"thats-it","en":"That's it.","zh":"到此为止。","d":1,"f":["警告威胁","拒绝"],"s":["冲突争吵","职场办公"],"t":"confrontational"},{"id":"wishing-you-a-bright-future","en":"Wishing you a bright future.","zh":"前程似锦。","d":3,"f":["问候寒暄"],"s":["离别送行","职场办公"],"t":"formal"},{"id":"come-on","en":"Come on!","zh":"加油！","d":1,"f":["安慰鼓励"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"seize-the-day","en":"Seize the day.","zh":"及时行乐。","d":4,"f":["劝告建议"],"s":["朋友聚会","日常寒暄"],"t":"neutral"},{"id":"just-get-started","en":"Just get started.","zh":"只要开始就好。","d":2,"f":["安慰鼓励","劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"take-a-hike","en":"Take a hike.","zh":"哪凉快哪待着去（滚开）。","d":3,"f":["拒绝","警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"come-back","en":"Come back.","zh":"回来吧。","d":1,"f":["请求","表达爱意"],"s":["约会亲密","离别送行"],"t":"affectionate"},{"id":"because-i-love-you","en":"Because I love you.","zh":"因为我爱你。","d":2,"f":["表达爱意"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"merry-christmas","en":"Merry Christmas.","zh":"圣诞快乐。","d":1,"f":["问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"try-a-little-harder","en":"Try a little harder.","zh":"再努力一点。","d":2,"f":["安慰鼓励","劝告建议"],"s":["职场办公","安慰疗伤"],"t":"friendly"},{"id":"hang-in-there","en":"Hang in there.","zh":"坚持住。","d":2,"f":["安慰鼓励"],"s":["安慰疗伤","紧急状况"],"t":"friendly"},{"id":"stop-dawdling","en":"Stop dawdling.","zh":"太磨叽了。","d":1,"f":["抱怨吐槽","催促"],"s":["日常寒暄","朋友聚会"],"t":"confrontational"},{"id":"thats-terrible","en":"That's terrible.","zh":"太糟糕了。","d":1,"f":["抱怨吐槽"],"s":["日常寒暄","安慰疗伤"],"t":"neutral"},{"id":"thats-ridiculous","en":"That's ridiculous.","zh":"太荒谬了。","d":1,"f":["抱怨吐槽","质疑不信"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"suit-yourself","en":"Suit yourself.","zh":"好自为之。","d":3,"f":["警告威胁","劝告建议"],"s":["冲突争吵","离别送行"],"t":"confrontational"},{"id":"fortune-is-coming-your-way","en":"Fortune is coming your way.","zh":"好运将至。","d":3,"f":["问候寒暄","安慰鼓励"],"s":["日常寒暄"],"t":"friendly"},{"id":"that-was-close","en":"That was close.","zh":"好险。","d":2,"f":["惊讶"],"s":["日常寒暄","紧急状况"],"t":"neutral"},{"id":"keep-it-under-wraps","en":"Keep it under wraps.","zh":"守口如瓶。","d":4,"f":["承诺保证"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"whats-in-it-for-me","en":"What's in it for me?","zh":"对我有什么好处？","d":3,"f":["质疑不信"],"s":["金钱往来","职场办公"],"t":"neutral"},{"id":"keep-your-voice-down","en":"Keep your voice down.","zh":"小声点。","d":2,"f":["警告威胁","请求"],"s":["家庭","职场办公"],"t":"urgent"},{"id":"cut-the-crap","en":"Cut the crap.","zh":"少跟我啰嗦。","d":3,"f":["拒绝","抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"i-hope-youre-happy","en":"I hope you're happy.","zh":"希望你过得快乐。","d":2,"f":["问候寒暄","安慰鼓励","表达爱意"],"s":["离别送行","日常寒暄","约会亲密"],"t":"friendly"},{"id":"do-me-a-favor","en":"Do me a favor.","zh":"帮个忙吧。","d":2,"f":["请求"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"christmas-eve","en":"Christmas Eve.","zh":"平安夜。","d":1,"f":["问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"without-further-ado","en":"Without further ado.","zh":"废话不多说。","d":4,"f":["转移话题","催促"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"dont-look-back","en":"Don't look back.","zh":"往事不回头。","d":2,"f":["劝告建议","安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"neutral"},{"id":"nice-to-meet-you","en":"Nice to meet you.","zh":"很高兴认识你。","d":2,"f":["问候寒暄"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"follow-your-heart","en":"Follow your heart.","zh":"心之所向。","d":3,"f":["劝告建议","安慰鼓励"],"s":["约会亲密","日常寒暄","安慰疗伤"],"t":"neutral"},{"id":"just-bear-with-it","en":"Just bear with it.","zh":"忍忍吧。","d":2,"f":["安慰鼓励","劝告建议"],"s":["职场办公","安慰疗伤"],"t":"neutral"},{"id":"no-way","en":"No way.","zh":"怎么可能。","d":1,"f":["质疑不信","惊讶","拒绝"],"s":["日常寒暄","朋友聚会","冲突争吵"],"t":"neutral"},{"id":"with-all-due-respect","en":"With all due respect.","zh":"恕我直言。","d":4,"f":["劝告建议","转移话题"],"s":["职场办公","冲突争吵"],"t":"formal"},{"id":"quite-the-opposite","en":"Quite the opposite.","zh":"恰恰相反。","d":2,"f":["质疑不信"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"fancy-meeting-you-here","en":"Fancy meeting you here.","zh":"想不到在这遇见你。","d":4,"f":["惊讶","问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"i-want-to-see-you","en":"I want to see you.","zh":"想见你。","d":3,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"take-your-time","en":"Take your time.","zh":"慢慢来。","d":2,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"i-cant-be-bothered-with-you","en":"I can't be bothered with you.","zh":"懒得理你。","d":3,"f":["表示无所谓","拒绝"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"the-breakdown-of-an-adult","en":"The breakdown of an adult.","zh":"成年人的崩溃。","d":3,"f":["抱怨吐槽"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"grow-up","en":"Grow up.","zh":"成熟点吧。","d":1,"f":["劝告建议","抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"i-dont-care-at-all","en":"I don't care at all.","zh":"我一点也不在乎。","d":3,"f":["表示无所谓"],"s":["冲突争吵","约会亲密"],"t":"neutral"},{"id":"i-dont-love-you-anymore","en":"I don't love you anymore.","zh":"我不再爱你。","d":3,"f":["拒绝","抱怨吐槽"],"s":["约会亲密","冲突争吵"],"t":"neutral"},{"id":"i-dont-know-how-to-put-this","en":"I don't know how to put this.","zh":"我不知道该怎么说才好。","d":3,"f":["表示无所谓"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"im-proud-of-you","en":"I'm proud of you.","zh":"我为你骄傲。","d":2,"f":["示好赞美","安慰鼓励"],"s":["家庭","职场办公"],"t":"friendly"},{"id":"lets-not-rush-into-this","en":"Let's not rush into this.","zh":"我们不要草率了。","d":3,"f":["劝告建议"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"were-even","en":"We're even.","zh":"我们扯平了。","d":1,"f":["表示无所谓"],"s":["朋友聚会","冲突争吵"],"t":"neutral"},{"id":"weve-known-each-other-for-a-long-time","en":"We've known each other for a long time.","zh":"我们认识很久了。","d":3,"f":["问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"i-still-love-you","en":"I still love you.","zh":"我依然爱你。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"yeah-right","en":"Yeah, right.","zh":"我信你个鬼。","d":3,"f":["质疑不信","反问讽刺"],"s":["日常寒暄","朋友聚会"],"t":"sarcastic"},{"id":"i-cant-make-that-call","en":"I can't make that call.","zh":"我做不了主。","d":3,"f":["拒绝"],"s":["职场办公","购物消费"],"t":"neutral"},{"id":"i-never-want-to-see-you-again","en":"I never want to see you again.","zh":"我再也不想见到你。","d":3,"f":["警告威胁","拒绝"],"s":["冲突争吵","约会亲密"],"t":"confrontational"},{"id":"i-cant-take-it-anymore","en":"I can't take it anymore.","zh":"我再也受不了了。","d":3,"f":["抱怨吐槽"],"s":["职场办公","冲突争吵"],"t":"neutral"},{"id":"i-have-no-choice","en":"I have no choice.","zh":"我别无选择。","d":2,"f":["表示无所谓"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"ive-had-enough","en":"I've had enough.","zh":"我受够了。","d":2,"f":["抱怨吐槽"],"s":["冲突争吵","职场办公"],"t":"confrontational"},{"id":"i-give-you-my-word","en":"I give you my word.","zh":"我向你保证。","d":3,"f":["承诺保证"],"s":["日常寒暄","约会亲密"],"t":"formal"},{"id":"im-sleepy","en":"I'm sleepy.","zh":"我困了。","d":1,"f":["道别"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"im-here","en":"I'm here.","zh":"我在呢。","d":1,"f":["安慰鼓励"],"s":["日常寒暄","约会亲密"],"t":"affectionate"},{"id":"i-wish-you-were-here","en":"I wish you were here.","zh":"我多希望你在身边。","d":3,"f":["表达爱意"],"s":["约会亲密","离别送行"],"t":"affectionate"},{"id":"life-is-so-hard","en":"Life is so hard.","zh":"我太难了。","d":2,"f":["抱怨吐槽"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"i-fell-in-love-with-you-at-first-sight","en":"I fell in love with you at first sight.","zh":"我对你一见钟情。","d":4,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"i-dont-like-him-anymore","en":"I don't like him anymore.","zh":"我已经不喜欢他了。","d":3,"f":["表示无所谓","抱怨吐槽"],"s":["约会亲密","朋友聚会"],"t":"neutral"},{"id":"i-dont-want-to-talk-to-you-anymore","en":"I don't want to talk to you anymore.","zh":"我已经不想理你了。","d":3,"f":["拒绝","表示无所谓"],"s":["冲突争吵","约会亲密"],"t":"confrontational"},{"id":"im-so-sorry","en":"I'm so sorry.","zh":"我很抱歉。","d":2,"f":["道歉"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"i-really-admire-you","en":"I really admire you.","zh":"我很欣赏你。","d":2,"f":["示好赞美"],"s":["职场办公","约会亲密"],"t":"friendly"},{"id":"im-stunned","en":"I'm stunned.","zh":"我惊呆了。","d":1,"f":["惊讶"],"s":["日常寒暄"],"t":"neutral"},{"id":"i-want-to-be-with-you","en":"I want to be with you.","zh":"我想和你在一起。","d":3,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"im-laying-my-cards-on-the-table","en":"I'm laying my cards on the table.","zh":"我摊牌了。","d":5,"f":["转移话题","承诺保证"],"s":["冲突争吵","职场办公"],"t":"neutral"},{"id":"im-with-you","en":"I'm with you.","zh":"我支持你。","d":2,"f":["安慰鼓励","承诺保证"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"theres-nothing-i-can-do","en":"There's nothing I can do.","zh":"我无能为力。","d":3,"f":["拒绝"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"ive-got-to-hand-it-to-you","en":"I've got to hand it to you.","zh":"我服了你。","d":4,"f":["示好赞美","反问讽刺"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"i-think-about-you-all-the-time","en":"I think about you all the time.","zh":"我每时每刻都在想你。","d":3,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"i-didnt-catch-that","en":"I didn't catch that.","zh":"我没听懂。","d":2,"f":["请求"],"s":["日常寒暄","电话沟通"],"t":"neutral"},{"id":"im-not-kidding-you","en":"I'm not kidding you.","zh":"我没和你开玩笑。","d":2,"f":["承诺保证"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"i-have-no-objection","en":"I have no objection.","zh":"我没意见。","d":2,"f":["表示无所谓","许可"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"i-love-you-with-all-my-heart","en":"I love you with all my heart.","zh":"我爱你毫无保留。","d":3,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"oh-my-god","en":"Oh my God.","zh":"我的天哪。","d":2,"f":["惊讶"],"s":["日常寒暄"],"t":"neutral"},{"id":"i-look-down-on-you","en":"I look down on you.","zh":"我看不起你。","d":3,"f":["抱怨吐槽","警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"i-really-like-you","en":"I really like you.","zh":"我真喜欢你。","d":2,"f":["表达爱意"],"s":["约会亲密"],"t":"affectionate"},{"id":"i-cant-sleep","en":"I can't sleep.","zh":"我睡不着。","d":2,"f":["抱怨吐槽"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"i-promise-you","en":"I promise you.","zh":"我答应你。","d":2,"f":["承诺保证"],"s":["日常寒暄","约会亲密"],"t":"neutral"},{"id":"im-tired","en":"I'm tired.","zh":"我累了。","d":1,"f":["抱怨吐槽","道别"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"i-got-in","en":"I got in.","zh":"我考上了。","d":2,"f":["惊讶"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"i-can-do-it","en":"I can do it.","zh":"我能行。","d":2,"f":["安慰鼓励","承诺保证"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"im-going-to-be-rich","en":"I'm going to be rich.","zh":"我要发大财。","d":3,"f":["承诺保证"],"s":["金钱往来","日常寒暄"],"t":"neutral"},{"id":"i-take-full-responsibility","en":"I take full responsibility.","zh":"我负全责。","d":3,"f":["道歉","承诺保证"],"s":["职场办公","冲突争吵"],"t":"formal"},{"id":"damn-it","en":"Damn it.","zh":"我靠（感叹）。","d":1,"f":["惊讶"],"s":["日常寒暄"],"t":"neutral"},{"id":"seize-the-moment","en":"Seize the moment.","zh":"把握现在。","d":3,"f":["劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"pinky-promise","en":"Pinky promise.","zh":"拉钩。","d":1,"f":["承诺保证"],"s":["朋友聚会","家庭"],"t":"friendly"},{"id":"cheer-up","en":"Cheer up.","zh":"振作起来。","d":1,"f":["安慰鼓励"],"s":["安慰疗伤","日常寒暄"],"t":"friendly"},{"id":"some-other-time","en":"Some other time.","zh":"改天吧。","d":2,"f":["拒绝"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"happy-new-year","en":"Happy New Year.","zh":"新年快乐。","d":2,"f":["问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"fearless","en":"Fearless.","zh":"无所畏惧。","d":1,"f":["安慰鼓励"],"s":["日常寒暄"],"t":"neutral"},{"id":"it-doesnt-matter","en":"It doesn't matter.","zh":"无所谓。","d":2,"f":["表示无所谓"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"out-with-the-old","en":"Out with the old.","zh":"旧的不去，新的不来。","d":4,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","安慰疗伤"],"t":"neutral"},{"id":"time-waits-for-no-one","en":"Time waits for no one.","zh":"时间不等人。","d":3,"f":["催促","劝告建议"],"s":["职场办公","日常寒暄"],"t":"urgent"},{"id":"time-will-tell","en":"Time will tell.","zh":"时间会证明一切。","d":3,"f":["安慰鼓励","承诺保证"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"how-have-you-been","en":"How have you been?","zh":"最近过得怎么样？","d":2,"f":["问候寒暄"],"s":["日常寒暄"],"t":"friendly"},{"id":"like-father-like-son","en":"Like father, like son.","zh":"有其父必有其子。","d":3,"f":["表示无所谓"],"s":["家庭","日常寒暄"],"t":"neutral"},{"id":"are-you-free","en":"Are you free?","zh":"有空吗？","d":2,"f":["请求","问候寒暄"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"just-spit-it-out","en":"Just spit it out.","zh":"有话直说。","d":2,"f":["请求","催促"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"interesting","en":"Interesting.","zh":"有趣的。","d":1,"f":["表示无所谓"],"s":["日常寒暄"],"t":"neutral"},{"id":"that-makes-sense","en":"That makes sense.","zh":"有道理。","d":2,"f":["表示无所谓"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"a-leopard-cant-change-its-spots","en":"A leopard can't change its spots.","zh":"本性难移。","d":5,"f":["抱怨吐槽","表示无所谓"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"the-odds-are-slim","en":"The odds are slim.","zh":"机会渺茫。","d":4,"f":["表示无所谓","抱怨吐槽"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"come-here-give-me-a-hug","en":"Come here, give me a hug.","zh":"来抱抱。","d":3,"f":["安慰鼓励","表达爱意"],"s":["约会亲密","家庭"],"t":"affectionate"},{"id":"awesome","en":"Awesome.","zh":"棒极了。","d":1,"f":["示好赞美","惊讶"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"never-say-never","en":"Never say never.","zh":"永不言弃。","d":2,"f":["安慰鼓励","承诺保证"],"s":["安慰疗伤","日常寒暄"],"t":"urgent"},{"id":"old-habits-die-hard","en":"Old habits die hard.","zh":"江山易改，本性难移。","d":5,"f":["抱怨吐槽"],"s":["日常寒暄","家庭"],"t":"neutral"},{"id":"nothing-is-impossible","en":"Nothing is impossible.","zh":"没有什么不可能。","d":2,"f":["安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"take-a-shower","en":"Take a shower.","zh":"洗澡。","d":2,"f":["道别"],"s":["家庭","日常寒暄"],"t":"neutral"},{"id":"live-in-the-moment","en":"Live in the moment.","zh":"活在当下。","d":3,"f":["劝告建议"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"calm-down","en":"Calm down.","zh":"淡定点。","d":1,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","冲突争吵"],"t":"friendly"},{"id":"scumbag","en":"Scumbag.","zh":"渣男。","d":1,"f":["抱怨吐槽"],"s":["约会亲密","冲突争吵"],"t":"confrontational"},{"id":"take-care-of-yourself","en":"Take care of yourself.","zh":"照顾好自己。","d":2,"f":["道别","安慰鼓励"],"s":["离别送行","家庭"],"t":"affectionate"},{"id":"everything-is-fine-so-far","en":"Everything is fine so far.","zh":"目前一切都好。","d":3,"f":["问候寒暄"],"s":["日常寒暄"],"t":"neutral"},{"id":"what-a-tiring-day","en":"What a tiring day.","zh":"真是疲惫的一天。","d":2,"f":["抱怨吐槽"],"s":["职场办公","家庭"],"t":"neutral"},{"id":"sleep-well","en":"Sleep well.","zh":"睡个好觉。","d":1,"f":["道别"],"s":["家庭","日常寒暄"],"t":"friendly"},{"id":"good-luck","en":"Good luck.","zh":"祝你好运。","d":1,"f":["问候寒暄","安慰鼓励"],"s":["日常寒暄","离别送行"],"t":"friendly"},{"id":"congratulations","en":"Congratulations.","zh":"祝贺你。","d":1,"f":["示好赞美","问候寒暄"],"s":["日常寒暄","朋友聚会"],"t":"friendly"},{"id":"smile","en":"Smile.","zh":"笑一个。","d":1,"f":["安慰鼓励","示好赞美"],"s":["日常寒暄"],"t":"friendly"},{"id":"forget-it","en":"Forget it.","zh":"算了吧。","d":1,"f":["表示无所谓","拒绝"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"get-lost","en":"Get lost.","zh":"给我滚。","d":1,"f":["警告威胁","拒绝"],"s":["冲突争吵"],"t":"confrontational"},{"id":"show-some-respect","en":"Show some respect.","zh":"给点面子。","d":3,"f":["请求","抱怨吐槽"],"s":["冲突争吵","朋友聚会"],"t":"neutral"},{"id":"happy-wife-happy-life","en":"Happy wife, happy life.","zh":"老婆开心，日子顺心。","d":4,"f":["表示无所谓","劝告建议"],"s":["家庭","朋友聚会"],"t":"neutral"},{"id":"nonsense","en":"Nonsense.","zh":"胡说。","d":1,"f":["质疑不信","抱怨吐槽"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"be-strong","en":"Be strong.","zh":"要坚强。","d":1,"f":["安慰鼓励"],"s":["安慰疗伤","家庭"],"t":"friendly"},{"id":"let-me-finish","en":"Let me finish.","zh":"让我说完。","d":2,"f":["请求"],"s":["冲突争吵","职场办公"],"t":"urgent"},{"id":"give-it-a-try","en":"Give it a try.","zh":"试试看。","d":2,"f":["劝告建议","安慰鼓励"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"keep-your-word","en":"Keep your word.","zh":"说到做到。","d":2,"f":["承诺保证"],"s":["日常寒暄","职场办公"],"t":"neutral"},{"id":"its-a-long-story","en":"It's a long story.","zh":"说来话长。","d":2,"f":["转移话题"],"s":["日常寒暄","朋友聚会"],"t":"neutral"},{"id":"watch-your-mouth","en":"Watch your mouth.","zh":"说话注意点。","d":2,"f":["警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"thank-you","en":"Thank you.","zh":"谢谢你。","d":1,"f":["表达感谢"],"s":["日常寒暄","职场办公"],"t":"friendly"},{"id":"thanks-but-no-thanks","en":"Thanks, but no thanks.","zh":"谢谢，算了。","d":3,"f":["拒绝","表达感谢"],"s":["日常寒暄","购物消费"],"t":"neutral"},{"id":"follow-your-own-path","en":"Follow your own path.","zh":"走自己的路。","d":2,"f":["安慰鼓励","劝告建议"],"s":["日常寒暄","安慰疗伤"],"t":"neutral"},{"id":"none-of-your-business","en":"None of your business.","zh":"跟你没关系。","d":2,"f":["拒绝","警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"kneel-down","en":"Kneel down.","zh":"跪下。","d":1,"f":["警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"its-not-worth-it","en":"It's not worth it.","zh":"这不值得。","d":2,"f":["劝告建议","安慰鼓励"],"s":["日常寒暄","冲突争吵"],"t":"neutral"},{"id":"its-my-honor","en":"It's my honor.","zh":"这是我的荣幸。","d":2,"f":["示好赞美"],"s":["职场办公","日常寒暄"],"t":"formal"},{"id":"money-cant-buy-everything","en":"Money can't buy everything.","zh":"金钱不是万能的。","d":3,"f":["劝告建议"],"s":["金钱往来","日常寒暄"],"t":"neutral"},{"id":"dont-jinx-it","en":"Don't jinx it.","zh":"闭上你的乌鸦嘴。","d":4,"f":["警告威胁","拒绝"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"shut-your-mouth","en":"Shut your mouth.","zh":"闭上你的嘴。","d":2,"f":["警告威胁"],"s":["冲突争吵"],"t":"confrontational"},{"id":"shut-up","en":"Shut up.","zh":"闭上嘴。","d":1,"f":["警告威胁"],"s":["冲突争吵","日常寒暄"],"t":"confrontational"},{"id":"just-looking-around","en":"Just looking around.","zh":"随便看看。","d":2,"f":["表示无所谓"],"s":["购物消费"],"t":"neutral"},{"id":"it-takes-a-few-days","en":"It takes a few days.","zh":"需要几天时间。","d":3,"f":["表示无所谓"],"s":["职场办公","日常寒暄"],"t":"neutral"},{"id":"face-reality","en":"Face reality.","zh":"面对现实。","d":1,"f":["劝告建议","安慰鼓励"],"s":["日常寒暄","安慰疗伤"],"t":"neutral"}];
+
+/* ===== 内联 src/lib/storage/idb.ts 同结构逻辑（export 关键字已去，逻辑一字不动） ===== */
+var DB_NAME = 'bannianjihua';
+var DB_VERSION = 1;
+var RECORDS_STORE = 'records';
+var dbPromise = null;
+
+function openDatabase() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise(function (resolve) {
+    try {
+      if (typeof indexedDB === 'undefined' || indexedDB === null) { resolve(null); return; }
+      var request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = function () {
+        var db = request.result;
+        if (!db.objectStoreNames.contains(RECORDS_STORE)) {
+          db.createObjectStore(RECORDS_STORE, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = function () { resolve(request.result); };
+      request.onerror = function () { resolve(null); };
+      request.onblocked = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  });
+  return dbPromise;
+}
+function writeTx(store, run) {
+  return openDatabase().then(function (db) {
+    if (!db) return false;
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(store, 'readwrite');
+        run(tx.objectStore(store));
+        tx.oncomplete = function () { resolve(true); };
+        tx.onerror = function () { resolve(false); };
+        tx.onabort = function () { resolve(false); };
+      } catch (e) { resolve(false); }
+    });
+  });
+}
+function idbPut(value) { return writeTx(RECORDS_STORE, function (s) { s.put(value); }); }
+function idbGetAll() {
+  return openDatabase().then(function (db) {
+    if (!db) return [];
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(RECORDS_STORE, 'readonly');
+        var request = tx.objectStore(RECORDS_STORE).getAll();
+        request.onsuccess = function () {
+          resolve(Array.isArray(request.result) ? request.result : []);
+        };
+        request.onerror = function () { resolve([]); };
+        tx.onabort = function () { resolve([]); };
+      } catch (e) { resolve([]); }
+    });
+  });
+}
+function idbDel(key) { return writeTx(RECORDS_STORE, function (s) { s.delete(key); }); }
+
+function uuid() {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  } catch (e) {}
+  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+function nowIso() { return new Date().toISOString(); }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function fmtTime(iso) {
+  try { return new Date(iso).toLocaleString('zh-CN', { hour12: false }); } catch (e) { return iso; }
+}
+
+/* ===== 应用状态 ===== */
+var current = null;
+var records = [];
+var idbOk = true;
+
+function $(id) { return document.getElementById(id); }
+
+function buildPrompt(p) {
+  var funcs = (p.f || []).join('、');
+  var scenes = (p.s || []).join('、');
+  var toneMap = {
+    friendly: '友好随意', neutral: '中性平和', formal: '正式礼貌',
+    urgent: '急切催促', confrontational: '对峙冲突', affectionate: '亲昵温柔', sarcastic: '讽刺反问'
+  };
+  return [
+    '你是我的英语口语陪练教练。请用简单英文陪我练习，全程不要直接给答案、不要替我把句子说完整。',
+    '我要表达的中文意思是：「' + p.zh + '」',
+    '使用场景：' + (scenes || '日常对话') + '；交际功能：' + (funcs || '通用表达') +
+      '；语气要求：' + (toneMap[p.t] || p.t || '自然') + '；难度等级：' + p.d + '（1 最简单，5 最难）。',
+    '请你先根据这个场景，用英文向我追问 1~2 个问题（比如我在对谁说、想达到什么效果、上文发生了什么），',
+    '引导我自己组织出合适的英文句子。我回答后，请继续追问我的时态、选词或语气是否恰当。'
+  ].join('\n');
+}
+
+function pickPhrase() {
+  var diff = parseInt($('diffSel').value, 10);
+  var pool = diff ? PHRASES.filter(function (p) { return p.d === diff; }) : PHRASES;
+  if (pool.length === 0) pool = PHRASES;
+  var next;
+  do { next = pool[Math.floor(Math.random() * pool.length)]; }
+  while (pool.length > 1 && current && next.id === current.id);
+  return next;
+}
+
+function renderTags(p) {
+  var toneMap = {
+    friendly: '友好', neutral: '中性', formal: '正式',
+    urgent: '急切', confrontational: '对峙', affectionate: '亲昵', sarcastic: '讽刺'
+  };
+  var tags = ['难度 ' + p.d];
+  (p.s || []).forEach(function (x) { tags.push(x); });
+  (p.f || []).forEach(function (x) { tags.push(x); });
+  if (p.t) tags.push('语气·' + (toneMap[p.t] || p.t));
+  $('tagsLine').innerHTML = tags.map(function (t) {
+    return '<span class="tag">' + escapeHtml(t) + '</span>';
+  }).join('');
+}
+
+function newRound() {
+  current = pickPhrase();
+  $('zhText').textContent = current.zh;
+  $('enText').textContent = current.en;
+  renderTags(current);
+  $('promptText').textContent = buildPrompt(current);
+  $('refBox').classList.remove('on');
+  $('refToggle').style.display = '';
+  $('step2Card').style.display = '';
+  $('step3Card').style.display = '';
+  $('followUp').value = '';
+  $('answer').value = '';
+  $('saveMsg').textContent = '';
+  $('saveMsg').className = 'msg';
+}
+
+function copyPrompt() {
+  if (!current) return;
+  var text = $('promptText').textContent;
+  $('copyMsg').textContent = '';
+  function ok() { $('copyMsg').textContent = '已复制，去外部 AI 粘贴即可'; }
+  function fail() { $('copyMsg').textContent = '复制失败，请手动长按/拖拽选择上方文本'; }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () { legacyCopy(text, ok, fail); });
+    } else {
+      legacyCopy(text, ok, fail);
+    }
+  } catch (e) { legacyCopy(text, ok, fail); }
+}
+function legacyCopy(text, ok, fail) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var done = document.execCommand('copy');
+    document.body.removeChild(ta);
+    done ? ok() : fail();
+  } catch (e) { fail(); }
+}
+
+function renderHistory() {
+  $('roundCount').textContent = String(records.length);
+  if (records.length === 0) { $('logCard').style.display = 'none'; return; }
+  $('logCard').style.display = '';
+  var sorted = records.slice().sort(function (a, b) {
+    return (b.createdAt || '').localeCompare(a.createdAt || '');
+  });
+  $('logList').innerHTML = sorted.map(function (r) {
+    var p = (r.payload && r.payload.phrase) || {};
+    return '<div class="log-item">' +
+      '<button class="del" data-id="' + escapeHtml(r.id) + '">删除</button>' +
+      '<div class="meta">' + escapeHtml(fmtTime(r.createdAt)) + ' · 题源 ' + escapeHtml(p.id || '?') + '</div>' +
+      '<div class="qa"><b>中文题面：</b>' + escapeHtml(p.zh || '') + '</div>' +
+      '<div class="qa"><b>AI 追问：</b>' + escapeHtml((r.payload && r.payload.followUp) || '') + '</div>' +
+      '<div class="qa ans"><b>我的作答：</b>' + escapeHtml((r.payload && r.payload.answer) || '') + '</div>' +
+      '<div class="refline">参考英文：' + escapeHtml(p.en || '') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function loadRecords() {
+  return idbGetAll().then(function (all) {
+    records = all.filter(function (r) {
+      return r && r.toolId === 'ai-sparring' && r.kind === 'ai-sparring';
+    });
+    renderHistory();
+  });
+}
+
+function saveRound() {
+  var msg = $('saveMsg');
+  msg.className = 'msg'; msg.textContent = '';
+  if (!current) { msg.className = 'msg err'; msg.textContent = '请先抽一道题。'; return; }
+  var followUp = $('followUp').value.trim();
+  var answer = $('answer').value.trim();
+  if (!followUp) { msg.className = 'msg err'; msg.textContent = '请先把外部 AI 的追问粘进来。'; return; }
+  if (!answer) { msg.className = 'msg err'; msg.textContent = '请写下你的英文作答再保存。'; return; }
+  var record = {
+    id: uuid(),
+    toolId: 'ai-sparring',
+    kind: 'ai-sparring',
+    refId: current.id,
+    payload: {
+      phrase: {
+        id: current.id, en: current.en, zh: current.zh,
+        difficulty: current.d, scene: current.s, func: current.f, tone: current.t
+      },
+      followUp: followUp,
+      answer: answer
+    },
+    createdAt: nowIso()
+  };
+  idbPut(record).then(function (success) {
+    if (!success) {
+      msg.className = 'msg err';
+      msg.textContent = '保存失败：浏览器本地存储不可用（隐私模式或被禁用），本轮未留记录。';
+      return;
+    }
+    msg.className = 'msg ok';
+    msg.textContent = '本轮已保存到浏览器本地，可在主站「我的数据」页导出。';
+    $('followUp').value = '';
+    $('answer').value = '';
+    loadRecords();
+  });
+}
+
+function onLogClick(e) {
+  var btn = e.target.closest ? e.target.closest('.del') : null;
+  if (!btn || !btn.getAttribute('data-id')) return;
+  var id = btn.getAttribute('data-id');
+  idbDel(id).then(function () { loadRecords(); });
+}
+
+function init() {
+  $('bankCount').textContent = String(PHRASES.length);
+  $('nextBtn').addEventListener('click', newRound);
+  $('refToggle').addEventListener('click', function () {
+    $('refBox').classList.add('on');
+    this.style.display = 'none';
+  });
+  $('copyBtn').addEventListener('click', copyPrompt);
+  $('saveBtn').addEventListener('click', saveRound);
+  $('logList').addEventListener('click', onLogClick);
+  openDatabase().then(function (db) {
+    if (!db) { idbOk = false; $('idbBanner').classList.add('on'); }
+    return loadRecords();
+  });
+}
+init();
+</script>
+</body>
+</html>
