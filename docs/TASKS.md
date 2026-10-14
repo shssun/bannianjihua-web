@@ -1,0 +1,208 @@
+# 任务卡（TASKS.md）
+
+> **唯一写者：team-lead（我方）。执行方只读，一个字都不要改。**
+>
+> **三条铁律**
+> 1. **只追加，不修改。** 任何人不得删除、改写、重排已有行。
+> 2. **不写别人的文件。** 我方只碰本文件 + `docs/OWNER-LOG.md`；执行方只碰 `docs/EXEC-LOG.md`。
+> 3. **任务 id 单调递增、永不复用。** 改需求 = 追加一张**新卡**，旧卡在 `OWNER-LOG.md` 写一条 `supersede`；**绝不原地改旧卡**。
+>
+> **状态不存储，只推导**：取两条日志中该 id **时间戳最新**的一条事件（见 `docs/AI-HANDOFF.md` §7）。
+>
+> 通道切换：`2026-10-14T14:21:00Z` 起生效。此前 18 项已验证任务的定义与验收记录见
+> `docs/archive/BACKLOG.md`（不删，可追溯）。
+
+---
+
+## T-001 · 补 GitHub Actions 定时探活（防 Supabase 免费版被暂停）
+
+priority: P1
+area: .github/workflows/, docs/DATABASE.md
+depends: —
+size: S
+spec: 本站唯一强后端是 Supabase（留言板），但 Supabase 免费版「连续 1 周无流量即自动暂停」，暂停后留言板会静默不可用。需在 `.github/workflows/` 下**新建**一个定时 workflow（如 `keepalive.yml`）：用 `on.schedule` 的 cron 每 1~3 天跑一次，对 Supabase 发起一次轻量**只读**请求保持项目活跃（例如 `GET <SUPABASE_URL>/rest/v1/` 或 Auth health 端点）。URL 与 anon key **必须**从仓库 Secrets 读取（如 `SUPABASE_URL` / `SUPABASE_ANON_KEY`），不得把密钥写进仓库。另把 `docs/DATABASE.md` §6 里「本期只写进本文件，不实现」更新为「已实现」并写明 Secrets 名称。站点是纯静态、无服务器端进程，本项只是 CI 定时任务，不改变该约束。⚠️ 验收只覆盖「配置正确」；workflow **真实生效**要等首次定时运行，我方会在 1~3 天后复查 Actions 运行记录，届时才算最终确认。
+acceptance:
+- 先实测当前状态：`curl -sS -o /dev/null -w "%{http_code}" "$SUPABASE_URL/rest/v1/"` —— **只要收到 HTTP 响应（401/404 也算）= 项目活着**；若连接失败或落到暂停提示页，则必须把 `status` 标为 `blocked` 并写明「需人工到 Supabase 控制台恢复」，**不得标 done**
+- `test -f .github/workflows/keepalive.yml` 且 `grep -q "schedule:" .github/workflows/keepalive.yml`
+- cron 周期 < 7 天：`grep -o "cron: .*" .github/workflows/keepalive.yml` 输出确认（如 `cron: '0 3 */2 * *'`）
+- 仓库内无明文密钥：`grep -rInE "supabase\\.co|eyJ" .github/workflows/keepalive.yml` 无输出
+- `grep -q "已实现" docs/DATABASE.md`
+
+## T-013 · 复核音频/素材侧遗留（标签偏差 / 帧 OCR / 隔离片段 / whisper 幻觉 / 错别字文件名）
+
+priority: P3
+area: docs/
+depends: T-023
+size: L
+spec: ⚠️ **暂缓领取：本项依赖仓库外源料，我方正在 `T-023` 里做镜像；`T-023` 变 `verified` 后本条即可正常领。** 音频/素材侧（moear 工具链，工作目录 `D:/workspaces/每日英语台词/`，**不进仓库**）据前期同事反馈存在 5 类系统性遗留，但本清单作者**未能一手复核**具体数量与位置，故本项先「核实 + 登记」，**先不做修复**：① 标签表系统性偏差（`_taxonomy/tags.json`、`_taxonomy/build_tags.py`），据称约 3 处；② 高危单元需靠帧 OCR 定谳（`_audit/_frames_a_manifest.json`、`_audit/frame_audit_b_meta.json`、`_audit/asr_doubt.json`），据称约 72 条；③ 隔离片段待决定去留（`_orphan_voices/`，含 `_moved.json`），据称约 8 条；④ whisper 转写疑似幻觉（`_logs/1_transcribe.log`、`_audit/asr_doubt.*`），据称约 26 条；⑤ 错别字文件名（散在 `D:/workspaces/每日英语台词/*.mp4`），据称约 25 个。产出 `docs/AUDIO-LEGACY-AUDIT.md`：**用命令实测**每个类别的真实数量与代表文件、标注来源，凡信息不足处写「待确认」，**不得直接沿用上述未复核数字**；并给出每类的处置建议（去 / 留 / 改）。源目录在仓库外，本项只产出文档，不修改素材。
+acceptance:
+- `test -f docs/AUDIO-LEGACY-AUDIT.md`
+- 文档含 ≥5 个类别小节且每节给出「数量 + 定位命令 + 代表文件」：`test $(grep -c "^## " docs/AUDIO-LEGACY-AUDIT.md) -ge 5`
+- 引用可复现：`ls "D:/workspaces/每日英语台词/_audit/" "D:/workspaces/每日英语台词/_taxonomy/" "D:/workspaces/每日英语台词/_orphan_voices/"` 能列出文档中引用的文件
+
+## T-014 · 补足 movie-line-shadowing 素材（当前仅 11 条 demo）
+
+priority: P3
+area: public/tools/english/movie-line-shadowing/, D:/workspaces/每日英语/
+depends: T-023
+size: M
+spec: ⚠️ **暂缓领取：本项要在仓库外源目录里生产素材，我方正在 `T-023` 里做镜像与源侧准备；`T-023` 变 `verified` 后本条即可正常领。** `movie-line-shadowing` 工具目前内容只有 **11 条 demo**：`public/tools/english/movie-line-shadowing/tool/data.json` 的 `items` 数组实测长度 = 11（而源目录 `D:/workspaces/每日英语/` 的成品素材多于 11 条）。需在**源工作目录**按既有管线补足条目（转写 + 中文 + TTS 配音等），再经 `npm run sync:tools` 增量同步进站（同步判据是「大小 + 内容 sha1」双判据，不会误判）。本项属素材生产，不写新代码；若某条素材缺中文/配音，需先在源侧补齐再同步。目标条数由老板给定（若未给定，以「源目录已就绪的成品条数」为准，并在 evidence 报告实际数字）。
+acceptance:
+- 条数确已超过 demo：`node -e "const d=require('./public/tools/english/movie-line-shadowing/tool/data.json'); if(d.items.length<=11){console.error('仍为 demo 条数'); process.exit(1)}"`
+- `npm run sync:tools` 退出码 0（源目标 sha1 一致）
+- `npm run check:tools` 退出码 0
+
+## T-015 · 统一 movie-line-shadowing 的站内 URL 层级（sync 增加 stripPrefix）
+
+priority: P3
+area: scripts/sync-tools.mjs, scripts/sync/movie-line-shadowing.json, src/data/tools/english/movie-line-shadowing.ts, public/tools/english/movie-line-shadowing/
+depends: T-023
+size: M
+spec: ⚠️ **暂缓领取：本项必须与**源侧**改动（源 HTML 里 `mediaUrl()` 的 `'../'` → `'./'`）**同时生效**，否则线上视频全 404。源侧改动由我方在 `T-023` 里备好并控制时序；`T-023` 变 `verified` 后本条即可正常领（届时仓库内侧与源侧会一次性落地）。** 其它工具入口都是 `public/tools/<频道>/<id>/index.html`，唯独 `movie-line-shadowing` 因源目录多一层 `tool/` 而变成 `public/tools/english/movie-line-shadowing/tool/index.html`（入口 `entry: 'tools/english/movie-line-shadowing/tool/index.html'`），URL 比别的工具深一层。给通用同步器 `scripts/sync-tools.mjs` 增加清单字段 `stripPrefix`（如 `"stripPrefix": "tool/"`），把匹配到的源相对路径去掉该前缀后再映射到目标；在 `scripts/sync/movie-line-shadowing.json` 里启用它，使产物落到 `.../movie-line-shadowing/index.html`。⚠️ **关键坑**：该工具 HTML 内部用 `mediaUrl(file){ return '../' + encodeURIComponent(file) }`（`tool/index.html` 约第 288 行）引用**上一层**的 `.mp4`；产物上移一层后会指向错误位置，必须**同时**把**源**目录里该工具 HTML 的 `'../'` 改成 `'./'`（改源再同步），否则视频全 404。改完更新 `Tool.entry`。`stripPrefix` 需与既有 `rename`（精确映射）/ `required`（按**源**路径判定）共存，且不影响其它清单。
+acceptance:
+- 新字段已实现并在清单启用：`grep -q "stripPrefix" scripts/sync-tools.mjs` 且 `grep -q "stripPrefix" scripts/sync/movie-line-shadowing.json`
+- 产物已上移：`test -f public/tools/english/movie-line-shadowing/index.html` 且 `test ! -d public/tools/english/movie-line-shadowing/tool`
+- 入口已更新：`grep -q "tools/english/movie-line-shadowing/index.html" src/data/tools/english/movie-line-shadowing.ts`
+- 同步与校验均通过：`npm run sync:tools` 与 `npm run check:tools` 退出码均 0
+
+## T-023 · 把「每日英语」源料按需镜像进 `_src-tmp/` 并备好源侧改动（**我方自行执行，执行方请跳过**）
+
+priority: P1
+area: scripts/src-tmp-sync.mjs, _src-tmp/, D:/workspaces/每日英语/, D:/workspaces/每日英语台词/, docs/
+depends: —
+size: M
+spec: `T-013` / `T-014` / `T-015` 三项**全部卡在同一个根因**上：它们都要读写**仓库外**的「每日英语」源料（`D:/workspaces/每日英语台词/` 约 375MB，含 394 个 `.mp4` + `audio/` + `audio_norm/`；`D:/workspaces/每日英语/` 约 26MB，含 11 个 `.mp4` + `tool/` + `docs/` + `_qa/` + `_tts_logs/`），而执行方**只有本仓库的可见性** → 领了也只能空跑一轮。本项由**我方**执行，把源料「变得可见」并把源侧改动准备好。(1) **扩展 `scripts/src-tmp-sync.mjs` 支持多个具名源根**（当前只支持单一源根 `C:/Users/ZhuanZ1/Documents/WS/英文学习/`），新增「每日英语」与「每日英语台词」两个具名源。(2) 按需镜像**文本类**文件：`每日英语台词/{_audit,_logs,_taxonomy,_orphan_voices,_zh,_run_all.sh,_run_tts.sh,_preview.html}` 与 `每日英语/{tool/*.py,tool/*.json,tool/index.html,tool/serve.py,docs/,_qa/,_tts_logs/}`；**一律排除** `.mp4` / `audio*/` / 图片帧等二进制大件（镜像是「让人读得懂生成链路」，不是搬素材）。(3) 刷新基准清单并跑**三方比对**（真源 / 基准 / 镜像磁盘）确认一致；`_manifest.json` 需能区分多个源根。(4) 在 `docs/AI-HANDOFF.md` §6.1 登记新的镜像范围与两个源根的真源路径。(5) **备好 `T-015` 所需的源侧改动**：`D:/workspaces/每日英语/tool/index.html` 里 `mediaUrl()` 用的 `'../'` 要改成 `'./'` —— 该改动**必须与 T-015 的仓库内侧改动同时生效**，否则线上视频全 404；本项只负责「改好并验证」，**具体落地时序由我方把关**。(6) 本项完成后解除 `T-013` / `T-014` / `T-015` 的 `depends` 门禁（`T-014` 的**素材生产**能否交给执行方，届时再评估：它需要 ffmpeg/whisper/TTS 能力，且 `_src-tmp/` 只读，很可能仍由我方做）。
+acceptance:
+- 两个具名源已镜像：`test -d "_src-tmp/每日英语"` 且 `test -d "_src-tmp/每日英语台词"`
+- 镜像内**零大件二进制**：`! find "_src-tmp/每日英语" "_src-tmp/每日英语台词" -type f \( -name '*.mp4' -o -name '*.mp3' -o -name '*.wav' -o -name '*.png' -o -name '*.jpg' \) | grep -q .`
+- 镜像总体积受控：`du -sm _src-tmp | awk '{exit !($1 < 40)}'`
+- 三方比对通过：`npm run src-tmp:check` 退出码 0（且刻意改一次镜像能报出「镜像被直接改动」= 判据有效）
+- 新源根已登记：`grep -q "每日英语" docs/AI-HANDOFF.md`
+- 门禁已解除：`T-013` / `T-014` / `T-015` 的 `depends` 不再指向 `T-023`（`grep -c "depends: T-023" docs/BACKLOG.md` 输出 0）
+
+## T-024 · 新建「函数参数实验室」工具（math 频道第一个落地工具）
+
+priority: P1
+area: public/tools/math/function-param-lab/, src/data/tools/math/, src/data/collections.ts
+depends: —
+size: L
+spec: 站点 `math` 频道（见 `src/data/channels.ts`）**至今没有任何已落地工具** —— 只有一个 `planned` 占位 `set-theory-cards`，且 `public/tools/math/` 目录**尚不存在**。本项是该频道第一个工具，请一次做到位。
+
+**老板需求原话**：「高中数学…很多容易误解的点，希望能有个全面的」「画个图也可…如果能调参数是最好不过了。比如 AX 方加上 BX 加上 C，然后 ABC 的值取正负 0，分别看到它这个图像发生什么变化，位置什么的」「先快速的」。
+
+**交付（只新建 2 个文件 + 追加 1 处，不改任何既有文件）**：
+
+1. **产物** `public/tools/math/function-param-lab/index.html` —— **自包含单文件**：内联 `<style>`/`<script>`，**零外部引用**（无 `<script src>` / `<link rel=stylesheet>` / 远程字体 / 图片）。风格参考站内既有单文件工具 `public/tools/english/dict-reader/index.html`（`<html lang="zh-CN" data-theme="dark">` + CSS 变量 + 系统字体栈）。
+2. **注册表** `src/data/tools/math/function-param-lab.ts` —— 纯字面量（构建设用 `Function()` 求值解析，**不得**出现函数/模板字符串/变量引用）。必填 `id: 'function-param-lab'`（**必须单引号字面量**，且 == 文件名 == 产物目录名）、`channel: 'math'`、`name: '函数参数实验室'`、`description`、`tags: ['数学','函数','图象','参数']`、`status: 'online'`、`runtime: 'client-only'`、`entry: 'tools/math/function-param-lab/index.html'`（**显式完整路径，不得拼**）、`cover`、`version: '1.0.0'`、`createdAt: '2026-10-14'`、`order`（**同频道 `set-theory-cards` 已占一个 order，请查重**）、`collections: ['high-school-math']`、`icap: ['active']`。
+3. **集合** 在 `src/data/collections.ts` 的 `COLLECTIONS` 数组里**追加一个对象**（⚠️ 该文件用正则 `\bid\s*:\s*'([^']+)'` 解析 id，**所有 id 必须写单引号字面量**；追加在数组末尾即可）：
+
+```ts
+{
+  id: 'high-school-math',
+  name: '高中数学',
+  cover: '📐',
+  description: '易错易误解点 · 数形结合：拖动参数，看图象怎么变',
+  order: 3,          // 现有占用：books 1 / movie-lines 2 / dragon-english-basic100 10 / dragon-english-grammar100 11
+  path: [
+    { label:'看图辨形', note:'拖动参数，看常见函数图象怎么变、位置怎么移',
+      toolId:'function-param-lab' },
+    { label:'（待建）', note:'更多章节的易误解点',
+      todo:'等「高中数学易误解点全清单」调研后按可视化性排序补入' },
+  ],
+}
+```
+
+**工具功能要求**（第一版要快、要能用，**不要过度设计**）：
+
+- **画布**：手写 **Canvas 2D**（**禁止任何第三方绘图库**）。坐标轴 + 网格 + 刻度（步长取 1/2/5×10ⁿ 自适应）。坐标系固定视窗（**不做**拖拽平移 / 滚轮缩放）；参数变化导致曲线超界时，自动取一个能看全的视窗即可。
+- **场景切换**：6 个标签页，切换时重建滑块：
+
+| # | 场景 | 参数（滑块） | 必须体现的「易误解点」 |
+|---|---|---|---|
+| 1 | `y = ax² + bx + c` | **a** ∈ [−3,3] 步 .1；**b** ∈ [−5,5] 步 .5；**c** ∈ [−5,5] 步 .5 | **a=0 时二次项消失、图象退化为直线**（最经典的"忘记讨论 a=0"）；a 变号 → 开口翻转且**值域随之翻转**；b 变 → 对称轴 `x=−b/(2a)` 移动；c 变 → 上下平移（过 `(0,c)`） |
+| 2 | `y = kx + b` | **k** ∈ [−5,5] 步 .5；**b** ∈ [−5,5] 步 .5 | `k=0` → 退化为**常函数**（不是"斜率为 0 的一次函数"） |
+| 3 | `y = k/x` | **k** ∈ [−5,5] 步 .5 | k 正负 → 一三 / 二四象限；**x=0 处必须断开**，见下方"断点硬要求" |
+| 4 | `y = aˣ` | **a** ∈ (0,4] 步 .1 | 0<a<1 减 / a>1 增；**值域恒 (0,+∞)，不随 a 变**（反直觉点） |
+| 5 | `y = log_a x` | **a** ∈ (0,4] 步 .1，**a=1 必须给提示** | 定义域恒 (0,+∞)；**底数不能为 1** |
+| 6 | `y = x + a/x` | **a** ∈ [−10,10] 步 .1 | 拐点 (√a, 2√a)；`a<0` 变「飘带函数」单调无最值；`a=0` 退化成直线 `y=x` |
+
+- **滑块交互**：拖动 → **实时重绘**（用 `requestAnimationFrame` 合并高频 input，不要每个 input 事件都重画）。每个滑块旁配一个**「归零」小按钮**（一键把该参数设为 0）—— 老板特别提到要"取 0"做对比。
+- **参数必须能取到 0 与负值**：不得把 0 从滑块范围里排除；取到 0 时**图象照常画**，用提示文案说明退化。
+- **定义域 / 值域读数**：每个场景**用解析式精确给出**（例如二次函数 `a>0 → [k,+∞)`，`k = c − b²/(4a)` 为顶点纵坐标；`a=0 → ℝ`），**不要靠采样猜**。用两行文本显示。
+- **一句结论**：随参数状态**动态切换**的文案（例如 `a=0` 时显示「a=0 使二次项消失，图象退化为直线 y = bx + c」；`a>0` 时显示「开口向上，值域 [k, +∞)」）。
+- **暗色主题**，与站内其他工具观感一致。
+
+**技术硬约束**：
+
+- **零第三方库**：不用 Desmos / GeoGebra / plotly / echarts / chart.js / d3 / function-plot 等任何绘图库，也不引任何 CDN 资源（理由：站点是纯静态、要求零外部请求；且 Desmos 需 API key + 必请求境外域、GeoGebra 整套仅非商业免费）。
+- **禁止 `eval` / `new Function`**（理由：① 将来加 CSP `script-src 'self'` 会被直接拦；② 同源上下文里能读本机 `localStorage` 与同源资源）。6 个场景的求值**直接写死成各自的 JS 函数**即可，**不需要**通用表达式解析器。
+- ⚠️ **断点硬要求**：`y = k/x` 在 `x=0` 处**绝对不得画出一条穿屏的竖线**（这是本项目最典型的一类视觉错误）。做法：遇 `NaN`/`±Infinity`/非有限值就记断点，折线里 `moveTo` 断开路径；相邻两点 y 均有限但**符号相反且 |Δy| > 1.5 × 画布高度** → 同样判为跨渐近线，断开。
+- **采样**：按画布像素列采样（每列一个 x），不要固定点数；对 `k/x` 这类陡峭段可用"相邻点中点递归细分"改善。
+- **高 DPI**：canvas 的 `width/height` 乘 `devicePixelRatio`，用 `ctx.setTransform(dpr,0,0,dpr,0,0)`，线宽取 `1/dpr` 的整数倍，否则线条发虚。
+
+**规划全文**：`docs/PLAN-math.md`（可读；但**以本卡的 spec / acceptance 为准**）。
+
+acceptance:
+- `test -f public/tools/math/function-param-lab/index.html`
+- `test -f src/data/tools/math/function-param-lab.ts` 且 `grep -n "id: 'function-param-lab'" src/data/tools/math/function-param-lab.ts` 命中
+- 集合已登记：`grep -q "id: 'high-school-math'" src/data/collections.ts`
+- **零外部引用**：`grep -nE "<(script|link)[^>]*(src|href)=" public/tools/math/function-param-lab/index.html` **无输出**
+- **零外部域名**：`grep -nE "https?://" public/tools/math/function-param-lab/index.html` 的输出**只允许**出现在注释或说明文案里（须人工确认无任何资源引用）
+- **不用动态求值**：`! grep -qE "\b(eval|new Function)\s*\(" public/tools/math/function-param-lab/index.html`
+- `node scripts/check-tools.mjs` 退出码 0（工具总数 19、`math` 频道 2 个）
+- `npx tsc -b` 退出码 0
+- **不跑 `npm run build`**；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
+- 真跑（人工项，**我方会用无头浏览器独立复验**）：打开工具后，① 把场景 1 的 `a` 拖到 **0**，图象**确实变成直线**且有退化提示文案；② 拖到负值，开口翻转、值域随之翻转；③ 切到 `y=k/x`，图象在 x=0 处**断开、无穿屏竖线**；④ 控制台零报错。
+
+## T-025 · 参数实验室第二期：补齐 6 个跨章场景，升级为「高中数学参数实验室」
+
+priority: P1
+area: public/tools/math/function-param-lab/index.html, src/data/tools/math/function-param-lab.ts, src/data/collections.ts
+depends: T-024
+size: L
+spec: ⚠️ **本项依赖 `T-024`，`T-024` 变 `verified` 之前请勿领取** —— 场景注册结构由 `T-024` 定型，提前做必然返工。
+
+**目标**：`T-024` 交付的是 6 个「函数」场景。本项把它扩成覆盖**高中全章**的参数实验室 —— 老板原话：「高中数学有很多容易误解的点，所以我希望能有个全面的」。
+
+**精确规格全文**：`docs/MATH-SCENARIOS.md`**第一~第八节**（共 8 个场景，每节含「场景配置 / 分支表 / 解析式精确读数规则 / 临界点徽标文案 / 断言列表」）。**以该文件为准**，本卡只写边界与判据。
+
+**净新增 6 个场景**：
+
+| # | 场景 id | 出处 | 一拖就现形 |
+|---|---|---|---|
+| 1 | `power-function-x-alpha` | #18 幂函数 | 定义域随 α **跳变** |
+| 2 | `quadratic-fixed-axis-moving-interval` | #13 定轴动区间 | 顶点滑出区间，**最值换点** |
+| 3 | `geometric-sum-q-one` | #30 等比 Sₙ | 指数型 → 直线型**突变** |
+| 4 | `trig-phase-shift` | #24 三角平移 | 实际平移是 **φ/ω** 不是 φ |
+| 5 | `slope-undefined` | #54 斜率不存在 | 倾角→90°，直线变竖直、点斜式**失效** |
+| 6 | `ellipse-2a-2c` | #59 椭圆退化 | 椭圆 → 线段 → **消失** |
+
+**并入已有场景（不要新增重复场景）**：
+- `T-024` 的 `y = ax² + bx + c` 场景**增加**：`Δ = b²−4ac` 读数 + 与 x 轴交点个数（2 / 1 / 0）+ `Δ=0` 临界点徽标（见 `MATH-SCENARIOS.md` 第三节）。
+- `T-024` 的 `y = aˣ` 场景**升级**：加 `a→1` 时曲线塌平 / 单调翻转的临界提示；补「值域恒 `(0,+∞)`，**不随 a 变**」这句反直觉结论（见第四节）。
+
+**结构要求**：
+- 场景必须走**可扩展的注册结构**：一个 `SCENARIOS` 数组，每项自带 `{id, group, label, params[], eval, readout, conclude}`。若 `T-024` 未这样实现，**本期顺带重构**成该结构。
+- 12 个场景按章分**三组**标签：`函数与基本初等` / `数列与三角` / `解析几何`，组内再切场景 tab。
+- 注册表 `name` 由「函数参数实验室」改为「**数学参数实验室**」；⚠️ **`id` 与文件路径保持不变**（仍是 `function-param-lab`），避免全站链接与路径 churn。
+- 集合 `high-school-math` 的 `path` 补齐：把 `T-024` 留的「（待建）」缺口步换成**真实步骤**（引用本工具的 `toolId`），保持 `check-tools` 通过。
+
+**继承 `T-024` 的全部技术硬约束（一个字都不放宽）**：手写 Canvas 2D、**零第三方库**、**禁 `eval` / `new Function`**、断点处**绝不画穿屏竖线**、按画布像素列采样、高 DPI（`devicePixelRatio` + `setTransform`）。
+
+**新增场景的断点要求**：
+- `y = x^α`：α<0 时 `x=0` 处**必须断开**
+- 若场景涉及 `y = tan x`：`x = π/2 + kπ` 处**必须断开**
+- 椭圆退化（`2a ≤ 2c`）：**不得画出复数解**，只给退化提示与图形（线段 / 点 / 消失）
+
+**参数必须能取到临界值**（本项目核心设计原则）：滑块范围**不得排除**临界值（α=0、q=1、φ=0、α=90°、2a=2c……），临界处必须出徽标文案，且每个滑块配「归零」小按钮。
+
+acceptance:
+- `node scripts/check-tools.mjs` 退出码 0（工具总数仍 **19**、`math` 频道仍 **2** —— 本项**不新增工具**，只扩场景）
+- `npx tsc -b` 退出码 0
+- **零外部引用**：`grep -nE "<(script|link)[^>]*(src|href)=" public/tools/math/function-param-lab/index.html` **无输出**
+- **不用动态求值**：`! grep -qE "\b(eval|new Function)\s*\(" public/tools/math/function-param-lab/index.html`
+- **6 个新场景 id 全部出现在产物里**：对 `power-function-x-alpha`、`quadratic-fixed-axis-moving-interval`、`geometric-sum-q-one`、`trig-phase-shift`、`slope-undefined`、`ellipse-2a-2c` 逐条 `grep -q`，全部命中
+- 注册表 `name` 已更新：`grep -q "数学参数实验室" src/data/tools/math/function-param-lab.ts`
+- 集合 `path` 缺口已补齐：`node scripts/check-tools.mjs` 通过即为证（它会校验 `path[].toolId` 在注册表、属于本集合、且缺口步必须带 `todo`）
+- 不跑 `npm run build`；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
+- 真跑（人工项，**我方会用无头浏览器独立复验**）：① `y=x^α` 拖到 α=−1，`x=0` 处**断开、无穿屏竖线**；② 定轴动区间把顶点拖出区间，**最值换点**且读数随之变；③ 等比 Sₙ 把 q 拖到 **1**，图象从指数型**突变成直线**且有临界徽标；④ 三角平移拖 φ，读数显示的**实际平移量 = φ/ω**；⑤ 椭圆把 2a 拖到 `< 2c`，退化提示出现；⑥ 控制台零报错。

@@ -14,8 +14,9 @@
     "sync:tools": "node scripts/sync-tools.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
     "ship": "node scripts/ship.mjs",
-    "backlog": "node scripts/backlog.mjs",
-    "backlog:scan": "node scripts/backlog.mjs scan",
+    "comms": "node scripts/comms.mjs",
+    "comms:check": "node scripts/comms.mjs check",
+    "comms:status": "node scripts/comms.mjs status",
     "src-tmp:check": "node scripts/src-tmp-sync.mjs",
     "src-tmp:refresh": "node scripts/src-tmp-sync.mjs --refresh"
   },
