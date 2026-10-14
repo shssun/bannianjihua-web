@@ -27,8 +27,9 @@
   **没有任何版本保护**——误删/误改即不可逆丢失。
 - 它承载的是**内容母版**：`内容/**/*.md`（约 1.1MB，含《基本英文100》
   《必修英文法100》《台词语音卡》的原始 Markdown + 附录 + 仿真题）+
-  `工具/*.py`（15 个生成脚本，其中 `build_html.py` 20KB、
-  `build_pure_dict.py` 29KB、`md2json.py` 10KB）。
+  `工具/*.py`（**13 个**生成脚本（2026-10-14 实测；任务 spec 原文写 15 个，
+  以实测为准），其中 `build_html.py` ≈20.4KB、`build_pure_dict.py` ≈34.8KB
+  （实测 35,620 B；spec 原文写 29KB）、`md2json.py` 10KB）。
 - **重建 HTML 的唯一途径**：修改 `内容/**/*.md` 后重跑
   `python 工具/build_html.py`（纯句词典版为 `build_pure_dict.py`）——
   该链路一旦断（目录丢失或脚本损坏），站内工具将无法再生成更新。
