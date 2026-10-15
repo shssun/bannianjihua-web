@@ -17,7 +17,7 @@ const tool: Tool = {
   description:
     '单人也能玩的互动陪练：工具只出题、不内置 AI 也不联网——把题面指令复制给任意外部 AI（ChatGPT/豆包等），再把它的追问粘回来、写下你的英文作答，每轮（题面/追问/作答）存入浏览器本地，可在「我的数据」导出。',
   tags: ['英语', '互动', '口语', '零后端'],
-  status: 'online',
+  status: 'developing',
   runtime: 'client-only',
   entry: 'tools/english/ai-sparring/index.html',
   cover: '💬',

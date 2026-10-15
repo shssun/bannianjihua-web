@@ -109,8 +109,13 @@ export default function ToolViewPage(): JSX.Element {
             target="_blank"
             rel="noopener noreferrer"
           >
-            打开工具
+            {tool.status === 'online' ? '打开工具' : '打开预览版'}
           </Button>
+          {tool.status !== 'online' ? (
+            <Typography variant="body2" color="var(--muted)" sx={{ lineHeight: 1.7 }}>
+              🚧 该工具仍在研发中，当前提供的是「预览版」—— 功能可能不完整、随时会调整。
+            </Typography>
+          ) : null}
           <Typography variant="caption" color="var(--muted)" sx={{ wordBreak: 'break-all' }}>
             {toolUrl}
           </Typography>

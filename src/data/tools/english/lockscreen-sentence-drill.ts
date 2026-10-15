@@ -18,7 +18,7 @@ const tool: Tool = {
   description:
     '背句判定原型（v0.1 demo）：在页面内模拟锁屏做默写判定 —— 不修改系统锁屏、不记忆进度，仅用于验证「锁屏背句」玩法可行性；支持语音复述（需麦克风授权），拒绝授权时可手动输入。',
   tags: ['英语', '背句', '原型'],
-  status: 'online',
+  status: 'developing',
   runtime: 'client-only',
   entry: 'tools/english/lockscreen-sentence-drill/index.html',
   cover: '🔒',

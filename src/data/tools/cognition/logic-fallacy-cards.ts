@@ -13,7 +13,7 @@ const tool: Tool = {
   channel: 'cognition',
   description: '公众号长文渲染为深色信息图卡（PNG），用于收藏与速查。',
   tags: ['信息图', '卡片', '认知'],
-  status: 'online',
+  status: 'developing',
   runtime: 'light-backend',
   entry: 'tools/cognition/logic-fallacy-cards/index.html',
   cover: '🧩',

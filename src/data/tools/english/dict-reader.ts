@@ -10,7 +10,7 @@ const tool: Tool = {
   channel: 'english',
   description: '把英文句子清单做成可点词查音标/释义的自包含阅读器，悬停即查、无需联网。',
   tags: ['英语', '离线', '词典'],
-  status: 'online',
+  status: 'developing',
   runtime: 'client-only',
   entry: 'tools/english/dict-reader/index.html',
   cover: '🔤',

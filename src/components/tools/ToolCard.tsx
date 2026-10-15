@@ -19,8 +19,16 @@ interface ToolCardProps {
  * 可避免被浏览器弹窗拦截，且中键/右键「新标签打开」正常可用。
  */
 export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
-  const canOpen = tool.status === 'online';
   const toolUrl = getToolEntryUrl(tool);
+  /**
+   * 可打开性：
+   * - `online`：已上线，按钮「打开」；
+   * - `developing` 且**已有产物**：仍在研发中，但保留**预览入口**
+   *   （按钮「预览」），便于自己试用与验收；
+   * - 其余（planned / paused，或无产物的 developing）：按钮禁用，显示「敬请期待」。
+   */
+  const isPreview = tool.status === 'developing' && Boolean(toolUrl);
+  const canOpen = tool.status === 'online' || isPreview;
   const channel = getChannelById(tool.channel);
 
   // ICAP 徽章：取该工具声明的**最高**层级（order 最大者）展示。
@@ -120,7 +128,7 @@ export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
 
       {/* 打开按钮：新标签页直接打开工具（真实 <a> 链接，避免弹窗拦截） */}
       <Button
-        variant={canOpen ? 'contained' : 'outlined'}
+        variant={tool.status === 'online' ? 'contained' : 'outlined'}
         size="small"
         disabled={!canOpen}
         endIcon={canOpen ? <OpenInNewIcon fontSize="small" /> : undefined}
@@ -130,7 +138,7 @@ export default function ToolCard({ tool }: ToolCardProps): JSX.Element {
         rel={canOpen ? 'noopener noreferrer' : undefined}
         sx={{ alignSelf: 'flex-start' }}
       >
-        {canOpen ? '打开' : '敬请期待'}
+        {canOpen ? (isPreview ? '预览' : '打开') : '敬请期待'}
       </Button>
     </Box>
   );
