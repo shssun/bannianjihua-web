@@ -218,7 +218,8 @@ node scripts/comms.mjs status     # 看「done 但未 verified」= 待验收
 | `execFileSync('git', ...)` | **必须** `{ stdio: ['ignore','pipe','pipe'] }`。默认 stdio 在本机宿主沙箱下**稳定抛 `EBUSY`** |
 | `npm install` | 必须加 `--include=optional` |
 | 批量删除闸门 | 宿主 fs shim 拦截单次 **>50 文件**的删除。**这道闸门是对的，不要绕过** —— 改脚本设计（「清空重拷」→「增量同步」） |
-| Vite `emptyOutDir` | 同样会撞上面那道闸门 → 本地验证用**仓库外**的 outDir：`npx vite build --outDir ../_buildcheck`（仓库外默认 `emptyOutDir=false`） |
+| Vite `emptyOutDir` | 同样会撞上面那道闸门 → 本地验证的 outDir **一律放在仓库内** `node_modules/.bc-<唯一名>`（`node_modules` 已被 gitignore；**每次用全新名**，目录本不存在就不会触发清空删除），**验证后立即删除**。⚠️ **不要再用 `../_buildcheck` 这类仓库外路径** —— 它会把垃圾堆在工作空间上层（2026-10-15 一次性从 `D:\workspaces\` 清出 22 项 ≈1.6 GB） |
+| 回收站 | **本沙箱不可用**：`Add-Type`、`[Reflection.Assembly]::Load`、`New-Object -ComObject`（含 `Shell.Application`）三条路全被安全策略拦截 → 做不到「移入回收站」。清理只有两条路：`Move-Item` 到待删目录（由老板自行清空），或永久删除（**须二次确认**） |
 | `cpSync` 覆盖已存在文件 | 报 `ESRCH` → 拷单文件用 **`copyFileSync`** |
 | 本地 curl 访问 localhost | 必须加 **`--noproxy '*'`** |
 | `&` 起的后台进程 | 会随 Bash 调用一起被杀 → 用后台任务机制启动 |
@@ -227,7 +228,7 @@ node scripts/comms.mjs status     # 看「done 但未 verified」= 待验收
 | `gh` CLI | **未登录** → 查 CI 状态靠 `npm run check:deploy` 轮询线上 `version.json` |
 
 **规约（沙箱内）**：本地只做 `commit + push`；本地验证只用
-`node scripts/sync-tools.mjs` / `node scripts/check-tools.mjs` / `npx tsc -b` / `npx vite build --outDir <仓库外目录>`。
+`node scripts/sync-tools.mjs` / `node scripts/check-tools.mjs` / `npx tsc -b` / `npx vite build --outDir node_modules/.bc-<唯一名>`。
 CI 里 2600+ 文件跑得通。
 
 ### 9.4 部署真相
@@ -252,6 +253,35 @@ CI 里 2600+ 文件跑得通。
 **派生铁律**：断言「输出为 0 / 无命中」之前，**先造一个必然命中的样例**，确认**探针本身有效**。
 
 > 实例（本轮踩到）：`docs/BACKLOG.md` 是**全 CRLF**，而 JS 正则里 `.` 不匹配 `\r` → `^key: value$` 整行匹配失败、**静默走兜底分支**。更坑的是那条「必须解析到 `acceptance`」的护栏**靠巧合通过了**（`acceptance:\r` 的值为空，`\s?` 恰好吃掉 `\r`）→ 给了假安全感。修法：**读入即归一化行尾**。
+
+### 9.6 ⭐ 角色边界与回退条件
+
+> ⚠️ 这一条原本**只存在于老板与 team-lead 的对话里**，因此每次上下文压缩都有丢失风险。
+> 2026-10-15 老板复核流程时发现该风险，遂固化到本文档。**改了本节要追加 OWNER-LOG 事件。**
+
+**默认路径（不是可选项）**：
+
+| 角色 | 干什么 |
+|---|---|
+| **老板** | 下任务、拍板决策 |
+| **我方（team-lead）** | ① **上游**：调研、拆解、写任务卡与 `acceptance`　② **验收**：独立复核 `done`　③ **部署**：`push`（= 上线） |
+| **执行方（Trae）** | 按卡实现、自测、`git commit`（不 push）、写 `EXEC-LOG.md`；**定时轮询**（约 20 分钟）自动认领 `todo` |
+
+**回退条件（两个条件必须同时成立，缺一不可）**：仅当
+
+1. 执行方**进度落后**（队列空转 / 长时间没有新 `done`），**并且**
+2. 我方**手头没有上游工作**（没有待拆的任务、没有待写的卡、没有待验收项）
+
+我方才**可以**自行实施具体任务。一旦自行实施，必须：
+
+- 在卡面 title 或 `note` 里显式写明「**我方自行执行，执行方请跳过**」（范例：T-023、T-029、T-030）
+- 仍按 §9.2 独立自验，并在 `OWNER-LOG.md` 追加对应 `note` / `verify`
+
+**反过来的责任**：⚠️ **保持 `todo` 队列非空是我方的责任。**
+执行方只有在 `todo` 非空时才有活干；**队列空 = 它空转 = 我方上游断供**，
+这不是执行方的执行问题，**不要拿它当「执行方效率低」的证据**。
+（2026-10-15 实测：执行方最后一次写 `EXEC-LOG.md` 是 `04:57:30Z`，
+此后约 19 小时零动作，原因正是上游没喂卡。）
 
 ---
 
