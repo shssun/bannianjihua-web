@@ -59834,36 +59834,36 @@
         {
           "word": "No",
           "start": 6.34,
-          "end": 6.48,
+          "end": 6.465,
           "prob": 0.469
         },
         {
           "word": "hard",
-          "start": 6.48,
-          "end": 6.56,
+          "start": 6.465,
+          "end": 6.536,
           "prob": 0.978
         },
         {
           "word": "feelings,",
-          "start": 6.56,
-          "end": 6.56,
+          "start": 6.536,
+          "end": 6.554,
           "prob": 0.997
         },
         {
           "word": "huh?",
-          "start": 6.56,
-          "end": 6.56,
+          "start": 6.554,
+          "end": 6.572,
           "prob": 0.968
         },
         {
           "word": "Hard",
-          "start": 6.56,
-          "end": 6.56,
+          "start": 6.572,
+          "end": 6.59,
           "prob": 0.413
         },
         {
           "word": "feelings.",
-          "start": 6.56,
+          "start": 6.59,
           "end": 6.84,
           "prob": 0.996
         },
@@ -60085,58 +60085,50 @@
         },
         {
           "index": 5,
-          "text": "No hard feelings, huh?",
+          "text": "No hard feelings, huh? Hard feelings.",
           "start": 6.34,
-          "end": 6.56,
+          "end": 6.84,
           "words": [
             {
               "word": "No",
               "start": 6.34,
-              "end": 6.48,
+              "end": 6.465,
               "prob": 0.469
             },
             {
               "word": "hard",
-              "start": 6.48,
-              "end": 6.56,
+              "start": 6.465,
+              "end": 6.536,
               "prob": 0.978
             },
             {
               "word": "feelings,",
-              "start": 6.56,
-              "end": 6.56,
+              "start": 6.536,
+              "end": 6.554,
               "prob": 0.997
             },
             {
               "word": "huh?",
-              "start": 6.56,
-              "end": 6.56,
+              "start": 6.554,
+              "end": 6.572,
               "prob": 0.968
-            }
-          ]
-        },
-        {
-          "index": 6,
-          "text": "Hard feelings.",
-          "start": 6.56,
-          "end": 6.84,
-          "words": [
+            },
             {
               "word": "Hard",
-              "start": 6.56,
-              "end": 6.56,
+              "start": 6.572,
+              "end": 6.59,
               "prob": 0.413
             },
             {
               "word": "feelings.",
-              "start": 6.56,
+              "start": 6.59,
               "end": 6.84,
               "prob": 0.996
             }
           ]
         },
         {
-          "index": 7,
+          "index": 6,
           "text": "Hard feelings, bro.",
           "start": 7.18,
           "end": 8.36,
@@ -60162,7 +60154,7 @@
           ]
         },
         {
-          "index": 8,
+          "index": 7,
           "text": "No hard feelings, right?",
           "start": 8.58,
           "end": 9.48,
@@ -60194,7 +60186,7 @@
           ]
         },
         {
-          "index": 9,
+          "index": 8,
           "text": "No hard feelings, okay?",
           "start": 10.34,
           "end": 11.36,

@@ -102,6 +102,83 @@ const RENAME = new Map([
 
 const CHECK_ONLY = process.argv.includes('--check');
 
+/**
+ * T-030 A-1 听判合并（承接 T-029 低置信 #11，方案 A′ 与已验收的 10 处同法）。
+ *
+ * 听判依据（ffmpeg 16k 单声道 PCM + 20ms 窗 RMS，噪声底取全文件 p10=-26.1dB，
+ * 语音阈值 = 噪声底 + 7dB = -19.1dB）：
+ *   合并区间 [6.34,6.84] 内 voiced 68%（25 帧中 17 帧），最大静音间隙仅 60ms
+ *   （6.56-6.62，与该文件健康句内词间隙同级，如 s1 内 1.60-1.66 也是 60ms）；
+ *   实际语流为 [6.24,6.68] 的一次连续发音，前边界有 0.16s 低谷（6.08-6.24）、
+ *   后边界 6.84 起持续 0.5s+ 纯静音（7.42 后彻底无声）→ 一次连续发音 =「一句」。
+ *   阳性对照：标注间隙 [6.84,7.18] 实测 voiced 0%（探针能识别静音，非假阴性）。
+ * 故按卡面「确认为一句 → 施加合并」；真源 JSON 不可写，变换落在本脚本
+ * （真源只读，产物层修复，重跑恒从真源重算，天然幂等）。
+ */
+const T030_MERGE = [
+  { file: '别往心里去.mp4', merge: [5, 6] },
+];
+
+const round3 = (x) => Math.round(x * 1000) / 1000;
+
+/**
+ * 方案 A′：把相邻两句合并为一句 —— 在 [spanStart, spanEnd] 内按各词自身时长
+ * 等比缩放重分配（每词保底 20ms；权重全塌缩则退化为等分），重编号 index，
+ * 重建顶层 words / text / wordCount / duration。
+ */
+function applyT030Merge(items) {
+  for (const rule of T030_MERGE) {
+    const it = items.find((x) => x.file === rule.file);
+    if (!it || !Array.isArray(it.sentences)) continue;
+    const [a, b] = rule.merge;
+    const sa = it.sentences[a];
+    const sb = it.sentences[b];
+    if (!sa || !sb) continue;
+    const words = [...sa.words, ...sb.words];
+    const start = Math.min(...words.map((w) => w.start));
+    const end = Math.max(...words.map((w) => w.end));
+    const span = end - start;
+    const weights = words.map((w) => Math.max(w.end - w.start, 0.02));
+    const sum = weights.reduce((x, y) => x + y, 0);
+    let t = start;
+    const placed = words.map((w, i) => {
+      const nw = {
+        ...w,
+        start: round3(t),
+        end: round3(t + (span * weights[i]) / sum),
+      };
+      t += (span * weights[i]) / sum;
+      return nw;
+    });
+    // 舍入后强制单调（消除 1ms 级交叉），末词对齐 span 末端
+    for (let i = 1; i < placed.length; i++) {
+      placed[i].start = Math.max(placed[i].start, placed[i - 1].end);
+      placed[i].end = Math.max(placed[i].end, placed[i].start);
+    }
+    placed[placed.length - 1].end = end;
+    const merged = {
+      ...sa,
+      text: `${sa.text} ${sb.text}`,
+      start: round3(start),
+      end: round3(end),
+      words: placed,
+    };
+    const sentences = [...it.sentences.slice(0, a), merged, ...it.sentences.slice(b + 1)].map(
+      (s, i) => ({ ...s, index: i }),
+    );
+    const flat = sentences.flatMap((s) => s.words);
+    items[items.indexOf(it)] = {
+      ...it,
+      sentences,
+      words: flat,
+      wordCount: flat.length,
+      duration: round3(Math.max(...flat.map((w) => w.end))),
+      text: sentences.map((s) => s.text).join(' ').replace(/\s+/g, ' ').trim(),
+    };
+  }
+  return items;
+}
+
 /** 目标条数（386 - 18 = 368）。用于自检。 */
 const EXPECTED_COUNT = 368;
 
@@ -158,6 +235,7 @@ function build() {
       }
       return it;
     });
+  applyT030Merge(items);
   const dataOut = { ...data, items };
   const files = new Set(items.map((it) => it.file));
 
