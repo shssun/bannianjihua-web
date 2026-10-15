@@ -112,6 +112,8 @@ function build() {
       throw new Error(`真源缺失：${p}（请设置 MOVIE_LINE_SRC 指向真源目录）`);
     }
   }
+  /* 注：真源缺失的情形由 main() 在调用本函数前拦下（CI 里真源不在），
+     见 main() 的 sourceAvailable 分支 —— 那里会跳过生成、复用已提交产物。 */
 
   // ---- data.json：删重复 + 去后缀改名（file 与 filenameText 同步改） ----
   const data = readJson(dataSrc);
@@ -181,6 +183,36 @@ function writeIfChanged(path, text) {
 
 function main() {
   console.log(`${TAG} 真源：${SRC}`);
+
+  // ---- 真源不可用时：跳过生成，复用仓库中已提交的产物（不阻断构建） ----
+  // ⚠️ CI（GitHub Actions）里 `D:/workspaces/每日英语台词/` 并不存在，
+  //    若在此抛错会让 `prebuild` 失败、整个 build 挂掉（实测 32c9e83 与
+  //    7e99bb5 两次部署均因此 failure）。这与 `sync-tools.mjs` 对缺失源
+  //    的既有设计一致：媒体复用仓库产物，这里同理复用三个 JSON。
+  const dataSrc = `${SRC}/tool/data.json`;
+  const zhSrc = `${SRC}/tool/zh.json`;
+  const manifestSrc = `${SRC}/tool/voices/manifest.json`;
+  const sourceAvailable = [dataSrc, zhSrc, manifestSrc].every((p) => existsSync(p));
+  if (!sourceAvailable) {
+    console.warn(`${TAG}   真源不可用（${SRC} 下缺 data.json / zh.json / voices/manifest.json）`);
+    const allInRepo = [
+      join(DEST, 'tool', 'data.json'),
+      join(DEST, 'tool', 'zh.json'),
+      join(DEST, 'tool', 'voices', 'manifest.json'),
+    ].every((p) => existsSync(p));
+    if (allInRepo) {
+      console.warn(`${TAG}   复用仓库中已提交的 3 个 JSON，跳过生成。`);
+      if (CHECK_ONLY) {
+        console.error(`${TAG} --check：真源不可用，无法校验。`);
+        process.exit(1);
+      }
+      return;
+    }
+    console.error(`${TAG}   且仓库中也没有这 3 个 JSON —— 该工具将无法工作。`);
+    console.error(`${TAG}   请设置 MOVIE_LINE_SRC 指向真源目录，或先提交一次生成产物。`);
+    process.exit(1);
+  }
+
   const { data, zh, manifest, files } = build();
 
   // ---- 自检：条数 / 键集合一致性（任何一项不过 → 立刻失败，不产出残缺产物） ----
