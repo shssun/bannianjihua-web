@@ -119,6 +119,36 @@
 
 ---
 
+## 6.1 生产构建的 Secrets 与「未配置」降级行为（T-026）
+
+### 需要哪两个 Secrets
+
+生产 bundle 里的 Supabase 地址与 anon key **不是发布后配置的，而是构建期注入的**。
+`.github/workflows/deploy.yml` 的 Build 步骤从仓库 Secrets 读取两个值，注入为 `VITE_` 前缀的构建期环境变量（无 `VITE_` 前缀的变量不会进客户端 bundle）：
+
+| 仓库 Secret | 注入为 | 说明 |
+|---|---|---|
+| `SUPABASE_URL` | `VITE_SUPABASE_URL` | 项目地址，形如 `https://xxxx.supabase.co` |
+| `SUPABASE_ANON_KEY` | `VITE_SUPABASE_ANON_KEY` | anon（公开）key；受 RLS 约束，仅可访问 `messages` 等公开表 |
+
+- 配置入口：仓库 **Settings → Secrets and variables → Actions**。
+- 仓库内**禁止**出现明文密钥（`.env` 不入库，仅空模板 `.env.example`）。
+- 本地开发不受影响：本地 `.env`（不入库）里写 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` 即可。
+
+### 未配置时的行为（不再静默）
+
+这两个 Secrets **缺失时构建仍会成功**，但站点进入**可识别的降级模式**：
+
+1. `src/lib/supabase.ts` 检测到 env 缺失 → `isSupabaseConfigured === false`，**不创建客户端**，并输出 `console.warn`（`[supabase] 未配置 VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY…`）。
+2. 留言板页顶部显示「后端未配置：当前展示本地演示数据。」提示条，列表标题追加「（演示数据）」标注。
+3. 列表展示 `src/data/fallbackMessages.ts` 的内联演示数据；**提交按钮禁用**，写不进任何地方。
+4. 若已配置但请求失败，同样走演示数据兜底，UI 同样标注（`fallback` 标记）。
+
+> ⚠️ 判断线上是否真正接通：打开留言板看有无「未配置」提示条即可——
+> 提示条消失且提交返回成功 = 已接通真实数据库。
+
+---
+
 ## 7. 文件与 API 索引
 
 | 文件 | 职责 |

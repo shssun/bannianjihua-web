@@ -44,8 +44,15 @@ jobs:
 
       # 构建。base 无需传入：vite.config.ts 默认即为 '/bannianjihua-web/'。
       # 若日后换成自定义域名/根路径部署，可改为：BASE_PATH=/ npm run build
+      #
+      # Supabase 环境变量（T-026）：从仓库 Secrets 注入为构建期变量（VITE_ 前缀
+      # 才会进客户端 bundle）。仓库里禁止出现明文密钥，此处只做透传。
+      # 缺失时构建仍会成功，但留言板会进入「未配置」降级模式（见 docs/DATABASE.md §6.1）。
       - name: Build
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
