@@ -93,6 +93,11 @@ const RENAME = new Map([
   ['你出个价把.mp4', '你出个价吧.mp4'],
   ['你再开玩笑把.mp4', '你再开玩笑吧.mp4'],
   ['你是万一挑一.mp4', '你是万里挑一.mp4'],
+  // ---- T-029 补做（3 条，卡面已列但首轮漏改；ASR 正字明文给出）----
+  // 判据：ASR text 为 "I don't go Dutch on the first day." / "Do you remember me?" / "Try harder."
+  ['do Dutch.mp4', 'go Dutch.mp4'],
+  ['你还记得我妈.mp4', '你还记得我吗.mp4'],
+  ['在努力一点.mp4', '再努力一点.mp4'],
 ]);
 
 const CHECK_ONLY = process.argv.includes('--check');
