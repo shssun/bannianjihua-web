@@ -38149,9 +38149,9 @@
     {
       "file": "不在乎.mp4",
       "filenameText": "不在乎",
-      "text": "I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't... I don't care anymore.",
+      "text": "I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore. I don't care anymore.",
       "duration": 9.74,
-      "wordCount": 34,
+      "wordCount": 32,
       "words": [
         {
           "word": "I",
@@ -38306,32 +38306,20 @@
         {
           "word": "don't",
           "start": 7.74,
-          "end": 7.74,
+          "end": 7.96,
           "prob": 0.99
         },
         {
           "word": "care",
-          "start": 7.74,
-          "end": 7.74,
+          "start": 7.96,
+          "end": 8.18,
           "prob": 0.404
         },
         {
           "word": "anymore.",
-          "start": 7.74,
-          "end": 7.74,
-          "prob": 0.979
-        },
-        {
-          "word": "I",
-          "start": 7.74,
-          "end": 7.88,
-          "prob": 0.87
-        },
-        {
-          "word": "don't...",
-          "start": 7.88,
+          "start": 8.18,
           "end": 8.4,
-          "prob": 0.712
+          "prob": 0.979
         },
         {
           "word": "I",
@@ -38555,7 +38543,7 @@
           "index": 6,
           "text": "I don't care anymore.",
           "start": 7.52,
-          "end": 7.74,
+          "end": 8.4,
           "words": [
             {
               "word": "I",
@@ -38566,45 +38554,25 @@
             {
               "word": "don't",
               "start": 7.74,
-              "end": 7.74,
+              "end": 7.96,
               "prob": 0.99
             },
             {
               "word": "care",
-              "start": 7.74,
-              "end": 7.74,
+              "start": 7.96,
+              "end": 8.18,
               "prob": 0.404
             },
             {
               "word": "anymore.",
-              "start": 7.74,
-              "end": 7.74,
+              "start": 8.18,
+              "end": 8.4,
               "prob": 0.979
             }
           ]
         },
         {
           "index": 7,
-          "text": "I don't...",
-          "start": 7.74,
-          "end": 8.4,
-          "words": [
-            {
-              "word": "I",
-              "start": 7.74,
-              "end": 7.88,
-              "prob": 0.87
-            },
-            {
-              "word": "don't...",
-              "start": 7.88,
-              "end": 8.4,
-              "prob": 0.712
-            }
-          ]
-        },
-        {
-          "index": 8,
           "text": "I don't care anymore.",
           "start": 8.4,
           "end": 9.74,
@@ -44073,9 +44041,9 @@
     {
       "file": "你以为你是谁.mp4",
       "filenameText": "你以为你是谁",
-      "text": "Who do you think you are? Who do you think you are? Who do you think you are? Who do you think you are? Who do you think you are? Who do you think you are?",
+      "text": "Who do you think you are? Who do you think you are? Who do you think you are? Who do you think you are? Who do you think you are?",
       "duration": 6.68,
-      "wordCount": 36,
+      "wordCount": 30,
       "words": [
         {
           "word": "Who",
@@ -44224,72 +44192,36 @@
         {
           "word": "Who",
           "start": 5.7,
-          "end": 5.94,
-          "prob": 0.893
-        },
-        {
-          "word": "do",
-          "start": 5.94,
-          "end": 5.98,
-          "prob": 0.995
-        },
-        {
-          "word": "you",
-          "start": 5.98,
-          "end": 6.14,
-          "prob": 0.994
-        },
-        {
-          "word": "think",
-          "start": 6.14,
-          "end": 6.26,
-          "prob": 0.998
-        },
-        {
-          "word": "you",
-          "start": 6.26,
-          "end": 6.28,
-          "prob": 0.997
-        },
-        {
-          "word": "are?",
-          "start": 6.28,
-          "end": 6.28,
-          "prob": 0.999
-        },
-        {
-          "word": "Who",
-          "start": 6.28,
-          "end": 6.28,
+          "end": 5.863333,
           "prob": 0.707
         },
         {
           "word": "do",
-          "start": 6.28,
-          "end": 6.28,
+          "start": 5.863333,
+          "end": 6.026667,
           "prob": 0.993
         },
         {
           "word": "you",
-          "start": 6.28,
-          "end": 6.28,
+          "start": 6.026667,
+          "end": 6.19,
           "prob": 0.994
         },
         {
           "word": "think",
-          "start": 6.28,
-          "end": 6.28,
+          "start": 6.19,
+          "end": 6.353333,
           "prob": 0.997
         },
         {
           "word": "you",
-          "start": 6.28,
-          "end": 6.5,
+          "start": 6.353333,
+          "end": 6.516667,
           "prob": 0.997
         },
         {
           "word": "are?",
-          "start": 6.5,
+          "start": 6.516667,
           "end": 6.68,
           "prob": 0.999
         }
@@ -44475,85 +44407,41 @@
           "index": 4,
           "text": "Who do you think you are?",
           "start": 5.7,
-          "end": 6.28,
-          "words": [
-            {
-              "word": "Who",
-              "start": 5.7,
-              "end": 5.94,
-              "prob": 0.893
-            },
-            {
-              "word": "do",
-              "start": 5.94,
-              "end": 5.98,
-              "prob": 0.995
-            },
-            {
-              "word": "you",
-              "start": 5.98,
-              "end": 6.14,
-              "prob": 0.994
-            },
-            {
-              "word": "think",
-              "start": 6.14,
-              "end": 6.26,
-              "prob": 0.998
-            },
-            {
-              "word": "you",
-              "start": 6.26,
-              "end": 6.28,
-              "prob": 0.997
-            },
-            {
-              "word": "are?",
-              "start": 6.28,
-              "end": 6.28,
-              "prob": 0.999
-            }
-          ]
-        },
-        {
-          "index": 5,
-          "text": "Who do you think you are?",
-          "start": 6.28,
           "end": 6.68,
           "words": [
             {
               "word": "Who",
-              "start": 6.28,
-              "end": 6.28,
+              "start": 5.7,
+              "end": 5.863333,
               "prob": 0.707
             },
             {
               "word": "do",
-              "start": 6.28,
-              "end": 6.28,
+              "start": 5.863333,
+              "end": 6.026667,
               "prob": 0.993
             },
             {
               "word": "you",
-              "start": 6.28,
-              "end": 6.28,
+              "start": 6.026667,
+              "end": 6.19,
               "prob": 0.994
             },
             {
               "word": "think",
-              "start": 6.28,
-              "end": 6.28,
+              "start": 6.19,
+              "end": 6.353333,
               "prob": 0.997
             },
             {
               "word": "you",
-              "start": 6.28,
-              "end": 6.5,
+              "start": 6.353333,
+              "end": 6.516667,
               "prob": 0.997
             },
             {
               "word": "are?",
-              "start": 6.5,
+              "start": 6.516667,
               "end": 6.68,
               "prob": 0.999
             }
@@ -70186,9 +70074,9 @@
     {
       "file": "对我有什么好处.mp4",
       "filenameText": "对我有什么好处",
-      "text": "What's in it for me? What's in it for me? What's in it for me? What's in it for me? What's in it for me? What's in it for me? So what's in it for me? What's in it for me?",
+      "text": "What's in it for me? What's in it for me? What's in it for me? What's in it for me? What's in it for me? So what's in it for me? What's in it for me?",
       "duration": 8.04,
-      "wordCount": 41,
+      "wordCount": 36,
       "words": [
         {
           "word": "What's",
@@ -70341,68 +70229,38 @@
           "prob": 0.998
         },
         {
-          "word": "What's",
-          "start": 6.32,
-          "end": 6.56,
-          "prob": 0.607
-        },
-        {
-          "word": "in",
-          "start": 6.56,
-          "end": 6.56,
-          "prob": 0.993
-        },
-        {
-          "word": "it",
-          "start": 6.56,
-          "end": 6.56,
-          "prob": 0.996
-        },
-        {
-          "word": "for",
-          "start": 6.56,
-          "end": 6.56,
-          "prob": 0.996
-        },
-        {
-          "word": "me?",
-          "start": 6.56,
-          "end": 6.56,
-          "prob": 0.998
-        },
-        {
           "word": "So",
-          "start": 6.56,
-          "end": 6.56,
+          "start": 6.32,
+          "end": 6.453333,
           "prob": 0.19
         },
         {
           "word": "what's",
-          "start": 6.56,
-          "end": 6.74,
+          "start": 6.453333,
+          "end": 6.586667,
           "prob": 0.876
         },
         {
           "word": "in",
-          "start": 6.74,
-          "end": 6.82,
+          "start": 6.586667,
+          "end": 6.72,
           "prob": 0.99
         },
         {
           "word": "it",
-          "start": 6.82,
-          "end": 6.9,
+          "start": 6.72,
+          "end": 6.853333,
           "prob": 0.994
         },
         {
           "word": "for",
-          "start": 6.9,
-          "end": 7,
+          "start": 6.853333,
+          "end": 6.986667,
           "prob": 0.998
         },
         {
           "word": "me?",
-          "start": 7,
+          "start": 6.986667,
           "end": 7.12,
           "prob": 0.999
         },
@@ -70630,88 +70488,50 @@
         },
         {
           "index": 5,
-          "text": "What's in it for me?",
-          "start": 6.32,
-          "end": 6.56,
-          "words": [
-            {
-              "word": "What's",
-              "start": 6.32,
-              "end": 6.56,
-              "prob": 0.607
-            },
-            {
-              "word": "in",
-              "start": 6.56,
-              "end": 6.56,
-              "prob": 0.993
-            },
-            {
-              "word": "it",
-              "start": 6.56,
-              "end": 6.56,
-              "prob": 0.996
-            },
-            {
-              "word": "for",
-              "start": 6.56,
-              "end": 6.56,
-              "prob": 0.996
-            },
-            {
-              "word": "me?",
-              "start": 6.56,
-              "end": 6.56,
-              "prob": 0.998
-            }
-          ]
-        },
-        {
-          "index": 6,
           "text": "So what's in it for me?",
-          "start": 6.56,
+          "start": 6.32,
           "end": 7.12,
           "words": [
             {
               "word": "So",
-              "start": 6.56,
-              "end": 6.56,
+              "start": 6.32,
+              "end": 6.453333,
               "prob": 0.19
             },
             {
               "word": "what's",
-              "start": 6.56,
-              "end": 6.74,
+              "start": 6.453333,
+              "end": 6.586667,
               "prob": 0.876
             },
             {
               "word": "in",
-              "start": 6.74,
-              "end": 6.82,
+              "start": 6.586667,
+              "end": 6.72,
               "prob": 0.99
             },
             {
               "word": "it",
-              "start": 6.82,
-              "end": 6.9,
+              "start": 6.72,
+              "end": 6.853333,
               "prob": 0.994
             },
             {
               "word": "for",
-              "start": 6.9,
-              "end": 7,
+              "start": 6.853333,
+              "end": 6.986667,
               "prob": 0.998
             },
             {
               "word": "me?",
-              "start": 7,
+              "start": 6.986667,
               "end": 7.12,
               "prob": 0.999
             }
           ]
         },
         {
-          "index": 7,
+          "index": 6,
           "text": "What's in it for me?",
           "start": 7.28,
           "end": 8.04,
@@ -78732,9 +78552,9 @@
     {
       "file": "我们不要草率了.mp4",
       "filenameText": "我们不要草率了",
-      "text": "Let's not be hasty. Let's not be hasty. Let's not be hasty. Let's not be hasty. Let's not be hasty. Come on, let's not be too hasty.",
+      "text": "Let's not be hasty. Let's not be hasty. Let's not be hasty. Let's not be hasty. Come on, let's not be too hasty.",
       "duration": 9,
-      "wordCount": 27,
+      "wordCount": 23,
       "words": [
         {
           "word": "Let's",
@@ -78833,68 +78653,44 @@
           "prob": 0.97
         },
         {
-          "word": "Let's",
-          "start": 7.08,
-          "end": 7.46,
-          "prob": 0.691
-        },
-        {
-          "word": "not",
-          "start": 7.46,
-          "end": 7.46,
-          "prob": 0.965
-        },
-        {
-          "word": "be",
-          "start": 7.46,
-          "end": 7.46,
-          "prob": 0.992
-        },
-        {
-          "word": "hasty.",
-          "start": 7.46,
-          "end": 7.46,
-          "prob": 0.763
-        },
-        {
           "word": "Come",
-          "start": 7.46,
-          "end": 7.58,
+          "start": 7.08,
+          "end": 7.244571,
           "prob": 0.361
         },
         {
           "word": "on,",
-          "start": 7.58,
-          "end": 7.78,
+          "start": 7.244571,
+          "end": 7.518857,
           "prob": 0.993
         },
         {
           "word": "let's",
-          "start": 7.92,
-          "end": 8.16,
+          "start": 7.518857,
+          "end": 7.848,
           "prob": 0.98
         },
         {
           "word": "not",
-          "start": 8.16,
-          "end": 8.26,
+          "start": 7.848,
+          "end": 7.985143,
           "prob": 0.998
         },
         {
           "word": "be",
-          "start": 8.26,
-          "end": 8.38,
+          "start": 7.985143,
+          "end": 8.149714,
           "prob": 0.998
         },
         {
           "word": "too",
-          "start": 8.38,
-          "end": 8.58,
+          "start": 8.149714,
+          "end": 8.424,
           "prob": 0.929
         },
         {
           "word": "hasty.",
-          "start": 8.58,
+          "start": 8.424,
           "end": 9,
           "prob": 0.998
         }
@@ -79030,81 +78826,49 @@
         },
         {
           "index": 4,
-          "text": "Let's not be hasty.",
-          "start": 7.08,
-          "end": 7.46,
-          "words": [
-            {
-              "word": "Let's",
-              "start": 7.08,
-              "end": 7.46,
-              "prob": 0.691
-            },
-            {
-              "word": "not",
-              "start": 7.46,
-              "end": 7.46,
-              "prob": 0.965
-            },
-            {
-              "word": "be",
-              "start": 7.46,
-              "end": 7.46,
-              "prob": 0.992
-            },
-            {
-              "word": "hasty.",
-              "start": 7.46,
-              "end": 7.46,
-              "prob": 0.763
-            }
-          ]
-        },
-        {
-          "index": 5,
           "text": "Come on, let's not be too hasty.",
-          "start": 7.46,
+          "start": 7.08,
           "end": 9,
           "words": [
             {
               "word": "Come",
-              "start": 7.46,
-              "end": 7.58,
+              "start": 7.08,
+              "end": 7.244571,
               "prob": 0.361
             },
             {
               "word": "on,",
-              "start": 7.58,
-              "end": 7.78,
+              "start": 7.244571,
+              "end": 7.518857,
               "prob": 0.993
             },
             {
               "word": "let's",
-              "start": 7.92,
-              "end": 8.16,
+              "start": 7.518857,
+              "end": 7.848,
               "prob": 0.98
             },
             {
               "word": "not",
-              "start": 8.16,
-              "end": 8.26,
+              "start": 7.848,
+              "end": 7.985143,
               "prob": 0.998
             },
             {
               "word": "be",
-              "start": 8.26,
-              "end": 8.38,
+              "start": 7.985143,
+              "end": 8.149714,
               "prob": 0.998
             },
             {
               "word": "too",
-              "start": 8.38,
-              "end": 8.58,
+              "start": 8.149714,
+              "end": 8.424,
               "prob": 0.929
             },
             {
               "word": "hasty.",
-              "start": 8.58,
+              "start": 8.424,
               "end": 9,
               "prob": 0.998
             }
@@ -82012,9 +81776,9 @@
     {
       "file": "我再也受不了了.mp4",
       "filenameText": "我再也受不了了",
-      "text": "I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore.",
+      "text": "I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore. I can't take it anymore.",
       "duration": 11.12,
-      "wordCount": 45,
+      "wordCount": 40,
       "words": [
         {
           "word": "I",
@@ -82229,60 +81993,30 @@
         {
           "word": "I",
           "start": 9.96,
-          "end": 10.24,
-          "prob": 0.979
-        },
-        {
-          "word": "can't",
-          "start": 10.24,
-          "end": 10.54,
-          "prob": 0.971
-        },
-        {
-          "word": "take",
-          "start": 10.54,
-          "end": 10.64,
-          "prob": 0.996
-        },
-        {
-          "word": "it",
-          "start": 10.64,
-          "end": 10.8,
-          "prob": 0.974
-        },
-        {
-          "word": "anymore.",
-          "start": 10.8,
-          "end": 10.8,
-          "prob": 0.984
-        },
-        {
-          "word": "I",
-          "start": 10.8,
-          "end": 10.8,
+          "end": 10.192,
           "prob": 0.923
         },
         {
           "word": "can't",
-          "start": 10.8,
-          "end": 10.8,
+          "start": 10.192,
+          "end": 10.424,
           "prob": 0.972
         },
         {
           "word": "take",
-          "start": 10.8,
-          "end": 10.8,
+          "start": 10.424,
+          "end": 10.656,
           "prob": 0.996
         },
         {
           "word": "it",
-          "start": 10.8,
-          "end": 10.8,
+          "start": 10.656,
+          "end": 10.888,
           "prob": 0.987
         },
         {
           "word": "anymore.",
-          "start": 10.8,
+          "start": 10.888,
           "end": 11.12,
           "prob": 0.988
         }
@@ -82558,73 +82292,35 @@
           "index": 7,
           "text": "I can't take it anymore.",
           "start": 9.96,
-          "end": 10.8,
-          "words": [
-            {
-              "word": "I",
-              "start": 9.96,
-              "end": 10.24,
-              "prob": 0.979
-            },
-            {
-              "word": "can't",
-              "start": 10.24,
-              "end": 10.54,
-              "prob": 0.971
-            },
-            {
-              "word": "take",
-              "start": 10.54,
-              "end": 10.64,
-              "prob": 0.996
-            },
-            {
-              "word": "it",
-              "start": 10.64,
-              "end": 10.8,
-              "prob": 0.974
-            },
-            {
-              "word": "anymore.",
-              "start": 10.8,
-              "end": 10.8,
-              "prob": 0.984
-            }
-          ]
-        },
-        {
-          "index": 8,
-          "text": "I can't take it anymore.",
-          "start": 10.8,
           "end": 11.12,
           "words": [
             {
               "word": "I",
-              "start": 10.8,
-              "end": 10.8,
+              "start": 9.96,
+              "end": 10.192,
               "prob": 0.923
             },
             {
               "word": "can't",
-              "start": 10.8,
-              "end": 10.8,
+              "start": 10.192,
+              "end": 10.424,
               "prob": 0.972
             },
             {
               "word": "take",
-              "start": 10.8,
-              "end": 10.8,
+              "start": 10.424,
+              "end": 10.656,
               "prob": 0.996
             },
             {
               "word": "it",
-              "start": 10.8,
-              "end": 10.8,
+              "start": 10.656,
+              "end": 10.888,
               "prob": 0.987
             },
             {
               "word": "anymore.",
-              "start": 10.8,
+              "start": 10.888,
               "end": 11.12,
               "prob": 0.988
             }
@@ -83846,9 +83542,9 @@
     {
       "file": "我多希望你在身边.mp4",
       "filenameText": "我多希望你在身边",
-      "text": "I wish you were here. I wish you were here. I wish you were here. I wish you were here. I wish you were here. Well, I wish you were here, Sam.",
+      "text": "I wish you were here. I wish you were here. I wish you were here. I wish you were here. Well, I wish you were here, Sam.",
       "duration": 6.74,
-      "wordCount": 32,
+      "wordCount": 27,
       "words": [
         {
           "word": "I",
@@ -83971,74 +83667,44 @@
           "prob": 0.981
         },
         {
-          "word": "I",
-          "start": 5.6,
-          "end": 5.78,
-          "prob": 0.334
-        },
-        {
-          "word": "wish",
-          "start": 5.78,
-          "end": 5.78,
-          "prob": 0.967
-        },
-        {
-          "word": "you",
-          "start": 5.78,
-          "end": 5.78,
-          "prob": 0.988
-        },
-        {
-          "word": "were",
-          "start": 5.78,
-          "end": 5.78,
-          "prob": 0.991
-        },
-        {
-          "word": "here.",
-          "start": 5.78,
-          "end": 5.78,
-          "prob": 0.658
-        },
-        {
           "word": "Well,",
-          "start": 5.78,
-          "end": 5.84,
+          "start": 5.6,
+          "end": 5.687692,
           "prob": 0.551
         },
         {
           "word": "I",
-          "start": 5.94,
-          "end": 5.98,
+          "start": 5.687692,
+          "end": 5.746154,
           "prob": 0.993
         },
         {
           "word": "wish",
-          "start": 5.98,
-          "end": 6.16,
+          "start": 5.746154,
+          "end": 6.009231,
           "prob": 0.978
         },
         {
           "word": "you",
-          "start": 6.16,
-          "end": 6.28,
+          "start": 6.009231,
+          "end": 6.184615,
           "prob": 0.995
         },
         {
           "word": "were",
-          "start": 6.28,
-          "end": 6.38,
+          "start": 6.184615,
+          "end": 6.330769,
           "prob": 0.985
         },
         {
           "word": "here,",
-          "start": 6.38,
-          "end": 6.52,
+          "start": 6.330769,
+          "end": 6.535385,
           "prob": 0.698
         },
         {
           "word": "Sam.",
-          "start": 6.6,
+          "start": 6.535385,
           "end": 6.74,
           "prob": 0.105
         }
@@ -84198,87 +83864,49 @@
         },
         {
           "index": 4,
-          "text": "I wish you were here.",
-          "start": 5.6,
-          "end": 5.78,
-          "words": [
-            {
-              "word": "I",
-              "start": 5.6,
-              "end": 5.78,
-              "prob": 0.334
-            },
-            {
-              "word": "wish",
-              "start": 5.78,
-              "end": 5.78,
-              "prob": 0.967
-            },
-            {
-              "word": "you",
-              "start": 5.78,
-              "end": 5.78,
-              "prob": 0.988
-            },
-            {
-              "word": "were",
-              "start": 5.78,
-              "end": 5.78,
-              "prob": 0.991
-            },
-            {
-              "word": "here.",
-              "start": 5.78,
-              "end": 5.78,
-              "prob": 0.658
-            }
-          ]
-        },
-        {
-          "index": 5,
           "text": "Well, I wish you were here, Sam.",
-          "start": 5.78,
+          "start": 5.6,
           "end": 6.74,
           "words": [
             {
               "word": "Well,",
-              "start": 5.78,
-              "end": 5.84,
+              "start": 5.6,
+              "end": 5.687692,
               "prob": 0.551
             },
             {
               "word": "I",
-              "start": 5.94,
-              "end": 5.98,
+              "start": 5.687692,
+              "end": 5.746154,
               "prob": 0.993
             },
             {
               "word": "wish",
-              "start": 5.98,
-              "end": 6.16,
+              "start": 5.746154,
+              "end": 6.009231,
               "prob": 0.978
             },
             {
               "word": "you",
-              "start": 6.16,
-              "end": 6.28,
+              "start": 6.009231,
+              "end": 6.184615,
               "prob": 0.995
             },
             {
               "word": "were",
-              "start": 6.28,
-              "end": 6.38,
+              "start": 6.184615,
+              "end": 6.330769,
               "prob": 0.985
             },
             {
               "word": "here,",
-              "start": 6.38,
-              "end": 6.52,
+              "start": 6.330769,
+              "end": 6.535385,
               "prob": 0.698
             },
             {
               "word": "Sam.",
-              "start": 6.6,
+              "start": 6.535385,
               "end": 6.74,
               "prob": 0.105
             }
@@ -89560,12 +89188,12 @@
     {
       "file": "我没意见.mp4",
       "filenameText": "我没意见",
-      "text": "Find by me. Find by me. Find by me. Find by me. Find by me. Find by me. Find by me, boss. Find by me. Find by me.",
+      "text": "Fine by me. Fine by me. Fine by me. Fine by me. Fine by me. Fine by me, boss. Fine by me. Fine by me.",
       "duration": 9.94,
-      "wordCount": 28,
+      "wordCount": 25,
       "words": [
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 0,
           "end": 0.38,
           "prob": 0.392
@@ -89583,7 +89211,7 @@
           "prob": 0.984
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 1.08,
           "end": 1.46,
           "prob": 0.727
@@ -89601,7 +89229,7 @@
           "prob": 0.973
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 2.2,
           "end": 2.56,
           "prob": 0.927
@@ -89619,7 +89247,7 @@
           "prob": 0.998
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 3.62,
           "end": 4.12,
           "prob": 0.883
@@ -89637,7 +89265,7 @@
           "prob": 0.997
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 4.76,
           "end": 5.26,
           "prob": 0.888
@@ -89655,49 +89283,31 @@
           "prob": 0.998
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 6.06,
-          "end": 6.56,
-          "prob": 0.933
-        },
-        {
-          "word": "by",
-          "start": 6.56,
-          "end": 6.76,
-          "prob": 0.993
-        },
-        {
-          "word": "me.",
-          "start": 6.76,
-          "end": 6.92,
-          "prob": 0.999
-        },
-        {
-          "word": "Find",
-          "start": 6.92,
-          "end": 6.92,
+          "end": 6.33,
           "prob": 0.931
         },
         {
           "word": "by",
-          "start": 6.92,
-          "end": 6.92,
+          "start": 6.33,
+          "end": 6.6,
           "prob": 0.992
         },
         {
           "word": "me,",
-          "start": 6.92,
-          "end": 6.92,
+          "start": 6.6,
+          "end": 6.87,
           "prob": 0.999
         },
         {
           "word": "boss.",
-          "start": 6.96,
+          "start": 6.87,
           "end": 7.14,
           "prob": 0.768
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 7.72,
           "end": 8.16,
           "prob": 0.935
@@ -89715,7 +89325,7 @@
           "prob": 1
         },
         {
-          "word": "Find",
+          "word": "Fine",
           "start": 9.08,
           "end": 9.44,
           "prob": 0.979
@@ -89736,12 +89346,12 @@
       "sentences": [
         {
           "index": 0,
-          "text": "Find by me.",
+          "text": "Fine by me.",
           "start": 0,
           "end": 0.72,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 0,
               "end": 0.38,
               "prob": 0.392
@@ -89762,12 +89372,12 @@
         },
         {
           "index": 1,
-          "text": "Find by me.",
+          "text": "Fine by me.",
           "start": 1.08,
           "end": 1.88,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 1.08,
               "end": 1.46,
               "prob": 0.727
@@ -89788,12 +89398,12 @@
         },
         {
           "index": 2,
-          "text": "Find by me.",
+          "text": "Fine by me.",
           "start": 2.2,
           "end": 2.88,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 2.2,
               "end": 2.56,
               "prob": 0.927
@@ -89814,12 +89424,12 @@
         },
         {
           "index": 3,
-          "text": "Find by me.",
+          "text": "Fine by me.",
           "start": 3.62,
           "end": 4.54,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 3.62,
               "end": 4.12,
               "prob": 0.883
@@ -89840,12 +89450,12 @@
         },
         {
           "index": 4,
-          "text": "Find by me.",
+          "text": "Fine by me.",
           "start": 4.76,
           "end": 5.76,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 4.76,
               "end": 5.26,
               "prob": 0.888
@@ -89866,70 +89476,44 @@
         },
         {
           "index": 5,
-          "text": "Find by me.",
+          "text": "Fine by me, boss.",
           "start": 6.06,
-          "end": 6.92,
-          "words": [
-            {
-              "word": "Find",
-              "start": 6.06,
-              "end": 6.56,
-              "prob": 0.933
-            },
-            {
-              "word": "by",
-              "start": 6.56,
-              "end": 6.76,
-              "prob": 0.993
-            },
-            {
-              "word": "me.",
-              "start": 6.76,
-              "end": 6.92,
-              "prob": 0.999
-            }
-          ]
-        },
-        {
-          "index": 6,
-          "text": "Find by me, boss.",
-          "start": 6.92,
           "end": 7.14,
           "words": [
             {
-              "word": "Find",
-              "start": 6.92,
-              "end": 6.92,
+              "word": "Fine",
+              "start": 6.06,
+              "end": 6.33,
               "prob": 0.931
             },
             {
               "word": "by",
-              "start": 6.92,
-              "end": 6.92,
+              "start": 6.33,
+              "end": 6.6,
               "prob": 0.992
             },
             {
               "word": "me,",
-              "start": 6.92,
-              "end": 6.92,
+              "start": 6.6,
+              "end": 6.87,
               "prob": 0.999
             },
             {
               "word": "boss.",
-              "start": 6.96,
+              "start": 6.87,
               "end": 7.14,
               "prob": 0.768
             }
           ]
         },
         {
-          "index": 7,
-          "text": "Find by me.",
+          "index": 6,
+          "text": "Fine by me.",
           "start": 7.72,
           "end": 8.68,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 7.72,
               "end": 8.16,
               "prob": 0.935
@@ -89949,13 +89533,13 @@
           ]
         },
         {
-          "index": 8,
-          "text": "Find by me.",
+          "index": 7,
+          "text": "Fine by me.",
           "start": 9.08,
           "end": 9.94,
           "words": [
             {
-              "word": "Find",
+              "word": "Fine",
               "start": 9.08,
               "end": 9.44,
               "prob": 0.979
@@ -94148,9 +93732,9 @@
     {
       "file": "改天吧.mp4",
       "filenameText": "改天吧",
-      "text": "I'll take a rain check. I'll take a rain check. Can I take a rain check? Can I take a rain check? Can I take a rain check? Can we take a rain check? Can I only take a rain check all the time?",
+      "text": "I'll take a rain check. I'll take a rain check. Can I take a rain check? Can I take a rain check? Can we take a rain check? Can I only take a rain check all the time?",
       "duration": 8.22,
-      "wordCount": 44,
+      "wordCount": 38,
       "words": [
         {
           "word": "I'll",
@@ -94287,72 +93871,36 @@
         {
           "word": "Can",
           "start": 4.6,
-          "end": 4.92,
-          "prob": 0.77
-        },
-        {
-          "word": "I",
-          "start": 4.92,
-          "end": 4.98,
-          "prob": 0.11
-        },
-        {
-          "word": "take",
-          "start": 4.98,
-          "end": 4.98,
-          "prob": 0.321
-        },
-        {
-          "word": "a",
-          "start": 4.98,
-          "end": 4.98,
-          "prob": 0.994
-        },
-        {
-          "word": "rain",
-          "start": 4.98,
-          "end": 4.98,
-          "prob": 0.997
-        },
-        {
-          "word": "check?",
-          "start": 4.98,
-          "end": 4.98,
-          "prob": 0.995
-        },
-        {
-          "word": "Can",
-          "start": 4.98,
-          "end": 4.98,
+          "end": 4.619245,
           "prob": 0.921
         },
         {
           "word": "we",
-          "start": 4.98,
-          "end": 4.98,
+          "start": 4.619245,
+          "end": 4.638491,
           "prob": 0.323
         },
         {
           "word": "take",
-          "start": 4.98,
-          "end": 5.14,
+          "start": 4.638491,
+          "end": 4.883868,
           "prob": 0.957
         },
         {
           "word": "a",
-          "start": 5.14,
-          "end": 5.26,
+          "start": 4.883868,
+          "end": 5.067901,
           "prob": 0.995
         },
         {
           "word": "rain",
-          "start": 5.26,
-          "end": 5.42,
+          "start": 5.067901,
+          "end": 5.313278,
           "prob": 0.999
         },
         {
           "word": "check?",
-          "start": 5.42,
+          "start": 5.313278,
           "end": 5.62,
           "prob": 0.997
         },
@@ -94584,94 +94132,50 @@
         },
         {
           "index": 4,
-          "text": "Can I take a rain check?",
-          "start": 4.6,
-          "end": 4.98,
-          "words": [
-            {
-              "word": "Can",
-              "start": 4.6,
-              "end": 4.92,
-              "prob": 0.77
-            },
-            {
-              "word": "I",
-              "start": 4.92,
-              "end": 4.98,
-              "prob": 0.11
-            },
-            {
-              "word": "take",
-              "start": 4.98,
-              "end": 4.98,
-              "prob": 0.321
-            },
-            {
-              "word": "a",
-              "start": 4.98,
-              "end": 4.98,
-              "prob": 0.994
-            },
-            {
-              "word": "rain",
-              "start": 4.98,
-              "end": 4.98,
-              "prob": 0.997
-            },
-            {
-              "word": "check?",
-              "start": 4.98,
-              "end": 4.98,
-              "prob": 0.995
-            }
-          ]
-        },
-        {
-          "index": 5,
           "text": "Can we take a rain check?",
-          "start": 4.98,
+          "start": 4.6,
           "end": 5.62,
           "words": [
             {
               "word": "Can",
-              "start": 4.98,
-              "end": 4.98,
+              "start": 4.6,
+              "end": 4.619245,
               "prob": 0.921
             },
             {
               "word": "we",
-              "start": 4.98,
-              "end": 4.98,
+              "start": 4.619245,
+              "end": 4.638491,
               "prob": 0.323
             },
             {
               "word": "take",
-              "start": 4.98,
-              "end": 5.14,
+              "start": 4.638491,
+              "end": 4.883868,
               "prob": 0.957
             },
             {
               "word": "a",
-              "start": 5.14,
-              "end": 5.26,
+              "start": 4.883868,
+              "end": 5.067901,
               "prob": 0.995
             },
             {
               "word": "rain",
-              "start": 5.26,
-              "end": 5.42,
+              "start": 5.067901,
+              "end": 5.313278,
               "prob": 0.999
             },
             {
               "word": "check?",
-              "start": 5.42,
+              "start": 5.313278,
               "end": 5.62,
               "prob": 0.997
             }
           ]
         },
         {
-          "index": 6,
+          "index": 5,
           "text": "Can I only take a rain check all the time?",
           "start": 6.2,
           "end": 8.22,
@@ -99815,9 +99319,9 @@
     {
       "file": "没门.mp4",
       "filenameText": "没门",
-      "text": "No way! No way! No way! No way! No way! No way! No way! No way! No way! No way!",
+      "text": "No way! No way! No way! No way! No way! No way! No way! No way! No way!",
       "duration": 8.2,
-      "wordCount": 20,
+      "wordCount": 18,
       "words": [
         {
           "word": "No",
@@ -99906,30 +99410,18 @@
         {
           "word": "No",
           "start": 7.16,
-          "end": 7.48,
-          "prob": 0.868
-        },
-        {
-          "word": "way!",
-          "start": 7.48,
-          "end": 7.82,
-          "prob": 0.584
-        },
-        {
-          "word": "No",
-          "start": 7.82,
-          "end": 7.82,
+          "end": 7.42,
           "prob": 0.729
         },
         {
           "word": "way!",
-          "start": 7.82,
-          "end": 7.94,
+          "start": 7.42,
+          "end": 7.68,
           "prob": 0.447
         },
         {
           "word": "No",
-          "start": 7.94,
+          "start": 7.68,
           "end": 7.94,
           "prob": 0.588
         },
@@ -100075,45 +99567,25 @@
         },
         {
           "index": 6,
-          "text": "No way!",
-          "start": 7.16,
-          "end": 7.82,
-          "words": [
-            {
-              "word": "No",
-              "start": 7.16,
-              "end": 7.48,
-              "prob": 0.868
-            },
-            {
-              "word": "way!",
-              "start": 7.48,
-              "end": 7.82,
-              "prob": 0.584
-            }
-          ]
-        },
-        {
-          "index": 7,
           "text": "No way! No way!",
-          "start": 7.82,
+          "start": 7.16,
           "end": 8.2,
           "words": [
             {
               "word": "No",
-              "start": 7.82,
-              "end": 7.82,
+              "start": 7.16,
+              "end": 7.42,
               "prob": 0.729
             },
             {
               "word": "way!",
-              "start": 7.82,
-              "end": 7.94,
+              "start": 7.42,
+              "end": 7.68,
               "prob": 0.447
             },
             {
               "word": "No",
-              "start": 7.94,
+              "start": 7.68,
               "end": 7.94,
               "prob": 0.588
             },
@@ -106218,9 +105690,9 @@
     {
       "file": "试试看.mp4",
       "filenameText": "试试看",
-      "text": "Give it a shot. Give it a shot. Give it a shot. Let's give it a shot. Just give it a shot. I'll give it a shot. I'll give it a shot. I'll give it a shot.",
+      "text": "Give it a shot. Give it a shot. Give it a shot. Let's give it a shot. Just give it a shot. I'll give it a shot. I'll give it a shot.",
       "duration": 8.52,
-      "wordCount": 37,
+      "wordCount": 32,
       "words": [
         {
           "word": "Give",
@@ -106387,60 +105859,30 @@
         {
           "word": "I'll",
           "start": 7.9,
-          "end": 8.04,
-          "prob": 0.978
-        },
-        {
-          "word": "give",
-          "start": 8.04,
-          "end": 8.18,
-          "prob": 0.993
-        },
-        {
-          "word": "it",
-          "start": 8.18,
-          "end": 8.2,
-          "prob": 0.992
-        },
-        {
-          "word": "a",
-          "start": 8.2,
-          "end": 8.2,
-          "prob": 0.998
-        },
-        {
-          "word": "shot.",
-          "start": 8.2,
-          "end": 8.2,
-          "prob": 0.989
-        },
-        {
-          "word": "I'll",
-          "start": 8.2,
-          "end": 8.2,
+          "end": 8.024,
           "prob": 0.756
         },
         {
           "word": "give",
-          "start": 8.2,
-          "end": 8.2,
+          "start": 8.024,
+          "end": 8.148,
           "prob": 0.991
         },
         {
           "word": "it",
-          "start": 8.2,
-          "end": 8.28,
+          "start": 8.148,
+          "end": 8.272,
           "prob": 0.996
         },
         {
           "word": "a",
-          "start": 8.28,
-          "end": 8.4,
+          "start": 8.272,
+          "end": 8.396,
           "prob": 0.998
         },
         {
           "word": "shot.",
-          "start": 8.4,
+          "start": 8.396,
           "end": 8.52,
           "prob": 0.992
         }
@@ -106660,73 +106102,35 @@
           "index": 6,
           "text": "I'll give it a shot.",
           "start": 7.9,
-          "end": 8.2,
-          "words": [
-            {
-              "word": "I'll",
-              "start": 7.9,
-              "end": 8.04,
-              "prob": 0.978
-            },
-            {
-              "word": "give",
-              "start": 8.04,
-              "end": 8.18,
-              "prob": 0.993
-            },
-            {
-              "word": "it",
-              "start": 8.18,
-              "end": 8.2,
-              "prob": 0.992
-            },
-            {
-              "word": "a",
-              "start": 8.2,
-              "end": 8.2,
-              "prob": 0.998
-            },
-            {
-              "word": "shot.",
-              "start": 8.2,
-              "end": 8.2,
-              "prob": 0.989
-            }
-          ]
-        },
-        {
-          "index": 7,
-          "text": "I'll give it a shot.",
-          "start": 8.2,
           "end": 8.52,
           "words": [
             {
               "word": "I'll",
-              "start": 8.2,
-              "end": 8.2,
+              "start": 7.9,
+              "end": 8.024,
               "prob": 0.756
             },
             {
               "word": "give",
-              "start": 8.2,
-              "end": 8.2,
+              "start": 8.024,
+              "end": 8.148,
               "prob": 0.991
             },
             {
               "word": "it",
-              "start": 8.2,
-              "end": 8.28,
+              "start": 8.148,
+              "end": 8.272,
               "prob": 0.996
             },
             {
               "word": "a",
-              "start": 8.28,
-              "end": 8.4,
+              "start": 8.272,
+              "end": 8.396,
               "prob": 0.998
             },
             {
               "word": "shot.",
-              "start": 8.4,
+              "start": 8.396,
               "end": 8.52,
               "prob": 0.992
             }

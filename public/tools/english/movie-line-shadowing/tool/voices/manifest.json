@@ -7267,18 +7267,6 @@
         {
           "speaker": "en-US-AriaNeural",
           "rate": "std",
-          "file": "voices/ba5d274753_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/ba5d274753_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
           "file": "voices/c2f61126e6_aria.mp3"
         },
         {
@@ -8539,18 +8527,6 @@
       ]
     ],
     "你以为你是谁.mp4": [
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/dd9fbefac6_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/dd9fbefac6_sonia.mp3"
-        }
-      ],
       [
         {
           "speaker": "en-US-AriaNeural",
@@ -13681,18 +13657,6 @@
         {
           "speaker": "en-US-AriaNeural",
           "rate": "std",
-          "file": "voices/69c42225c5_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/69c42225c5_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
           "file": "voices/9d714763d9_aria.mp3"
         },
         {
@@ -15360,18 +15324,6 @@
           "rate": "std",
           "file": "voices/617c16129f_sonia.mp3"
         }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/9b44a4680d_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/9b44a4680d_sonia.mp3"
-        }
       ]
     ],
     "我们扯平了.mp4": [
@@ -16024,18 +15976,6 @@
           "rate": "std",
           "file": "voices/f12c8dbf2e_sonia.mp3"
         }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/f12c8dbf2e_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/f12c8dbf2e_sonia.mp3"
-        }
       ]
     ],
     "我别无选择.mp4": [
@@ -16347,18 +16287,6 @@
           "speaker": "en-GB-SoniaNeural",
           "rate": "std",
           "file": "voices/94535e0c79_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/bd8d868832_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/bd8d868832_sonia.mp3"
         }
       ]
     ],
@@ -17457,18 +17385,6 @@
         {
           "speaker": "en-US-AriaNeural",
           "rate": "std",
-          "file": "voices/6de07c3f88_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/6de07c3f88_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
           "file": "voices/deaaaa3ab4_aria.mp3"
         },
         {
@@ -18455,18 +18371,6 @@
           "speaker": "en-GB-SoniaNeural",
           "rate": "std",
           "file": "voices/ae1f60195f_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/cf0f422344_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/cf0f422344_sonia.mp3"
         }
       ],
       [
@@ -19781,18 +19685,6 @@
           "speaker": "en-GB-SoniaNeural",
           "rate": "std",
           "file": "voices/0568d541cc_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/df596305ee_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/df596305ee_sonia.mp3"
         }
       ]
     ],
@@ -21119,18 +21011,6 @@
           "speaker": "en-GB-SoniaNeural",
           "rate": "std",
           "file": "voices/8f202fa31f_sonia.mp3"
-        }
-      ],
-      [
-        {
-          "speaker": "en-US-AriaNeural",
-          "rate": "std",
-          "file": "voices/aa7401578d_aria.mp3"
-        },
-        {
-          "speaker": "en-GB-SoniaNeural",
-          "rate": "std",
-          "file": "voices/aa7401578d_sonia.mp3"
         }
       ],
       [
