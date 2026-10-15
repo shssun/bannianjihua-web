@@ -131,7 +131,7 @@
 
 ## 8.1 `_src-tmp/` —— 仓库外源料的**只读镜像**
 
-有些任务的素材在仓库外（例如 `C:/Users/ZhuanZ1/Documents/WS/英文学习/`、`D:/workspaces/每日英语*/`），执行方看不见。把这些源料**按需镜像**进仓库内的 `_src-tmp/`（已 gitignore），让执行方「看得见」。
+有些任务的素材在仓库外，执行方看不见。把这些源料**按需镜像**进仓库内的 `_src-tmp/`（已 gitignore），让执行方「看得见」。
 
 **三条规矩**：
 
@@ -139,9 +139,41 @@
 2. **产出必须落在正式目录。** 你在 `_src-tmp/` 里读到的内容，产出的代码/文档要写到**对应的项目目录**（`src/`、`public/`、`docs/`），**不是**写在 `_src-tmp/` 里。
 3. **如果你改了 `_src-tmp/工具/*.py`，必须在 `note=` 里写明改了哪一段。** 因为镜像 → 真源是**单向**的，我方需要把这处改动**回填到真源**。你不写，改动就会丢。
 
-**判据必须三方比对**：真源 / 基准清单 / 镜像磁盘。只比前两者会**静默漏过「镜像被直接改动」**。
+**判据必须三方比对**：真源 / 基准清单 / 镜像磁盘。只比前两者会**静默漏过「镜像被直接改动」**（且**两个方向都要查**：真源前进 → 镜像过期；镜像被写 → 脏镜像）。
 
 命令：`npm run src-tmp:check` / `npm run src-tmp:refresh`
+
+### 镜像范围（多源根，2026-10-15 起）
+
+| 源根 | 真源路径 | 镜像落点 | 收哪些 | 文件数 |
+|---|---|---|---|---|
+| `(根)` | `C:/Users/ZhuanZ1/Documents/WS/英文学习/` | `_src-tmp/`（**不变**） | `内容/**` + `工具/*.{py,html}` + 根 `*.md` | 57 |
+| `每日英语` | `D:/workspaces/每日英语/` | `_src-tmp/每日英语/` | `tool/`、`docs/`、`_qa/`、`_tts_logs/`（**不含** `tool/voices/` 的 49 个音频） | 43 |
+| `每日英语台词` | `D:/workspaces/每日英语台词/` | `_src-tmp/每日英语台词/` | `_audit/`、`_logs/`、`_taxonomy/`、`_orphan_voices/`、`_zh/`、`tool/`、`tool_phrase/` + 根目录文本文件（**不含** 394 个 `.mp4` 与 `audio*/`） | 90 |
+
+- **只收文本类**：扩展名不在白名单内的一律跳过；单文件 > 3 MB 跳过。这条是「零二进制大件」的**主判据**，不是靠事后扫描补救。
+- 镜像**总体积上限 40 MB**（当前 8.91 MB），刷新时超限会**直接 exit 1**。
+- `_manifest.json` 的 `sources[]` 逐源根独立成条（`name` / `root` / `prefix` / `count` / `bytes`），因此能区分多个源根。
+
+### ⚠️ 已登记但**故意未落地**的源侧改动（供 T-015 使用）
+
+`D:/workspaces/每日英语/tool/index.html` **第 288 行**（镜像内同位置可见）：
+
+```js
+function mediaUrl(file) { return '../' + encodeURIComponent(file); }   // 现状
+function mediaUrl(file) { return './' + encodeURIComponent(file); }    // T-015 落地时应改成这样
+```
+
+**已定位并复核，但尚未施加到真源。** 原因：这个改动**必须与 T-015 的仓库内侧改动同一批落地**，否则——仓库副本目前位于 `public/tools/english/movie-line-shadowing/tool/index.html`（多一层 `tool/`），其 `'../'` 是**正确**的；一旦真源先改而 `sync:tools`（`prebuild` 会调它）跑过，就会把 `'./'` 灌进这个**仍在 `tool/` 层**的副本 → 线上视频全 404。
+
+**T-015 领卡时请按下述顺序做**（顺序错了就 404）：
+
+1. 先给 `scripts/sync-tools.mjs` 加 `stripPrefix` 并在 `scripts/sync/movie-line-shadowing.json` 启用 `"stripPrefix": "tool/"`；
+2. **同一批**里改真源第 288 行 `'../'` → `'./'`；
+3. 再跑 `npm run sync:tools`（产物上移到 `.../movie-line-shadowing/index.html`）+ 更新 `Tool.entry`；
+4. `npm run check:tools` exit 0。
+
+⚠️ **注意删除配额**：仓库 `public/tools/english/movie-line-shadowing/tool/` 下有 **52 个文件**（49 个在 `voices/`），上移后旧目录被清掉会**超过单回合 50 次删除的宿主闸门**。**这道闸门是对的，不要绕过** —— 应把它设计成增量移动（例如分批 `git mv`，或先移文件再单独删空目录），而不是「清空重拷」。
 
 ---
 

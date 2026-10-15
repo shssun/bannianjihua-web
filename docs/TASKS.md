@@ -206,3 +206,45 @@ acceptance:
 - 集合 `path` 缺口已补齐：`node scripts/check-tools.mjs` 通过即为证（它会校验 `path[].toolId` 在注册表、属于本集合、且缺口步必须带 `todo`）
 - 不跑 `npm run build`；构建验证用 `npx vite build --outDir ../_buildcheck`，退出码 0
 - 真跑（人工项，**我方会用无头浏览器独立复验**）：① `y=x^α` 拖到 α=−1，`x=0` 处**断开、无穿屏竖线**；② 定轴动区间把顶点拖出区间，**最值换点**且读数随之变；③ 等比 Sₙ 把 q 拖到 **1**，图象从指数型**突变成直线**且有临界徽标；④ 三角平移拖 φ，读数显示的**实际平移量 = φ/ω**；⑤ 椭圆把 2a 拖到 `< 2c`，退化提示出现；⑥ 控制台零报错。
+
+## T-026 · 线上从未注入 Supabase 环境变量 —— 留言板实为 fallback 演示数据
+
+priority: P1
+area: .github/workflows/deploy.yml, src/services/, src/lib/, docs/DATABASE.md
+depends: —
+size: M
+spec: **这是一条已实测确认的真缺陷，不是猜测**（首次登记在 `T-001` 的 blocked note 里，当时判为「超出 T-001 范围」故未立项）。事实链：① 生产 bundle 里**没有** `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` 的值；② 仓库里只有空的 `.env.example`，`.env` 不入库；③ `.github/workflows/deploy.yml` 的构建步骤**没有**把仓库 Secrets 传进去 → 生产构建时这两个变量是 `undefined`；④ `src/services/` 的 Supabase 客户端因此拿不到地址，走 `APIResult` 的 `fallback` 分支；⑤ 结果：**留言板页面上显示的「留言」是代码里内联的演示数据，点提交也写不进任何地方**。用户看到的是一个"能用"的留言板，其实一个字节都没落库 —— 这比直接报错更糟，因为它**静默**。
+
+**要求**：
+
+1. **构建注入**：`deploy.yml` 的构建步骤从 `secrets.SUPABASE_URL` / `secrets.SUPABASE_ANON_KEY` 读入并注入为构建期环境变量（`VITE_` 前缀）。仓库内**禁止**出现明文密钥。
+2. **缺失时不再静默降级**：env 缺失时，fallback 数据必须**可识别**——UI 上明确标出「未配置数据库，以下为演示数据」，并留 `console.warn`。**不得**把演示数据当作真实数据展示而不作任何提示。
+3. **文档**：`docs/DATABASE.md` 写明「生产构建需要哪两个 Secrets」与「未配置时的行为」。
+
+⚠️ 本项的**最终线上接通验证**与 `T-001` 共用同一个前置（仓库 Secrets 里得真有这两个值）。若 Secrets 仍未配置，本项做到「代码侧就绪 + 降级行为可验证」即可，**交付时不得声称线上已接通**。
+
+acceptance:
+- 构建注入已配置：`grep -q "VITE_SUPABASE_URL" .github/workflows/deploy.yml` 且 `grep -q "secrets\." .github/workflows/deploy.yml`
+- 仓库内无明文密钥：`! grep -rInE "supabase\.co|eyJ[A-Za-z0-9_-]{10,}" .github/workflows/`
+- 降级已可见（真跑）：在**不带** env 的构建产物上打开留言板，页面必须出现「演示数据 / 未配置」之类的明确提示；控制台有对应 warn
+- 文档已更新：`grep -q "SUPABASE_ANON_KEY" docs/DATABASE.md`
+- `npx tsc -b` 退出码 0；`npx vite build --outDir ../_buildcheck` 退出码 0（**不要**跑 `npm run build`）
+
+## T-027 · 恢复「高中数学」集合的学习路径后续步骤（path 现仅剩一步）
+
+priority: P3
+area: src/data/collections.ts
+depends: —
+size: S
+spec: `T-025` 交付时，`high-school-math` 集合的 `path` 原本是两步：第 1 步指向 `function-param-lab`，第 2 步是带 `todo` 的「（待建）」**缺口步**。`T-025` 按卡面要求「把缺口步换成真实步骤」，但实际做法是**删除**了缺口步而非替换 —— 原因是 `scripts/check-tools.mjs` **禁止同一 path 里重复出现同一个 `toolId`**，而 math 频道当时只有 `function-param-lab` 一个工具，凑不出第二个真实步骤。结果：`path` 只剩 1 步，集合页 `LearningPath.tsx` 的「后续步骤」语义丢失 —— 学习者看到的是「这个集合只有一步，走完就没了」。
+
+本项**只补回这一步**：在 `path` 数组**末尾追加一个缺口步**，只写 `label` + `todo`，**不要**写 `toolId`。`check-tools` 对缺口步的要求正是「必须带 `todo`」，所以这是被允许、被鼓励的形态（缺口步本就该渲染成「待建」而不是假链接）。
+
+⚠️ **不要**为了凑数而重复引用 `function-param-lab` —— 会直接撞校验。
+
+acceptance:
+- `node scripts/check-tools.mjs` 退出码 0
+- 缺口步确实在集合段内：`node -e "const t=require('fs').readFileSync('src/data/collections.ts','utf8');const i=t.indexOf(\"id: 'high-school-math'\");const seg=t.slice(i,i+900);if(!/todo\s*:/.test(seg)){console.error('未在 high-school-math 段内找到缺口步');process.exit(1)}"` 退出码 0
+- 真跑（人工项，我方独立复验）：打开 `/tools/collection/high-school-math`，学习路径出现**第二步**，且它以「待建」形态渲染而**非**假链接
+- `npx tsc -b` 退出码 0
+
