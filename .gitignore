@@ -44,3 +44,12 @@ pnpm-debug.log*
 # 仅作「让执行方看得见」之用 —— 不在版本库里，也禁止把正式产出写进这里。
 # 正式产出必须落到项目对应目录（public/tools/... 、src/data/tools/...）。
 _src-tmp/
+
+# 一次性调研报告（只读产出，不入库）
+_reports/
+
+# 素材改名/变更的本地备份目录。
+# ⚠️ 绝不放在 public/ 下 —— 那会被打包并部署上线（白传体积）。
+# 备份一律放仓库外真源目录旁（如 D:/workspaces/每日英语台词/_rename_backup_*/）。
+**/_rename_backup_*/
+**/*_backup_t*/

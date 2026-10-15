@@ -49,7 +49,24 @@
   "rename": {
     "你真美1.mp4": "你真美.mp4",
     "你鼓舞了我1.mp4": "你鼓舞了我.mp4",
-    "我们扯平了1.mp4": "我们扯平了.mp4"
+    "我们扯平了1.mp4": "我们扯平了.mp4",
+    "don't ge me wrong.mp4": "don't get me wrong.mp4",
+    "don't sett;e.mp4": "don't settle.mp4",
+    "give me break.mp4": "give me a break.mp4",
+    "his bark is worse than hit bite.mp4": "his bark is worse than his bite.mp4",
+    "hold your hourses.mp4": "hold your horses.mp4",
+    "tahta makes two of us.mp4": "that makes two of us.mp4",
+    "the heart wants what the hearts wants.mp4": "the heart wants what it wants.mp4",
+    "what a conincidence.mp4": "what a coincidence.mp4",
+    "you are way of line.mp4": "you are way out of line.mp4",
+    "mind you own business.mp4": "mind your own business.mp4",
+    "it is what it is .mp4": "it is what it is.mp4",
+    "what am i to you .mp4": "what am i to you.mp4",
+    "对我又什么好处.mp4": "对我有什么好处.mp4",
+    "从新开始.mp4": "从头开始.mp4",
+    "你出个价把.mp4": "你出个价吧.mp4",
+    "你再开玩笑把.mp4": "你再开玩笑吧.mp4",
+    "你是万一挑一.mp4": "你是万里挑一.mp4"
   },
   "required": ["tool/index.html"],
   "optional": true

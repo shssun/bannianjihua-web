@@ -70,6 +70,29 @@ const RENAME = new Map([
   ['你真美1.mp4', '你真美.mp4'],
   ['你鼓舞了我1.mp4', '你鼓舞了我.mp4'],
   ['我们扯平了1.mp4', '我们扯平了.mp4'],
+  // ---- T-029 错别字修正（17 条）：真源 mp4 已同步改名，不留旧链接 ----
+  // 英文 12 条
+  ["don't ge me wrong.mp4", "don't get me wrong.mp4"],
+  ["don't sett;e.mp4", "don't settle.mp4"],
+  ['give me break.mp4', 'give me a break.mp4'],
+  ['his bark is worse than hit bite.mp4', 'his bark is worse than his bite.mp4'],
+  ['hold your hourses.mp4', 'hold your horses.mp4'],
+  ['tahta makes two of us.mp4', 'that makes two of us.mp4'],
+  ['the heart wants what the hearts wants.mp4', 'the heart wants what it wants.mp4'],
+  ['what a conincidence.mp4', 'what a coincidence.mp4'],
+  ['you are way of line.mp4', 'you are way out of line.mp4'],
+  ['mind you own business.mp4', 'mind your own business.mp4'],
+  // ⚠️ 尾部带空格的源名 → 去掉尾部空格（实为「it is what it is.mp4」前的空格）
+  ['it is what it is .mp4', 'it is what it is.mp4'],
+  ['what am i to you .mp4', 'what am i to you.mp4'],
+  // 中文 5 条
+  ['对我又什么好处.mp4', '对我有什么好处.mp4'],
+  // ⚠️ 是「从头开始」不是「重新开始」：ASR 为 "From the beginning."，
+  //    且真源/产物中已存在语义不同的「重新开始.mp4」(ASR "A fresh start.")，改重名会撞车。
+  ['从新开始.mp4', '从头开始.mp4'],
+  ['你出个价把.mp4', '你出个价吧.mp4'],
+  ['你再开玩笑把.mp4', '你再开玩笑吧.mp4'],
+  ['你是万一挑一.mp4', '你是万里挑一.mp4'],
 ]);
 
 const CHECK_ONLY = process.argv.includes('--check');
