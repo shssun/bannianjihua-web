@@ -276,3 +276,32 @@ acceptance:
 - `npm run sync:tools` 与 `npm run check:tools` 退出码均 0
 - 真跑（我方独立复验）：`chrome --headless=new --dump-dom` 打开线上页面 exit 0 且 DOM 非空；左侧列表项数 = 368
 - `npx tsc -b` 退出码 0
+
+## T-029 · 修 movie-line-shadowing 的错别字文件名与 13 条硬幻觉 ASR
+
+priority: P3
+area: D:/workspaces/每日英语台词/, scripts/gen-mls-data.mjs
+depends: T-028
+size: M
+spec: 老板指令「补全并去重」已完成（T-028），本卡处理**同批素材的另一类质量问题**。老板 2026-10-15 拍板：**本轮不动，另立卡下轮修**。
+
+**实测量（我方独立复算，非自评）**：
+- **错别字文件名**：394 个 mp4 中有 22 个错别字 + 格式异常，两类：
+  - 英文：`don't sett;e`（settle）、`hold your hourses`（horses）、`his bark is worse than hit bite`、`mind you own business`（your）、`tahta makes two of us`（that）、`what a conincidence`（coincidence）、`don't ge me wrong`（get）、`give me break`（a break）、`do Dutch`（go Dutch）、`you are way of line`（off）、`the heart wants what the hearts wants`、`take days`（不完整）
+  - 中文：`从新开始`（重新）、`对我又什么好处`（有）、`你是万一挑一`（万里）、`你还记得我妈`（我吗）、`你出个价把`（吧）、`你再开玩笑把`（吧）、`在努力一点`（再）、`淡定点`
+  - 格式异常：`it is what it is .mp4`、`what am i to you .mp4`（文件名尾部多余空格）
+- **13 条硬幻觉 ASR**：判据 = **单句时长 <0.4s 且含 ≥4 词**（物理不可能）。我方三口径复算交集恰 13 条（口径A <0.55s且≥3词 = 70 句/51 条；口径B <0.4s且≥4词 = 14 句/13 条；口径C 每词<0.1s = 22 句/18 条）。
+
+⚠️ **关键坑（必须写进实现）**：这批素材**本身就是按设计把同一句重复 3-9 次**（跟读/磨耳朵机制，如 `洗澡.mp4` 重复 27 次 `Take a shower.`）→ **「重复次数」绝不能当幻觉判据**，用它会误伤 200+ 条。真判据是**时长/词速**。
+
+⚠️ **改名必须三处同改**（否则 404，T-028 已踩过这个坑）：① 真源 mp4 文件名 ② `data.json` 的 `file`/`filenameText` ③ `zh.json` 的 key ④ `voices/manifest.json` 的 key。且 `gen-mls-data.mjs` 的 `REMOVE`/`RENAME` 规则表要同步更新。
+
+⚠️ **ASR 文本修正**只改 `text`/`sentences`，**不要动 `words` 时间戳**（页面靠它做词级跟读高亮）。
+
+acceptance:
+- 错别字清单落成文档：`docs/MOVIE-LINE-DATA-FIX.md`（含每条：现名 / 正确名 / 依据）
+- 改名后四处一致：`node -e` 脚本校验 `data.json` 的 file 集合、`zh.json` 键集合、`manifest.json` 键集合、磁盘 mp4 文件名集合**四者相等**
+- `node scripts/check-tools.mjs` 退出码 0
+- `node scripts/gen-mls-data.mjs --check` 退出码 0
+- 真跑：`chrome --headless=new --dump-dom` 打开工具页 exit 0 且 DOM 非空、列表项数 = 条目数
+- `npx tsc -b` 退出码 0
