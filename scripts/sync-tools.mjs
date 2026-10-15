@@ -31,6 +31,19 @@
  * - **rename 映射**：清单可给 `"rename": { "player.html": "index.html" }`，
  *   把源相对路径精确映射为目标相对路径（用于工具本体文件名不符合站内命名规范的场合）。
  *   ⚠️ `required` 仍按**源**相对路径判定，不按映射后的。
+ * - **stripPrefix 前缀剥离**：清单可给 `"stripPrefix": "tool/"`，
+ *   把匹配到的**源相对路径**去掉该前缀后再映射到目标路径。用于源目录比站内目录
+ *   多一层（如 `tool/`）时把产物整体上移一层，使 URL 与其它工具保持一致。
+ *   ⚠️ **顺序规则（重要）**：
+ *     1. 先查 `rename`（其 key 是**源**相对路径语义）——
+ *        命中则 rename 的值**直接作为目标**，**不再 stripPrefix**
+ *        （因为 rename 的值已经是最终目标名）。
+ *     2. `rename` 未命中时，才取 `srcRel` 并剥掉 `stripPrefix`。
+ *   例：清单同时有 `"stripPrefix": "tool/"` 与 `"rename": {"player.html": "index.html"}`：
+ *     - 源 `tool/index.html` → rename 未命中 → strip `tool/` → 目标 `index.html`
+ *     - 源 `tool/player.html` → rename 命中 → 目标 `index.html`（不再 strip）
+ *   ⚠️ `stripPrefix` 未配置 / 为空串 / 前缀不匹配时，行为与未配置**逐字节一致**。
+ *   ⚠️ `required` 仍按**源**相对路径（strip **之前**）判定，与 `rename` 同理。
  * - **CI 友好**：源目录不存在 → 打印警告并继续（整体 exit 0），
  *   直接复用仓库里已提交的产物，不阻断构建。
  */
@@ -169,6 +182,8 @@ for (const manifestName of manifestFiles) {
   const exclude = Array.isArray(manifest.exclude) ? manifest.exclude : [];
   const required = Array.isArray(manifest.required) ? manifest.required : [];
   const rename = manifest.rename && typeof manifest.rename === 'object' ? manifest.rename : {};
+  // 前缀剥离：把匹配到的**源**相对路径去掉该前缀后再映射（空串 / 未配置 = 不剥离）
+  const stripPrefix = typeof manifest.stripPrefix === 'string' ? manifest.stripPrefix : '';
 
   console.log(`${TAG} ── ${id}  (${manifestName})`);
 
@@ -197,10 +212,17 @@ for (const manifestName of manifestFiles) {
     if (!isIncluded(srcRel, include, exclude)) {
       continue;
     }
-    seenSrc.add(srcRel);
-    const dstRel = Object.prototype.hasOwnProperty.call(rename, srcRel)
-      ? rename[srcRel]
-      : srcRel;
+    seenSrc.add(srcRel); // ⚠️ required 按 strip **之前**的源相对路径判定
+    // 顺序规则：rename 命中 → 其值即最终目标（不再 strip）；
+    //           rename 未命中 → 取 srcRel，再剥掉 stripPrefix。
+    let dstRel;
+    if (Object.prototype.hasOwnProperty.call(rename, srcRel)) {
+      dstRel = rename[srcRel];
+    } else if (stripPrefix && srcRel.startsWith(stripPrefix)) {
+      dstRel = srcRel.slice(stripPrefix.length);
+    } else {
+      dstRel = srcRel;
+    }
     expected.set(dstRel, abs); // key = 目标相对路径
   }
 

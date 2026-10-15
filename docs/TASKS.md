@@ -248,3 +248,31 @@ acceptance:
 - 真跑（人工项，我方独立复验）：打开 `/tools/collection/high-school-math`，学习路径出现**第二步**，且它以「待建」形态渲染而**非**假链接
 - `npx tsc -b` 退出码 0
 
+
+## T-028 · movie-line-shadowing 补全至 368 条并统一下沉 URL 层级（合并 T-014 + T-015）
+
+priority: P1
+area: scripts/sync/movie-line-shadowing.json, scripts/sync-tools.mjs, public/tools/english/movie-line-shadowing/, src/data/tools/english/movie-line-shadowing.ts
+depends: T-023
+size: L
+spec: ⚠️ **本卡取代 T-014 与 T-015 的落地方式，两张旧卡不改动（只追加）。** 老板指令：「这个页面只有一部分视频，请补全并去重」。实测：线上 `tool/data.json` 仅 **11** 条，真源 `D:/workspaces/每日英语台词/tool/data.json` 有 **386** 条；真源根目录 394 个 mp4（386 条对应 **256 MB**）、`tool/voices/` **1887** 个 mp3（943 组 `_aria`/`_sonia`）。二者必须一次做完，理由：① 分两次 = 两次 256 MB 全量拷贝；② `npm run build` 的 `prebuild` 会调 `sync-tools.mjs`，**T-015 的源侧 `'../'`→`'./'` 与仓库内侧必须同批生效**这个坑根本绕不开；③ 三个 `index.html`（两个源 + 仓库副本）sha1 全为 `47a819c8011855244ba798a8a486b74a88edc93b`，是同一份前端。
+
+**去重结论（老板两轮拍板）**：22 组 `(1)`/`1` 后缀同名变体，**sha1 内容比对全部不同**（0 组真重复）；其中 `你真美1.mp4` / `你鼓舞了我1.mp4` / `我们扯平了1.mp4` 磁盘上**没有无后缀版本** = 独有条目，**不得删除**，改为去掉后缀当正式名保留。真双版本的 18 条删除（`振作起来(1).mp4` 不在 data.json 内，故实际删 18）。**最终 368 条 / 245.9 MB 视频 + 31 MB 语音**。磁盘 394 个 mp4 的 sha1 比对 0 组同内容重复。
+
+**落地步骤**（缺一即线上视频全 404）：
+1. `scripts/sync-tools.mjs` 新增 `stripPrefix` 字段（rename 命中则直接作目标、不再 strip；`required` 仍按**源**路径判定）
+2. `scripts/sync/movie-line-shadowing.json`：`src` 改为 `D:/workspaces/每日英语台词`，加 `stripPrefix: "tool/"`，加 `rename` 映射 3 条独有条目，exclude 挡住源侧 `*.py` / `__pycache__` / `_audit/` / `_logs/` / `audio*/` / `audio/` / `audio_norm/` / `tool_phrase/` / `*.sh` / `_preview.html`
+3. **同批**把真源（两个源目录各一份）`tool/index.html` 第 288 行 `mediaUrl` 的 `'../'` 改为 `'./'` —— 与产物上移一层同步生效
+4. 跑 `npm run sync:tools` 产出 368 条 → `npm run check:tools` → 更新 `Tool.entry` 为 `tools/english/movie-line-shadowing/index.html`
+5. 真跑验证：`--dump-dom` 必须 exit 0 且 DOM 字节数正常（**静态检查必然假绿**，本项目曾有死循环让 check-tools/tsc/vite build 全绿的教训）
+
+acceptance:
+- 产物已上移：`test -f public/tools/english/movie-line-shadowing/index.html` 且 `test ! -d public/tools/english/movie-line-shadowing/tool`
+- 条目数 = 368：`node -e "const j=require('./public/tools/english/movie-line-shadowing/data.json'); if(j.items.length!==368){console.error('期望 368 实得 '+j.items.length);process.exit(1)}"` 退出码 0
+- 无残留后缀重复项：`! ls public/tools/english/movie-line-shadowing/*.mp4 | grep -qE '\(1\)\.mp4$'`
+- 三个独有条目已改名保留：`test -f "public/tools/english/movie-line-shadowing/你真美.mp4"` 且同名 3 个均存在
+- 源侧改动已生效：`grep -q "return './' + encodeURIComponent(file)" "D:/workspaces/每日英语台词/tool/index.html"`
+- 入口已更新：`grep -q "tools/english/movie-line-shadowing/index.html" src/data/tools/english/movie-line-shadowing.ts`
+- `npm run sync:tools` 与 `npm run check:tools` 退出码均 0
+- 真跑（我方独立复验）：`chrome --headless=new --dump-dom` 打开线上页面 exit 0 且 DOM 非空；左侧列表项数 = 368
+- `npx tsc -b` 退出码 0
