@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>甘肃新高考（物化生）六科考点权重思维导图 · 2027届</title>
+<style>
+:root{
+  --bg:#0d1117; --bg2:#010409; --panel:#161b22; --panel2:#1c2128;
+  --bd:#30363d; --bd2:#3d444d;
+  --tx:#e6edf3; --tx2:#adbac7; --tx3:#768390;
+  --S:#f85149; --A:#ffa657; --B:#58a6ff; --C:#8b949e;
+  --acc:#3fb950;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:var(--bg); color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:14px; overflow:hidden;
+}
+/* ---------- 顶栏 ---------- */
+header{
+  height:60px; display:flex; align-items:center; gap:16px; padding:0 18px;
+  background:linear-gradient(180deg,#161b22,#0d1117);
+  border-bottom:1px solid var(--bd); flex:0 0 auto;
+}
+header h1{font-size:16px; margin:0; font-weight:650; letter-spacing:.3px; white-space:nowrap;}
+.badge-cal{
+  font-size:11.5px; color:var(--tx2); background:var(--panel2);
+  border:1px solid var(--bd2); border-radius:999px; padding:4px 11px; white-space:nowrap;
+}
+.badge-cal b{color:var(--A); font-weight:600;}
+.spacer{flex:1;}
+.hbtn{
+  background:var(--panel2); color:var(--tx2); border:1px solid var(--bd2);
+  border-radius:6px; padding:6px 11px; font-size:12.5px; cursor:pointer; white-space:nowrap;
+  font-family:inherit;
+}
+.hbtn:hover{background:#262c36; color:var(--tx);}
+.hbtn.on{background:rgba(63,185,80,.15); border-color:var(--acc); color:var(--acc);}
+
+/* ---------- 科目 Tab ---------- */
+.tabs{
+  display:flex; gap:6px; padding:10px 18px 0; background:var(--bg);
+  border-bottom:1px solid var(--bd); flex:0 0 auto; overflow-x:auto;
+}
+.tab{
+  padding:9px 16px; font-size:13.5px; color:var(--tx3); cursor:pointer;
+  border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0;
+  white-space:nowrap; background:transparent; font-family:inherit;
+  display:flex; align-items:center; gap:7px;
+}
+.tab:hover{color:var(--tx2);}
+.tab.active{color:var(--tx); background:var(--panel); border-color:var(--bd); font-weight:600;}
+.tab .dot{width:8px;height:8px;border-radius:50%;}
+.tab .sub{font-size:11px;color:var(--tx3);font-weight:400;}
+
+/* ---------- meta 条 ---------- */
+.meta{
+  padding:11px 18px; background:var(--panel); border-bottom:1px solid var(--bd);
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center; flex:0 0 auto;
+}
+.chip{
+  font-size:11.5px; padding:4px 10px; border-radius:6px;
+  background:var(--panel2); border:1px solid var(--bd2); color:var(--tx2);
+}
+.chip b{color:var(--tx); font-weight:600;}
+.chip.warn{background:rgba(248,81,73,.13); border-color:rgba(248,81,73,.45); color:#ffb3ad;}
+.chip.warn b{color:#ff8580;}
+
+/* ---------- 主体 ---------- */
+#main{display:flex; flex:1 1 auto; min-height:0; position:relative;}
+#stage{
+  flex:1 1 auto; position:relative; overflow:hidden; cursor:grab;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(88,166,255,.05), transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(248,81,73,.04), transparent 55%),
+    var(--bg2);
+}
+#stage.drag{cursor:grabbing;}
+#canvas{position:absolute; top:0; left:0; transform-origin:0 0;}
+#links{position:absolute; top:0; left:0; overflow:visible; pointer-events:none;}
+
+/* ---------- 节点 ---------- */
+.node{
+  position:absolute; width:216px; min-height:50px; padding:8px 10px 8px 12px;
+  border-radius:9px; border:1px solid var(--bd2); background:var(--panel);
+  cursor:pointer; display:flex; flex-direction:column; justify-content:center;
+  transition:box-shadow .15s, border-color .15s, transform .12s;
+  user-select:none;
+}
+.node:hover{border-color:var(--tx3); box-shadow:0 0 0 3px rgba(255,255,255,.05);}
+.node.sel{border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.14);}
+.node.hit{border-color:#ffe066; box-shadow:0 0 0 3px rgba(255,224,102,.28);}
+.node .r1{display:flex; align-items:center; gap:6px;}
+.node .bdg{
+  font-size:9.5px; font-weight:700; line-height:1; padding:2.5px 5px; border-radius:4px;
+  flex:0 0 auto; letter-spacing:.3px;
+}
+.node .nm{font-size:12.6px; line-height:1.35; font-weight:550; flex:1 1 auto;}
+.node .r2{
+  margin-top:3px; font-size:10.5px; color:var(--tx3); line-height:1.35;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.node .sc{color:var(--tx2); font-weight:600;}
+.node .tg{
+  position:absolute; right:-9px; top:50%; transform:translateY(-50%);
+  width:18px; height:18px; border-radius:50%; background:var(--panel2);
+  border:1px solid var(--bd2); color:var(--tx3); font-size:11px; line-height:16px;
+  text-align:center; font-family:monospace;
+}
+.node.kids .tg{color:var(--tx2);}
+.leafdot{color:var(--tx3); font-size:11px; opacity:.5;}
+
+.w-S{background:rgba(248,81,73,.13); border-color:rgba(248,81,73,.5);}
+.w-S .bdg{background:var(--S); color:#fff;}
+.w-S .sc{color:#ff9b95;}
+.w-A{background:rgba(255,166,87,.11); border-color:rgba(255,166,87,.45);}
+.w-A .bdg{background:var(--A); color:#2b1a05;}
+.w-A .sc{color:#ffc98a;}
+.w-B{background:rgba(88,166,255,.10); border-color:rgba(88,166,255,.42);}
+.w-B .bdg{background:var(--B); color:#04121f;}
+.w-B .sc{color:#9cc9ff;}
+.w-C{background:rgba(139,148,158,.10); border-color:rgba(139,148,158,.35);}
+.w-C .bdg{background:var(--C); color:#0d1117;}
+.w-C .nm{color:var(--tx2);}
+
+.node.root{
+  width:250px; min-height:64px; padding:12px 14px;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+  border:1px solid var(--bd2);
+}
+.node.root .nm{font-size:16px; font-weight:700;}
+.node.root .r2{font-size:11px;}
+.node.mid{width:228px;}
+
+/* ---------- 右侧详情 ---------- */
+#side{
+  width:330px; flex:0 0 auto; background:var(--panel); border-left:1px solid var(--bd);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+#side .hd{
+  padding:12px 14px; border-bottom:1px solid var(--bd); font-size:12px;
+  color:var(--tx3); letter-spacing:.5px; flex:0 0 auto;
+}
+#side .bd{padding:14px; overflow-y:auto; flex:1 1 auto;}
+#side .tt{font-size:15px; font-weight:650; line-height:1.4; margin-bottom:10px;}
+.kv{margin-bottom:12px;}
+.kv .k{font-size:11px; color:var(--tx3); margin-bottom:4px; letter-spacing:.4px;}
+.kv .v{font-size:12.8px; color:var(--tx2); line-height:1.6;}
+.wtag{display:inline-block; font-size:11px; font-weight:700; padding:3px 9px; border-radius:5px;}
+.wtag.S{background:var(--S); color:#fff;}
+.wtag.A{background:var(--A); color:#2b1a05;}
+.wtag.B{background:var(--B); color:#04121f;}
+.wtag.C{background:var(--C); color:#0d1117;}
+.path{font-size:11px; color:var(--tx3); line-height:1.6; margin-bottom:12px;}
+.legend{padding:12px 14px; border-top:1px solid var(--bd); font-size:11.5px; color:var(--tx3); flex:0 0 auto;}
+.legend .li{display:flex; align-items:center; gap:7px; margin-bottom:5px;}
+.legend .sw{width:14px;height:14px;border-radius:3px;flex:0 0 auto;}
+.legend .li span:last-child{color:var(--tx2);}
+
+/* ---------- 底部工具 ---------- */
+#bar{
+  height:44px; flex:0 0 auto; background:var(--panel); border-top:1px solid var(--bd);
+  display:flex; align-items:center; gap:8px; padding:0 18px; font-size:12px; color:var(--tx3);
+}
+#bar input{
+  background:var(--bg2); border:1px solid var(--bd2); border-radius:6px;
+  color:var(--tx); padding:5px 10px; font-size:12px; width:190px; font-family:inherit;
+}
+#bar input:focus{outline:none; border-color:var(--B);}
+.zoombtn{
+  background:var(--panel2); border:1px solid var(--bd2); color:var(--tx2);
+  width:26px; height:24px; border-radius:5px; cursor:pointer; font-size:13px;
+  line-height:1; font-family:inherit;
+}
+.zoombtn:hover{color:var(--tx);}
+#stat{margin-left:auto; font-size:11.5px; color:var(--tx3);}
+
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:5px;}
+::-webkit-scrollbar-thumb:hover{background:#484f58;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>甘肃新高考 · 六科考点权重思维导图</h1>
+  <div class="badge-cal">适用：<b>2027届（现高三）</b> · 兰州/甘肃</div>
+  <div class="badge-cal">语数英 <b>新高考全国Ⅱ卷</b> ｜ 物化生 <b>甘肃自主命题</b></div>
+  <div class="spacer"></div>
+  <button class="hbtn" id="btnExpand">全部展开</button>
+  <button class="hbtn" id="btnCollapse">折叠到模块</button>
+  <button class="hbtn" id="btnFit">适应窗口</button>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div class="meta" id="meta"></div>
+
+<div id="main">
+  <div id="stage">
+    <div id="canvas">
+      <svg id="links"></svg>
+    </div>
+  </div>
+  <div id="side">
+    <div class="hd">节点详情</div>
+    <div class="bd" id="sideBody">
+      <div class="kv"><div class="v" style="color:var(--tx3); line-height:1.8">
+        点击任意节点查看：权重等级 · 近三年分值 · 考查形式 · 备考提示。<br><br>
+        权重口径：<br>
+        <span class="wtag S" style="margin-right:6px">S</span>每年必考，分值 ≥12 分<br>
+        <span class="wtag A" style="margin-right:6px">A</span>三年内多次出现，5–12 分<br>
+        <span class="wtag B" style="margin-right:6px">B</span>隔年或轮换出现<br>
+        <span class="wtag C" style="margin-right:6px">C</span>低频 / 扫盲型考点
+      </div></div>
+    </div>
+    <div class="legend">
+      <div class="li"><span class="sw" style="background:var(--S)"></span><span>S 核心必考 · 优先投入</span></div>
+      <div class="li"><span class="sw" style="background:var(--A)"></span><span>A 高频 · 常规攻坚</span></div>
+      <div class="li"><span class="sw" style="background:var(--B)"></span><span>B 中频 · 轮换扫盲</span></div>
+      <div class="li"><span class="sw" style="background:var(--C)"></span><span>C 低频 · 考前过一遍</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="bar">
+  <span>权重筛选</span>
+  <button class="hbtn on" data-w="S">S 核心</button>
+  <button class="hbtn on" data-w="A">A 高频</button>
+  <button class="hbtn on" data-w="B">B 中频</button>
+  <button class="hbtn on" data-w="C">C 低频</button>
+  <span style="margin-left:14px">搜索</span>
+  <input autocomplete="off" id="q" placeholder="输入关键词定位节点">
+  <span style="margin-left:14px">缩放</span>
+  <button class="zoombtn" id="zo">−</button>
+  <button class="zoombtn" id="zi">＋</button>
+  <div id="stat"></div>
+</div>
+
+<script>
+/* ============================================================
+   权重等级：S 核心必考 / A 高频 / B 中频 / C 低频
+   s: 近三年（2024-2026）该考点在甘肃卷或全国Ⅱ卷中的参考分值
+   f: 出现频次描述
+   t: 备考提示（考查形式 / 抢分要点）
+   注意：甘肃 2022-2023 为老高考全国乙卷（理综），2024 起为新高考，
+   故权重以 2024-2026 三年为主口径，2022-2023 仅作知识点热度参考。
+   ============================================================ */
+
+function N(n,w,s,f,t,c){return {n:n,w:w,s:s,f:f,t:t,c:c||null};}
+
+const SUBJECTS = [
+/* ============================ 数学 ============================ */
+{
+  key:'math', name:'数学', color:'#58a6ff', sub:'全国Ⅱ卷 · 150分/120分钟',
+  meta:[
+    ['卷别','新高考全国Ⅱ卷（教育部考试院命题）'],
+    ['结构','8单选40 + 3多选18 + 3填空15 + 5解答77'],
+    ['计分','150分 原始分计入'],
+    ['三年趋势','结构三年完全一致；基础题约40%、中档45%、压轴15%']
+  ],
+  warn:'2022-2023 甘肃用全国乙卷（文理分科），2024 起才改用全国Ⅱ卷，旧卷只能补知识点、不能当套卷仿真',
+  root:N('数学 · 全国Ⅱ卷','S','150分','2024-2026 结构恒定（8+3+3+5）',
+    '压轴固定在导数（第18/19题）与解析几何/概率。保分战场＝前8单选＋前2-3填空＋前2道解答，约90-105分，一轮必须练到零失误。',[
+  N('函数与导数','S','30–36分','2024-2026 每年必考，全卷分值最高',
+    '第8题常把奇偶性/周期性/对称性三合一；第13题零点与参数；第19题压轴＝切线＋恒成立求参＋最值三问。一轮"见过、会第一问"，二三轮再冲完整。',[
+    N('函数性质（奇偶/单调/周期/对称）','S','5分','每年 1 题',
+      '抽象函数与具体函数结合考查逻辑推理，先把四条性质的等价变形练熟。'),
+    N('导数几何意义与切线方程','A','5分','三年 2 次',
+      '注意"在某点"与"过某点"的区别，是导数题的第一问送分口。'),
+    N('导数与单调性/极值/最值','S','17分','每年 1 道大题',
+      '分类讨论的分界点必须写全，步骤分密集，宁可写慢不可跳步。'),
+    N('恒成立 / 能成立求参数','S','压轴第2问','2025、2026 连考',
+      '两条路：构造差函数分类讨论、必要性探路 + 参数分离，二选一练到闭眼能做。'),
+    N('不等式证明（含双变量）','A','压轴第3问','2024 考查',
+      '端点效应 + 洛必达法则备用；双变量问题统一先减元再构造。'),
+    N('指对幂比较大小','A','5分','隔年出现','统一取对数或找中间量0/1，别硬算。'),
+    N('函数图像识别与零点','A','5分','2026 第13题','先定性（单调/极值/端点）再定量，图像题别逐个代入。')
+  ]),
+  N('解析几何','S','22–27分','2024-2026 每年 2 题 + 压轴候选',
+    '2026 第11题抛物线＋等边三角形、第18题椭圆轨迹。计算量大但强调"几何性质优先、数形结合"，先定几何关系再动笔算。',[
+    N('椭圆','S','12–17分','三年均考','定义、离心率、焦点三角形；大题常以椭圆为载体考定点定值与面积最值。'),
+    N('双曲线','A','5分','2024、2026 考查','渐近线、离心率、定义式 |PF₁−PF₂|=2a，小题为主。'),
+    N('抛物线','A','5–11分','2024、2026 考查','定义转化（到焦点距离＝到准线距离）是提速关键。'),
+    N('直线与圆','A','5分','隔年出现','弦长、切线、隐形圆与距离最值；2025 全国卷考过隐形圆。'),
+    N('圆锥曲线综合（定点/定值/弦长/面积最值）','S','17分','每年第18题位置',
+      '设而不求 + 韦达定理是标准动作，务必练到"看见直线联立就条件反射"。')
+  ]),
+  N('立体几何','S','19–22分','2024-2026 每年 1 道解答',
+    '2026 第16题三棱锥线面垂直证明＋线面角。空间向量法因代数化程度高已成为主流，同时保留体积法等几何法作第二路径。',[
+    N('空间向量法求角与距离','S','15分','每年解答题','建系→写坐标→求法向量→套公式，流程化训练性价比最高。'),
+    N('位置关系证明（线面平行/垂直、面面垂直）','S','解答第1问','每年必考','第一问必须拿满，定理条件（线在面内、两线相交）不能漏写。'),
+    N('几何体表面积/体积与外接球','A','5分','2024 三棱台、2026 第14题','补形法、墙角模型、汉堡模型三大套路要背熟。'),
+    N('折叠与展开问题','A','5分','2025 四边形折叠','折叠前后不变量是突破口，先标不变关系再算。')
+  ]),
+  N('概率与统计','S','18–22分','2024-2026 每年 1–2 题',
+    '2026 第15题电子元件故障检测：频率分布直方图 + 二项分布期望方差。情境化极强，2025 出现过"乒乓球随机游走"反套路压轴。',[
+    N('统计：直方图/数字特征/独立性检验/回归','A','5–15分','三年均考','分位数定位、频率×组距 公式最容易混，单独做一轮专项。'),
+    N('概率：分布列、期望方差、二项分布','S','15分','每年 1 道解答','先识别模型（二项/超几何/独立重复）再列式，识别错＝全题错。'),
+    N('条件概率与全概率','A','5分','2026 涉及','公式要记准，画树状图比套公式稳。'),
+    N('排列组合与计数原理','A','5分','2026 第6题','分组分配问题必须分类讨论，平均分组要除以阶乘。'),
+    N('概率新定义 / 随机游走类压轴','B','压轴','2025 出现','重建模轻套路，一轮不必深耕，二轮集中见题型。')
+  ]),
+  N('数列','A','15–20分','2024-2026 每年选择 + 解答',
+    '2026 第10题等比数列前n项和性质、第12题。公比为负时项正负交替是最常见失分点。',[
+    N('等差 / 等比数列通项与求和','S','5–15分','每年必考','基本量法（首项+公差/公比）是万能解，先设再列。'),
+    N('错位相减 / 裂项 / 倒序求和','A','5分','隔年出现','三种求和法各练5道，形成条件反射。'),
+    N('递推数列与构造','A','5分','三年 2 次','一阶线性递推构造等比，二阶用特征根（可作了解）。'),
+    N('数列与函数/导数/不等式综合','B','压轴候选','2025 出现','数列放缩常用"裂项放缩"与"单调有界"，别在通项上死磕。')
+  ]),
+  N('三角函数与解三角形','A','15–20分','2024-2026 每年 1 道解答',
+    '2026 第17题：余弦定理证钝角三角形 → 正弦定理＋面积公式求周长。定位为中档题，一轮要专题突破拿满步骤分。',[
+    N('解三角形（正/余弦定理、面积、周长）','S','15分','每年 1 道解答','先判断解的个数（SSS/SAS/SSA），再选定理，避免漏解。'),
+    N('三角恒等变换与图像性质','A','5分','每年选择填空','和差倍半、辅助角公式、y=Asin(ωx+φ) 三参数。'),
+    N('平面向量','A','5分','每年 1 题','几何意义（极化恒等式、投影）比坐标法快一倍。')
+  ]),
+  N('基础送分模块','C','10–16分','每年第1-3题',
+    '集合与复数三年固定在第1、2题，属于必须零失误的送分区，但每年都有人算错。',[
+    N('集合与常用逻辑用语','C','5分','每年 1 题','补集、子集、充分必要条件，3分钟内解决。'),
+    N('复数','C','5分','每年 1 题','四则运算与模，注意 i²=−1 与共轭。'),
+    N('不等式与基本不等式','C','5分','隔年出现','"1的代换"与"凑定值"两个动作。')
+  ])
+])},
+
+/* ============================ 语文 ============================ */
+{
+  key:'chinese', name:'语文', color:'#f85149', sub:'全国Ⅱ卷 · 150分/150分钟',
+  meta:[
+    ['卷别','新高考全国Ⅱ卷'],
+    ['结构','现代文35 + 古诗文35 + 语用20 + 作文60'],
+    ['计分','150分 原始分计入'],
+    ['命题导向','素养立意、反套路、重思辨，阅读量持续增大']
+  ],
+  warn:'语文是六科里"投入产出比最不线性"的一科：作文60分占40%，必须全程贯穿训练，不能留到三轮',
+  root:N('语文 · 全国Ⅱ卷','S','150分','2024-2026 板块结构稳定',
+    '阅读＋写作合计约124分（82.7%）。本质＝读懂别人的话（阅读）＋说好自己的话（写作）。现代文与古诗文各35分，是仅次于作文的两大块。',[
+  N('现代文阅读Ⅰ · 信息类文本','S','17–19分','每年必考',
+    '复合文本（科技新闻＋论文）为主。重信息筛选整合、论证分析、概念理解。答案开放，需精准概括＋规范表达。',[
+    N('信息筛选与整合','S','5–6分','每年必考','分层标注段落，逐项回原文比对，警惕"偷换概念/以偏概全"。'),
+    N('论证分析（论点/论据/论证方法/思路）','S','5–6分','每年必考','先找中心论点再拆分论点，论证结构题按"提出—分析—结论"作答。'),
+    N('概念理解与逻辑推断','A','3–4分','每年 1 题','选项常设"因果倒置/无中生有"，用"能否从原文推出"判断。'),
+    N('探究评价与迁移应用','A','3–4分','隔年出现','结合文本观点评外部现象，必须先复述文本立场。')
+  ]),
+  N('现代文阅读Ⅱ · 文学类文本','S','16–18分','每年必考，小说/散文轮换',
+    '2025 全国Ⅱ卷考《儒林外史》节选。形象、手法、意蕴、评点是四类固定设问。反模板、重共情。',[
+    N('小说：人物 / 情节 / 环境 / 主题','S','8–10分','小说年份必考','人物题抓"外在+内在+关系"，情节题抓"推动/铺垫/突转"。'),
+    N('散文：形象 / 情感 / 语言','S','8–10分','散文年份必考','抓线索物象与情感脉络，语言题从"炼字+句式+修辞"三层答。'),
+    N('艺术手法赏析','S','4–6分','每年必考','术语要准（衬托≠对比、借代≠借喻），格式＝手法＋内容＋效果。'),
+    N('文本探究与评点','A','4分','隔年出现','言之成理即可得分，但要"观点＋文本依据＋分析"三段式。')
+  ]),
+  N('文言文阅读','S','约20分','每年必考',
+    '选文以正史/杂记（史传人物、良吏贤士）为主，兼顾《晋书》类史传＋后人评点。断句、实词、概述、翻译四题固定。',[
+    N('断句','A','3分','每年必考','抓名词代词作主语宾语、虚词（夫/盖/也）位置、对称句式。'),
+    N('实词 / 虚词 / 文化常识','A','3分','每年必考','120实词＋18虚词是硬功夫，语境推断优先于死记。'),
+    N('内容概述与文意理解','A','3分','每年必考','错误项多为"张冠李戴/时序错乱/程度失当"。'),
+    N('句子翻译','S','8分','每年必考，2句','直译为主、字字落实，特殊句式（宾语前置/定语后置）必须调整语序。'),
+    N('主观简答','A','3分','隔年出现','概括人物品格或事件原因，分条作答。')
+  ]),
+  N('古代诗歌阅读','S','约9分','每年必考',
+    '1选择＋1主观。唐宋诗词为主，名家非名篇。意象、情感、炼字、表现手法四大抓手。',[
+    N('思想感情把握','S','4分','每年必考','抓标题、注释、意象群、情感词，分层概括不遗漏。'),
+    N('表现手法与炼字','A','3分','每年 1 题','修辞＋描写＋抒情方式三类；炼字按"释义＋描景＋传情"答。'),
+    N('形象与语言风格','B','2分','隔年出现','结合诗人经历与时代背景。')
+  ]),
+  N('名篇名句默写','S','约6分','每年必考，3小题',
+    '唯一"背了就能拿满"的板块，目标是6分全拿。情境式默写，不是上下句填空，必须理解句意再定位。',[
+    N('高中必背篇目','S','4分','每年 2 题','优先拿下《劝学》《师说》《赤壁赋》《氓》《离骚》高频句。'),
+    N('初中兼考篇目','A','2分','每年 1 题','易错字专项：通假字、同音异形字，默写本每周过一轮。')
+  ]),
+  N('语言文字运用','S','约20分','每年必考，全部情境化',
+    '已取消孤立的字音字形客观题，改为嵌入真实读写情境。重词语释义、语句修改、表达优化。',[
+    N('成语 / 词语辨析与运用','A','3–4分','每年必考','近义成语辨析看"对象/感情色彩/轻重/搭配"四维。'),
+    N('病句辨析与修改','A','3–4分','每年必考','六大病句类型口诀化，先找主干再查枝叶。'),
+    N('语句衔接与连贯','A','3–4分','每年必考','看陈述对象一致、逻辑顺序、代词指代、关联词搭配。'),
+    N('修辞 / 仿写 / 句式变换','B','3–4分','三年 2 次','仿写要"形似＋神似"，修辞效果题按"手法＋内容＋情感"。'),
+    N('压缩扩展 / 图文转换','B','3–4分','三年 1–2 次','流程图抓环节与箭头，图表题抓趋势与极值。')
+  ]),
+  N('写作','S','60分','每年必考，占全卷40%',
+    '思辨型材料作文，反对套作与空洞宏大叙事，侧重个人成长体验与时代认知融合。目标48分+。',[
+    N('审题立意','S','—','每年必考','新材料作文抓核心概念与关系型对立，立意要"具体＋有层次"。'),
+    N('结构布局','S','—','每年必考','总分总＋分论点并列/递进，段首亮观点是阅卷友好写法。'),
+    N('素材运用','S','—','每年必考','建立科技自立、青年成长、文化传承三类素材库，一案多用。'),
+    N('语言表达与思辨深度','S','—','每年必考','避免绝对化表述，多用"并非…而是…"，体现辩证。')
+  ])
+])},
+
+/* ============================ 英语 ============================ */
+{
+  key:'english', name:'英语', color:'#3fb950', sub:'全国Ⅱ卷 · 150分/120分钟',
+  meta:[
+    ['卷别','新高考全国Ⅱ卷'],
+    ['结构','听力30 + 阅读50 + 语言运用30 + 写作40'],
+    ['计分','150分 原始分计入'],
+    ['时间','120分钟（含听力）']
+  ],
+  warn:'⚠ 甘肃 2025、2026 听力不计入总分（笔试×1.25）；从 2027 届起听力正式计入总分 —— 你这届听力必须练',
+  root:N('英语 · 全国Ⅱ卷','S','150分','2024-2026 结构稳定',
+    '2027 起听力30分计入总分，这是你这届最大的结构性变化。写作40分（应用文15＋读后续写25）是第二大块。',[
+  N('听力','S','30分','2027 起计入总分',
+    '20题分两节：5段短对话（7.5分）＋5段长对话/独白（22.5分）。平均得分率仅58%–65%，提分空间最大的一块，目标24分+。',[
+    N('短对话（时间/地点/数字/意图）','A','7.5分','每年必考','利用播放指令时间预读题干，圈关键词。'),
+    N('长对话与独白','S','22.5分','每年必考','转折词（but/however）后必出答案，独白抓首尾句与重复词。'),
+    N('精听复盘法','S','—','训练方法','每天一套真题，错题反复听写直到全懂，两周见效。')
+  ]),
+  N('阅读理解','S','37.5分','每年必考，15题×2.5分',
+    '全卷分值最高的板块。近年重逻辑思辨，正确选项约90%是原文同义替换。限时训练每篇7-8分钟。',[
+    N('细节理解','S','10–12.5分','每年必考，占比最大','定位→比对，答案必在原文有依据，不选"合理但没提到"的。'),
+    N('推理判断','S','7.5–10分','每年必考','推断要"一步到位"，两步以上的推断基本是错的。'),
+    N('主旨大意 / 标题选择','A','2.5–5分','每年 1–2 题','抓首尾段与各段首句，警惕以偏概全。'),
+    N('词义猜测','A','2.5分','每年 1 题','看前后句的逻辑关系（并列/转折/举例/定义）。'),
+    N('高频词与长难句','S','—','贯穿全卷','3500词＋真题高频学术词（如 microplastics、synthetic），构词法拆词根。')
+  ]),
+  N('七选五','S','12.5分','每年必考，5题×2.5分',
+    '技巧性最强、性价比最高的题型，目标满分。不依赖语感，逻辑法掌握后提分极快。',[
+    N('主题句 / 段首段尾设空','A','5分','每年必考','段落主题句看本段高频词与结构位置。'),
+    N('过渡句 / 逻辑衔接','S','5分','每年必考','圈选项代词（it/they/this）与连词，回原文看空格前后句。'),
+    N('一致性检查','A','2.5分','每年必考','代入后检查人称、时态、单复数是否一致。')
+  ]),
+  N('完形填空','A','15分','每年必考，15题×1分',
+    '性价比相对低：新高考更重语境与情感色彩，对语篇和词汇深度要求高，提分慢。建议放到阅读之后攻坚。',[
+    N('语境与情感线索','A','8–10分','每年必考','先通读全文把握情感走向，再逐空选，别看一句选一句。'),
+    N('词汇辨析（近义/形近）','A','5分','每年必考','真题高频词组本＋固定搭配专项。'),
+    N('逻辑连接词','B','2分','隔年出现','转折/因果/递进标志词。')
+  ]),
+  N('语法填空','A','15分','每年必考，10题×1.5分',
+    '考点高度集中：时态语态、非谓语、从句连接词、词性转换。是有明确清单、可短期突破的题型。',[
+    N('时态与语态','A','3分','每年 1–2 题','抓时间状语与主谓一致。'),
+    N('非谓语动词','S','4.5分','每年 2–3 题','先判断主动/被动、进行/完成，再定 to do / doing / done。'),
+    N('定语从句与名词性从句','A','3分','每年 1–2 题','先看缺什么成分再选引导词，that/which/who/what 分清楚。'),
+    N('词性转换与构词法','A','3分','每年 1–2 题','名词/形容词/副词后缀表要背熟。'),
+    N('介词与固定搭配','B','1.5分','隔年出现','真题短语积累，别靠语感。')
+  ]),
+  N('应用文写作','S','15分','每年必考',
+    '提分最快的写作题，有套路可循，模板＋功能句可拉开5-6分差距。近年趋势反模板，注重思辨与交际得体。',[
+    N('格式与要点覆盖','S','5分','每年必考','书信/通知/报道格式固定，审题先圈全部要点，漏要点扣分最重。'),
+    N('功能句与衔接','S','5分','每年必考','开头、过渡、结尾各备3套万能句，用逻辑词串联。'),
+    N('语言准确性与得体','A','5分','每年必考','先求对再求雅，时态与人称全篇统一。')
+  ]),
+  N('读后续写','S','25分','每年必考',
+    '需要长期积累，短期难突破，但25分是六科单题里最大的一块，必须全程训练。',[
+    N('情节构思与逻辑衔接','S','10分','每年必考','承接原文的伏笔与矛盾，两段首句已给，先定"两段各自解决什么"。'),
+    N('细节呼应（人物/物件/情感）','S','8分','每年必考','回收前文出现过的细节（如某件物品、某句话）是高分标志。'),
+    N('语言生动性（动作/心理/环境描写）','A','7分','每年必考','每续写段至少1处动作链描写＋1处心理或环境描写。')
+  ])
+])},
+
+/* ============================ 物理 ============================ */
+{
+  key:'physics', name:'物理', color:'#a371f7', sub:'甘肃卷 · 100分/75分钟',
+  meta:[
+    ['卷别','甘肃省教育考试院自主命题'],
+    ['结构','单选7×4=28 + 多选3×5=15 + 非选择5题57'],
+    ['计分','100分 原始分计入（首选科目，不赋分）'],
+    ['模块占比','力学35–40 + 电磁学35–42 + 热/光/原合计约20']
+  ],
+  warn:'2022-2023 甘肃物理在全国乙卷理综内（110分制、含选考），2024 起改为独立100分卷，题型与题量断裂式变化',
+  root:N('物理 · 甘肃卷','S','100分','2024-2026 结构稳定：10选择 + 5非选择',
+    '75分钟15题。力学＋电磁学合计超70%，是绝对主干；热学、光学、近代物理各约5–8分，以选择题为主。命题"无情境不命题"，需先建模再求解。',[
+  N('力学','S','35–40分','2024-2026 每年占比最高',
+    '主干中的主干。核心是"多过程分析"：画受力图→分阶段→选规律（牛顿/能量/动量）→列式。',[
+    N('匀变速直线运动与图像','A','4分','每年 1 题','v-t 面积＝位移、斜率＝加速度；2026 考过"先加速后减速全过程"判断瞬时量。'),
+    N('受力分析与共点力平衡','A','4–6分','每年必考','弹力有无判断、摩擦力方向、整体法隔离法切换。'),
+    N('牛顿运动定律（含瞬时性、超重失重）','S','6–10分','每年必考','2026 第4题人形机器人奔跑。瞬时性问题抓"绳/弹簧"的突变差异。'),
+    N('曲线运动：平抛 / 类平抛 / 圆周运动','S','6–10分','每年必考','平抛分解到两轴；圆周运动先找圆心半径再求向心力来源。'),
+    N('万有引力与航天','A','4–6分','三年 2 次','黄金代换 GM=gR²、卫星变轨、开普勒第三定律；2026 出现"引力差值"新定义题。'),
+    N('功和能：动能定理 / 机械能守恒 / 功能关系','S','8–12分','每年必考','大题必用。先判断是否守恒，不守恒就用动能定理，能量守恒是最稳的路径。'),
+    N('动量：动量定理 / 动量守恒 / 碰撞与反冲','S','8–12分','每年必考','2026 第14题球形机器人（13分）。碰撞模型＝动量守恒＋能量损失，系统视角分析。')
+  ]),
+  N('电磁学','S','35–42分','2024-2026 每年，压轴主力',
+    '与力学并列的另一半江山。压轴题几乎固定为"力电融合"：复合场 / 电磁感应 ＋ 牛顿与能量。',[
+    N('静电场：场强 / 电势 / 电场力做功与电势能','S','6–8分','每年必考','2026 第2题静电卡盘。做功与电势能变化反号，是高频陷阱。'),
+    N('恒定电流：闭合电路欧姆定律 / 动态分析','A','4–6分','每年 1 题','串并联动态分析按"局部→整体→局部"三步走。'),
+    N('磁场：安培力 / 洛伦兹力','S','6–8分','每年必考','安培力左手定则、洛伦兹力永不做功，注意"有效长度"。'),
+    N('带电粒子在复合场中的圆周运动','S','8–12分','每年必考或作压轴','2026 多选第10题磁谱仪、第15题压轴。先定圆心半径（几何）再列 r=mv/qB。'),
+    N('电磁感应：法拉第定律 / 楞次定律 / 图像','S','8–12分','每年必考','感应电动势＋安培力＋运动学三联动，是压轴题最常见的载体。'),
+    N('交变电流：有效值峰值 / 理想变压器 / 远距离输电','A','4–6分','三年 2 次','有效值＝峰值/√2（正弦）；变压器变比与功率守恒。')
+  ]),
+  N('热学','A','6–9分','2024-2026 每年 1 题 + 偶尔作计算题',
+    '2026 第13题（9分）：气室等温充气→挤压变形→等容升温。难点不在气体定律，而在受力分析与几何面积变化。',[
+    N('理想气体状态方程 / 气体实验定律','S','6–9分','每年必考','玻意耳、查理、盖·吕萨克三定律的适用条件要分清等温/等容/等压。'),
+    N('气体压强与活塞受力分析','S','—','每年必考','热学题的真正难点是力学建模，务必先画受力图。'),
+    N('热力学第一定律','B','2–3分','隔年出现','ΔU=W+Q 符号法则，做功看体积变化。'),
+    N('固体液体与物态变化','C','2分','低频','扫盲型，考前过一遍即可。')
+  ]),
+  N('光学','B','4–6分','2024-2026 每年 1 题',
+    '以选择题形式出现，折射率与全反射是绝对核心。',[
+    N('折射定律与全反射','A','4分','每年必考','临界角 sinC=1/n；2026 第9题锥形光纤检测气泡是全卷最精妙的一题。'),
+    N('光的干涉与衍射（双缝干涉）','B','2分','三年 1–2 次','Δx=Lλ/d 条纹间距公式，2026 考过。'),
+    N('几何光学作图','B','2分','低频','光路可逆，先画法线。')
+  ]),
+  N('近代物理','A','4–8分','2024-2026 每年 1 题',
+    '全部以选择题呈现，属于"记忆＋简单计算"型，性价比高，必须拿满。',[
+    N('原子能级跃迁','A','4分','三年 2 次','hν=E₂−E₁，注意是"吸收光子能量等于能级差"，与光强无关。'),
+    N('核反应与衰变 / 质量亏损 / 质能方程','A','4分','每年 1 题','电荷数、质量数双守恒；2026 第1题铅-205铊核β衰变。'),
+    N('光电效应','B','2–4分','隔年出现','截止频率、逸出功、遏止电压三公式。')
+  ]),
+  N('机械振动与机械波','B','3–4分','三年 1–2 次',
+    '2026 选择题考过简谐横波。属于容易漏掉的模块，一轮要专门扫一遍。',[
+    N('简谐运动与单摆','B','2分','低频','周期公式、回复力特征。'),
+    N('机械波图像与传播方向','B','2分','三年 1 次','"上坡下、下坡上"判断质点振动方向。')
+  ]),
+  N('实验（一力一电）','S','15–18分','每年 2 题，共15–18分',
+    '甘肃卷实验题已彻底"去模板化"：不考背步骤，考原理迁移。2026 考薄膜压缩时间测量（动量定理）＋棉花电阻替代法测电阻。',[
+    N('力学实验：验证动量守恒 / 机械能守恒 / 探究加速度','A','6–8分','每年 1 题，原型来自教材','装置理解＋数据处理（逐差法），原型要吃透。'),
+    N('电学实验：伏安法 / 测电动势内阻 / 创新电路','S','8–12分','每年 1 题，常为创新题','内外接选择、滑动变阻器分压/限流、U-I 图像斜率截距的物理意义。'),
+    N('实验通用能力：有效数字 / 图像 / 误差 / 方案设计','S','—','每年必考','这是实验题真正的得分点：读数估读、作图规范、误差来源表述、方案设计。'),
+    N('等效替代法 / 半偏法 / 传感器与DIS','A','4–8分','2026 出现','原理迁移题的固定母题，各练3道。')
+  ]),
+  N('应试与数学工具','S','—','贯穿全卷',
+    '2026 甘肃卷数学要求明显提高：几何建模、代数推导、含参分类讨论是"隐形门槛"。',[
+    N('情境建模训练','S','—','每年必考','读题→圈条件→剥离情境→建模型→选规律，每周至少1次专项。'),
+    N('时间分配','S','—','75分钟','选择23-26分钟｜实验10-12分钟｜计算25-30分钟｜检查5分钟。'),
+    N('多选题策略','S','—','每年必考','不确定的宁少选不多选，部分选对得3分、错选0分。')
+  ])
+])},
+
+/* ============================ 化学 ============================ */
+{
+  key:'chemistry', name:'化学', color:'#ffa657', sub:'甘肃卷 · 100分/75分钟 · 赋分',
+  meta:[
+    ['卷别','甘肃省教育考试院自主命题'],
+    ['结构','单选14×3=42 + 非选择4题58（流程/实验/原理/有机）'],
+    ['计分','100分 等级赋分计入'],
+    ['命题特色','题干西北化（钍基熔盐堆、当归、钛白、白云岩），考点全国化']
+  ],
+  warn:'化学是赋分科目：卷面难度高时不要慌，赋分看的是省内位次而非绝对分',
+  root:N('化学 · 甘肃卷','S','100分','2024-2026 结构稳定：14选择 + 4大题',
+    '75分钟18题。非选择题固定为工艺流程＋实验探究＋反应原理＋有机合成四大题。「物质结构与性质」「化学反应原理」两大模块分值占比最高。',[
+  N('物质结构与性质','S','20–25分','2024-2026 分值占比最高之一',
+    '选择题＋第13题（晶胞）固定考查。甘肃卷必考晶胞均摊与密度计算，2026 是 Co-N 立方晶胞 Zn 替换顶点。',[
+    N('原子结构：电子排布式/排布图/电离能/电负性/半径','S','6分','每年必考','基态原子价层电子排布"四步法"；第一电离能 ⅡA>ⅢA、ⅤA>ⅥA。'),
+    N('分子结构：共价键/杂化/VSEPR/分子极性/氢键','S','6分','每年必考','价层电子对→杂化→模型→构型一条链，氢键对沸点溶解性的解释要会写。'),
+    N('晶体结构与晶胞计算','S','6–9分','每年必考','均摊法三步：①数原晶胞 ②按替换位置重算 ③密度式分子=Σ(原子×M)。'),
+    N('元素推断与周期律','A','6分','每年必考','以"位—构—性"三角为框架，先定周期再定族。')
+  ]),
+  N('化学反应原理','S','25–30分','2024-2026 分值占比最高之一',
+    '第17题固定位置，通常含热化学＋速率平衡＋图像＋反应历程四类设问。是区分度最大的大题。',[
+    N('热化学：盖斯定律 / 热化学方程式','S','6分','每年必考','目标方程式＝已知式线性叠加；状态、ΔH单位缺一不可。'),
+    N('反应速率与化学平衡：三段式 / K、Kp / 平衡图像','S','10–14分','每年必考','三段式是卷面分不能丢的部分；平衡图像抓"先拐先平数值大"。'),
+    N('水溶液：电离平衡 / 分布分数δ图 / Ksp / 多重平衡','S','6–10分','每年必考，难度上升','2026 第14题把"酸分布分数δ"与"配合物 -lgc"双图同框。δ图找酸形交点 pH=pKa；-lgc 图找配合物交点 pH=pK稳。'),
+    N('电化学：原电池 / 电解池 / 电极反应式 / 离子交换膜','S','6–9分','每年必考','"三定法"：定池型→定电极（负失氧、正得还；阳氧阴还）→写电极式。2026 考尿素燃料电池处理含Cr(Ⅵ)污水。'),
+    N('反应历程能量图与决速步判断','A','3–4分','2026 出现','活化能最高的那一步就是决速步，从图中读自由能差。')
+  ]),
+  N('化学实验','S','12–18分','每年 1 道大题 + 2–3道选择',
+    '2026 第16题白云石钙含量测定（CaC₂O₄沉淀＋KMnO₄返滴）。定量实验＋误差分析是核心。',[
+    N('定量实验：滴定法 / 含量测定','S','8–12分','每年必考','终点判断、返滴定与间接滴定的计算逻辑；近终点褪色快慢要能解释（Mn²⁺催化）。'),
+    N('基本仪器与操作：分离提纯/蒸馏/分液/重结晶','A','4–6分','每年必考','仪器名称不能写错别字（坩埚、分液漏斗）。'),
+    N('实验方案设计与评价','A','4–6分','每年必考','模板：原理科学性→操作可行性→环保经济性→现象是否明显。'),
+    N('误差分析与异常现象解释','A','3–4分','每年必考','按"操作→物理量变化→结果偏高/偏低"三步表述。')
+  ]),
+  N('工艺流程','S','12–15分','每年 1 道大题',
+    '2026 第15题钛白生产（甘肃本土情境）。传统套路流程减少，转向真实工业情境，要求从图文中现场提取反应信息。',[
+    N('流程分析：原料→浸出→除杂→分离→产品','S','6–8分','每年必考','三步法：读头尾定目标、看箭头找循环、析条件推目的。'),
+    N('陌生方程式书写','S','4–6分','每年必考','先定氧化剂还原剂与产物，再用电荷守恒、原子守恒配平。'),
+    N('条件控制目的（pH/温度/氛围）','A','3–4分','每年必考','高频答案词：提高浸出率、抑制水解、使××沉淀完全、循环利用。')
+  ]),
+  N('有机化学','S','15–20分','每年 1 道压轴大题 + 2道选择',
+    '2026 第18题恩那度司他合成（含 Dimroth 重排）。有机压轴已从"推断"升级为"机理＋合成设计"。',[
+    N('官能团性质与反应类型','A','6分','每年必考','烃→卤代烃→醇→醛→酸→酯转化网，每步试剂条件烂熟。'),
+    N('同分异构体书写（限定条件）','A','3–4分','每年必考','有序法：碳链→位置→官能团→立体，先定官能团再拼骨架。'),
+    N('有机合成路线设计（逆合成分析）','S','8–10分','每年必考','由目标分子切割官能团骨架，逐步前推到简单原料。'),
+    N('有机机理与重排（断键判定）','A','3–4分','2026 新出现','Dimroth 重排断 σ 键看"能否形成更稳定芳环"的一侧。'),
+    N('核磁共振氢谱与结构表征','A','3分','隔年出现','峰组数＝等效氢种类，峰面积比＝数目比，推出对称结构。')
+  ]),
+  N('元素及其化合物','A','12–18分','每年渗透考查',
+    '不单独成题，但渗透在流程题、选择题、离子方程式中，是"底层支撑"。',[
+    N('金属元素：钠/镁/铝/铁/铜','A','4–6分','每年必考','以化合价变化为主线，单质→氧化物→碱→盐转化图。'),
+    N('非金属元素：氯/硫/氮/硅','A','4–6分','每年必考','特征颜色与特殊反应（钝化、铝热、侯氏制碱、氯碱工业）。'),
+    N('氧化还原反应与离子方程式','A','6分','每年必考','三步：拆写→查原子守恒→查电荷守恒；试剂用量不同产物可能不同。')
+  ]),
+  N('化学基本概念与STSE','A','6–9分','每年 2–3 道选择',
+    '送分区，但情境越来越新（2026 考"十五五"清洁能源、钍基熔盐堆、岷县当归、尿素发光材料）。',[
+    N('物质分类与性质 / 胶体 / 电解质','A','3分','每年必考','辨析类，概念边界要清。'),
+    N('阿伏加德罗常数 NA','A','3分','几乎每年','三大陷阱：物质状态、可逆反应与水解、电子转移数目。'),
+    N('化学与STSE / 传统文化 / 甘肃本土情境','A','3–6分','每年必考','情境是壳，落点必是课本主干，别被陌生名词吓住。')
+  ])
+])},
+
+/* ============================ 生物 ============================ */
+{
+  key:'biology', name:'生物', color:'#3fb950', sub:'甘肃卷 · 100分/75分钟 · 赋分',
+  meta:[
+    ['卷别','甘肃省教育考试院自主命题'],
+    ['结构','单选16×3=48 + 非选择5题52'],
+    ['计分','100分 等级赋分计入'],
+    ['模块占比','细胞代谢≈22 ｜ 遗传进化≈21 ｜ 生态环境≈17 ｜ 稳态调节≈16 ｜ 技术工程≈14']
+  ],
+  warn:'生物同为赋分科目；本卷阅读信息量大、图表占比高，单纯死记课本很难拿高分',
+  root:N('生物 · 甘肃卷','S','100分','2024-2026 结构稳定：16选择 + 5非选择',
+    '75分钟21题。大量融入甘肃本土素材（天祝藜麦、西北甜醅、青藏雪豹、荒漠生态）。重概念辨析、图表读取、逻辑推理、实验探究。',[
+  N('分子与细胞','S','约22分','2024-2026 每年占比最高',
+    '细胞代谢是本模块的核心，也是全卷分值最集中的单点。',[
+    N('组成细胞的分子：蛋白质/核酸/糖/脂质/无机物','A','3–6分','每年必考','2026 第1题天祝藜麦。易错：高温使蛋白质变性只破坏空间结构，氨基酸营养价值未丢失。'),
+    N('细胞结构与功能（膜/细胞器/原核真核）','A','3–6分','每年必考','2026 第2题：原核细胞同样有磷脂双分子层；电镜"暗-亮-暗"三层结构当时尚未提出流动镶嵌模型。'),
+    N('细胞代谢：酶与ATP','A','3–6分','每年必考','酶的本质、影响因素曲线、ATP与ADP转化。'),
+    N('细胞呼吸','S','4–8分','每年必考','2026 第4题线粒体复合体Ⅰ柱状图（WT vs CMS），要求分析实验结果而非背流程。'),
+    N('光合作用','S','6–12分','每年必考（含非选择题）','2026 第17题光合模型（SIF曲线评价模型偏差）。光饱和点、色素、净光合速率。'),
+    N('细胞的生命历程：增殖/分化/衰老/凋亡/癌变','B','3–6分','三年 2 次','有丝分裂图像、癌变特征、凋亡与坏死区别。'),
+    N('物质跨膜运输','B','2–3分','隔年出现','主动运输与被动运输的判断依据。')
+  ]),
+  N('遗传与进化','S','约21分','2024-2026 每年占比第二',
+    '遗传推理是本卷区分度的核心来源之一，非选择题必有一道遗传题。',[
+    N('遗传定律：分离 / 自由组合 / 伴性遗传','S','8–12分','每年必考','系谱分析＋概率计算。非同源染色体自由组合是重组已有基因，不增加基因数量。'),
+    N('遗传的分子基础：DNA复制/转录/翻译/中心法则','A','3–6分','每年必考','同位素标记实验、半保留复制计算。'),
+    N('变异与育种：基因突变/基因重组/染色体变异','A','3–6分','每年必考','三类变异的区分与育种方案设计。'),
+    N('表观遗传','B','2–3分','2026 出现','DNA甲基化、组蛋白修饰均属表观遗传，调控表达不改变序列。'),
+    N('进化：自然选择/基因频率/物种形成','B','3分','三年 1–2 次','2026 第7题高山雪莲长期采挖与自然选择。')
+  ]),
+  N('稳态与调节','S','约16分','2024-2026 每年必考',
+    '神经—体液调节常作为非选择题载体，2026 第18题。',[
+    N('内环境与稳态','A','3分','每年 1 题','成分、理化性质（渗透压/pH/温度）。'),
+    N('神经调节','S','4–6分','每年必考','电位变化机制、突触传递、反射弧。'),
+    N('体液调节（激素）','S','4–6分','每年必考','2026 第11题多组激素处理推测化合物X作用，需对比控制变量。'),
+    N('免疫调节','A','3–6分','三年 2 次','体液免疫与细胞免疫流程、疫苗原理。'),
+    N('植物激素调节','A','3–6分','三年 2 次','生长素两重性、其他激素协同拮抗。')
+  ]),
+  N('生物与环境','S','约17分','2024-2026 每年必考',
+    '甘肃本土荒漠生态情境高频出现，生态保护类设问是特色。',[
+    N('种群与群落','A','4–6分','每年必考','种群密度调查方法、群落演替、种间关系（2026 第13题）。'),
+    N('生态系统结构与功能：能量流动/物质循环/信息传递','S','8–12分','每年必考','能量流动计算（传递效率10%–20%）、碳循环图、抵抗力与恢复力稳定性。'),
+    N('生态保护与荒漠治理（本土情境）','A','3–6分','每年必考','2026 第14题荒漠植物适应、第19题相关情境。')
+  ]),
+  N('生物技术与工程','S','约14分','2024-2026 每年必考',
+    '基因工程几乎每年一道非选择题，2026 第21题以西北甜醅串联发酵与基因工程。',[
+    N('发酵工程与微生物培养','A','3–6分','每年必考','2026 第3题支原体污染动物细胞培养、第21题甜醅发酵。'),
+    N('基因工程','S','6–8分','每年必考','限制酶选择、表达载体构建、目的基因检测与鉴定。'),
+    N('细胞工程与胚胎工程','B','3–6分','三年 1–2 次','植物组织培养、动物细胞融合、胚胎移植。')
+  ]),
+  N('实验探究能力（贯穿全卷）','S','约10–15分','每年必考',
+    '2025 减少了实验设计类长句表述，2026 又回升。不能完全押方向，必须两手准备。',[
+    N('变量控制与对照设置','S','—','每年必考','自变量/因变量/无关变量，先写"取…加入…控制…观察…"。'),
+    N('实验结果预测与结论表述','S','—','每年必考','预期结果要写具体现象（生成某色沉淀/溶液变某色/有气泡）。'),
+    N('实验方案评价与改进','A','—','三年 2 次','从"单一变量原则""对照是否充分""是否可重复"三角度评。'),
+    N('图表信息读取（柱状图/表格/电泳条带/流程）','S','—','每年必考，占比极高','2026 第4题WT-CMS柱状图、第6题RNA与蛋白质印迹条带。比较时必须统一对象和条件。')
+  ]),
+  N('答题规范','S','—','贯穿非选择题',
+    '生物非选择题要求写出"材料信息—生物学原理—过程变化—结论"的完整链条，这是失分最集中的地方。',[
+    N('规范术语与长句作答','S','—','每年必考','避免口语化，用教材原词；分条作答。'),
+    N('避免绝对化表述','A','—','每年必考','选择题里"一定""完全""只能"多为错误项。')
+  ])
+])}
+];
+
+/* ============================================================
+   渲染逻辑
+   ============================================================ */
+const NODE_W = 216, NODE_H = 66, GAP_Y = 12, COL_GAP = 258;
+let cur = SUBJECTS[0];
+let scale = 1, tx = 60, ty = 40;
+let selNode = null;
+const collapsed = new Set();
+const filterW = new Set(['S','A','B','C']);
+let query = '';
+
+const $ = id => document.getElementById(id);
+const stage=$('stage'), canvas=$('canvas'), svg=$('links'), sideBody=$('sideBody');
+
+/* --- 可见子节点（考虑折叠 + 权重筛选 + 搜索） --- */
+function visibleChildren(node){
+  let kids = node.c || [];
+  if(filterW.size < 4){
+    kids = kids.filter(k => subtreeMatch(k));
+  }
+  return kids;
+}
+function weightOk(n){ return filterW.has(n.w); }
+function subtreeMatch(n){
+  if(query){ if(hasQuery(n)) return true; }
+  if(weightOk(n)) return true;
+  return (n.c||[]).some(subtreeMatch);
+}
+function hasQuery(n){
+  if(!query) return false;
+  const s=(n.n+' '+(n.s||'')+' '+(n.f||'')+' '+(n.t||'')).toLowerCase();
+  if(s.includes(query)) return true;
+  return (n.c||[]).some(hasQuery);
+}
+
+function isCollapsed(node){ return collapsed.has(node) && (node.c||[]).length>0; }
+
+/* --- 布局 --- */
+let cursorY = 0;
+function layout(node, depth){
+  node._x = depth * COL_GAP;
+  const kids = isCollapsed(node) ? [] : visibleChildren(node);
+  if(kids.length===0){
+    node._y = cursorY;
+    cursorY += NODE_H + GAP_Y;
+  }else{
+    kids.forEach(k=>layout(k, depth+1));
+    node._y = (kids[0]._y + kids[kids.length-1]._y)/2;
+  }
+}
+
+/* --- 绘制 --- */
+let nodeEls = [], linkPaths = [];
+function render(){
+  cursorY = 0;
+  layout(cur.root, 0);
+  const maxDepth = (function d(n){ 
+    const k = isCollapsed(n)?[]:visibleChildren(n);
+    return k.length? 1+Math.max(...k.map(d)) : 0; })(cur.root);
+  const W = maxDepth*COL_GAP + NODE_W + 80;
+  const H = Math.max(cursorY + 60, 400);
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+
+  nodeEls.forEach(e=>e.remove());
+  nodeEls=[]; linkPaths=[];
+  let pathsHTML='';
+
+  (function walk(node, depth, parent){
+    const el = document.createElement('div');
+    const kids = isCollapsed(node)?[]:visibleChildren(node);
+    const isRoot = depth===0;
+    el.className = 'node w-'+node.w + (isRoot?' root':'') + (depth===1?' mid':'');
+    if(node===selNode) el.classList.add('sel');
+    if(query && hasQuery(node)) el.classList.add('hit');
+    el.style.left = node._x+'px';
+    el.style.top  = node._y+'px';
+    if(depth===0){ el.style.minHeight='78px'; }
+
+    const bdgW = {S:'S',A:'A',B:'B',C:'C'}[node.w];
+    let h = '<div class="r1"><span class="bdg">'+bdgW+'</span><span class="nm">'+esc(node.n)+'</span></div>';
+    h += '<div class="r2"><span class="sc">'+esc(node.s||'')+'</span>'+
+         (node.f? ' · '+esc(node.f):'')+'</div>';
+    el.innerHTML = h;
+    if((node.c||[]).length>0){
+      el.classList.add('kids');
+      const tg=document.createElement('div');
+      tg.className='tg';
+      tg.textContent = isCollapsed(node)? '+':'−';
+      tg.onclick = e=>{ e.stopPropagation(); isCollapsed(node)?collapsed.delete(node):collapsed.add(node); render(); };
+      el.appendChild(tg);
+    }
+    el.onclick = ()=>{ selNode=node; showDetail(node, pathOf(node)); render(); };
+    canvas.appendChild(el);
+    nodeEls.push(el);
+
+    if(parent){
+      const x1 = parent._x + (depth===1?250:NODE_W), y1 = parent._y + (depth===1?32:NODE_H/2);
+      const x2 = node._x, y2 = node._y + NODE_H/2;
+      const mx = (x1+x2)/2;
+      pathsHTML += '<path d="M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2+'" '+
+        'fill="none" stroke="'+linkColor(node.w)+'" stroke-width="'+(depth===1?2:1.4)+'" stroke-opacity="'+(depth===1?.75:.45)+'"/>';
+    }
+    kids.forEach(k=>walk(k, depth+1, node));
+  })(cur.root, 0, null);
+
+  svg.innerHTML = pathsHTML;
+  applyTransform();
+  $('stat').textContent = '当前显示 '+nodeEls.length+' 个节点 · '+cur.name+' · '+cur.sub;
+}
+function linkColor(w){
+  return {S:'#f85149',A:'#ffa657',B:'#58a6ff',C:'#8b949e'}[w] || '#484f58';
+}
+function esc(s){ return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+function pathOf(target){
+  const p=[];
+  (function w(n, trail){
+    if(n===target){ p.push(...trail, n.n); return true; }
+    for(const k of (n.c||[])){ if(w(k, trail.concat([n.n]))) return true; }
+    return false;
+  })(cur.root, []);
+  return p;
+}
+function applyTransform(){
+  canvas.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
+}
+function showDetail(node, path){
+  const wname={S:'S 核心必考',A:'A 高频',B:'B 中频',C:'C 低频'}[node.w];
+  let h = '<div class="path">'+path.map(esc).join(' › ')+'</div>';
+  h += '<div class="tt">'+esc(node.n)+'</div>';
+  h += '<div class="kv"><div class="k">权重等级</div><div class="v"><span class="wtag '+node.w+'">'+wname+'</span></div></div>';
+  if(node.s) h += '<div class="kv"><div class="k">参考分值（2024-2026）</div><div class="v">'+esc(node.s)+'</div></div>';
+  if(node.f) h += '<div class="kv"><div class="k">出现频次</div><div class="v">'+esc(node.f)+'</div></div>';
+  if(node.t) h += '<div class="kv"><div class="k">考查形式与备考提示</div><div class="v">'+esc(node.t)+'</div></div>';
+  sideBody.innerHTML = h;
+  sideBody.scrollTop = 0;
+}
+
+/* --- 交互 --- */
+function buildTabs(){
+  const t=$('tabs'); t.innerHTML='';
+  SUBJECTS.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='tab'+(s===cur?' active':'');
+    b.innerHTML='<span class="dot" style="background:'+s.color+'"></span>'+s.name+
+                '<span class="sub">'+s.sub+'</span>';
+    b.onclick=()=>{ cur=s; selNode=null; collapsed.clear(); buildTabs(); buildMeta(); render(); fit(); };
+    t.appendChild(b);
+  });
+}
+function buildMeta(){
+  const m=$('meta'); m.innerHTML='';
+  cur.meta.forEach(([k,v])=>{
+    const d=document.createElement('div'); d.className='chip';
+    d.innerHTML='<b>'+k+'</b> · '+v; m.appendChild(d);
+  });
+  if(cur.warn){
+    const d=document.createElement('div'); d.className='chip warn';
+    d.innerHTML='⚠ <b>口径提示</b> · '+cur.warn; m.appendChild(d);
+  }
+}
+function fit(){
+  const r=stage.getBoundingClientRect();
+  const cw=parseFloat(canvas.style.width), ch=parseFloat(canvas.style.height);
+  scale = Math.min(r.width/cw, r.height/ch, 1.05);
+  tx = Math.max(20,(r.width - cw*scale)/2);
+  ty = Math.max(10,(r.height - ch*scale)/2);
+  applyTransform();
+}
+
+/* 拖拽平移 */
+let dragging=false, sx=0, sy=0, ox=0, oy=0;
+stage.addEventListener('mousedown', e=>{
+  if(e.target.closest('.node')) return;
+  dragging=true; sx=e.clientX; sy=e.clientY; ox=tx; oy=ty; stage.classList.add('drag');
+});
+window.addEventListener('mousemove', e=>{
+  if(!dragging) return; tx=ox+(e.clientX-sx); ty=oy+(e.clientY-sy); applyTransform();
+});
+window.addEventListener('mouseup', ()=>{dragging=false; stage.classList.remove('drag');});
+stage.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const r=stage.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const f = e.deltaY<0?1.1:0.9;
+  const ns=Math.max(.25,Math.min(1.8, scale*f));
+  tx = mx - (mx-tx)*(ns/scale); ty = my - (my-ty)*(ns/scale); scale=ns; applyTransform();
+},{passive:false});
+
+/* 按钮 */
+$('btnExpand').onclick=()=>{ collapsed.clear(); render(); };
+$('btnCollapse').onclick=()=>{
+  collapsed.clear();
+  (cur.root.c||[]).forEach(m=>{ (m.c||[]).forEach(k=>{ if((k.c||[]).length) collapsed.add(k); }); });
+  render(); fit();
+};
+$('btnFit').onclick=fit;
+$('zi').onclick=()=>{scale=Math.min(1.8,scale*1.15);applyTransform();};
+$('zo').onclick=()=>{scale=Math.max(.25,scale/1.15);applyTransform();};
+document.querySelectorAll('[data-w]').forEach(b=>{
+  b.onclick=()=>{
+    const w=b.dataset.w;
+    if(filterW.has(w)){ filterW.delete(w); b.classList.remove('on'); }
+    else { filterW.add(w); b.classList.add('on'); }
+    render();
+  };
+});
+$('q').addEventListener('input', e=>{
+  query = e.target.value.trim().toLowerCase();
+  if(query){ collapsed.clear(); }
+  render();
+});
+
+buildTabs(); buildMeta(); render(); fit();
+window.addEventListener('resize', ()=>{ /* 保持当前视图 */ });
+</script>
+</body>
+</html>

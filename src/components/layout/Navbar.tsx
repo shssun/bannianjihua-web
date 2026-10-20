@@ -27,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: '首页', to: '/' },
   { label: '文章', to: '/blog' },
   { label: '工具箱', to: '/tools' },
+  { label: '考点图谱', to: '/gaokao' },
   { label: '研发计划', to: '/roadmap' },
   { label: '留言板', to: '/message' },
   { label: '互评走廊', to: '/corridor' },
@@ -35,7 +36,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * 顶部固定导航栏：Logo + 7 项导航 + 深浅色切换。
+ * 顶部固定导航栏：Logo + 8 项导航 + 深浅色切换。
  * 移动端折叠为抽屉菜单。
  */
 export default function Navbar(): JSX.Element {

@@ -11,6 +11,7 @@ import RoadmapPage from '@/pages/RoadmapPage';
 import MessageBoardPage from '@/pages/MessageBoardPage';
 import CorridorPage from '@/pages/CorridorPage';
 import DataPage from '@/pages/DataPage';
+import GaokaoPage from '@/pages/GaokaoPage';
 import AboutPage from '@/pages/AboutPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import { BASE_PREFIX } from '@/lib/paths';
@@ -52,6 +53,8 @@ const routes: RouteObject[] = [
       { path: 'tools/collection/:collection', element: <CollectionPage /> },
       { path: 'tools/:id', element: <ToolViewPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
+      // 考点图谱：备考知识点统一入口（注册表 src/data/gaokao/entries.ts）
+      { path: 'gaokao', element: <GaokaoPage /> },
       { path: 'message', element: <MessageBoardPage /> },
       // 互评走廊：贴出你的句子 → 他人挑错/追问（复用 Supabase，见 supabase/migrations/）
       { path: 'corridor', element: <CorridorPage /> },

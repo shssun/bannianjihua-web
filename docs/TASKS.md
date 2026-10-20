@@ -338,3 +338,25 @@ acceptance:
 - 若动了数据：五项一致性校验全 0 违例（时间戳单调 / 顶层 words 并集 / wordCount / zh key / manifest 槽位），且验证据阳性对照
 - `node scripts/check-tools.mjs` 退出码 0
 - 真跑：`chrome --headless=new --dump-dom` exit 0 且列表项数 == 条目数
+
+## T-031 · 新增「考点图谱」栏目并接入六科考点权重思维导图
+
+priority: P1
+area: 仓库内（D:/workspaces/bannianjihua_web）
+depends: -
+size: M
+executor: 我方自行执行，执行方请跳过（源料在 WorkBuddy 资料库托管页，执行方无法访问；执行方已 5 天无动作，回退条件两条齐备）
+spec: 老板 2026-10-20 指令「把资料库页面 https://workbuddy.link/p/GNy6OhxWRrFUvuG7RSFDdv 整理到网站里，开一个新的专栏或菜单作为入口，方便后续扩展知识点」。源料 =「甘肃新高考六科考点权重思维导图」（2027届口径，S/A/B/C 四级权重 + 近三年分值 + 备考提示，六科 tabs / 权重筛选 / 搜索 / 缩放，单文件纯静态 62KB）。
+
+实施（已完成）：
+- 源料经清理（去 WorkBuddy 注入：inject.js 引用 / data-page-node-id / data-pnid-children / pnid 注释）后落 `public/gaokao/exam-weight-map/index.html`（58461 字节，零注入残留、零外部依赖、完全自包含）
+- 新栏目页 `src/pages/GaokaoPage.tsx`（路由 `/gaokao`）+ 注册表 `src/data/gaokao/entries.ts`（与工具注册表分离，不占频道/集合/ICAP 三维度；后续知识点按同一模式追加纯字面量条目）
+- `router.tsx` 加路由、`Navbar.tsx` 加菜单项「考点图谱」（置于工具箱之后）
+- 打开方式遵循架构约定：真实 `<a target="_blank" rel="noopener noreferrer">` 新标签直开，不用 iframe、不用 window.open；entry 经 publicUrl() 补 base 前缀（子路径安全）
+
+acceptance:
+- [x] 路由 `/gaokao` 可达，Navbar（桌面 + 移动抽屉）出现「考点图谱」菜单项
+- [x] `public/gaokao/exam-weight-map/index.html` 存在且 grep -ci 'pnid|page_comm|workbuddy' = 0、src/href 无任何外部引用
+- [x] `npx tsc -b` exit 0；`node scripts/check-tools.mjs` exit 0（频道4/集合5/ICAP4/工具19/路径3，本卡未动工具注册表）
+- [x] `vite build` exit 0 且产物含 gaokao/exam-weight-map/index.html
+- [x] 真跑（vite preview + 无头 Chrome）：栏目页 DOM 11589 字节，断言「考点图谱/六科考点权重思维导图/2027届/打开/entry 路径」5/5 命中；导图页 DOM 75084 字节，六科 tab 与「权重筛选/节点详情」全渲染、canvas 节点 39 个、控制台零报错
