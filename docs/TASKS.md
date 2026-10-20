@@ -382,3 +382,18 @@ acceptance:
 - [x] 知识树页真跑 exit 0、DOM 111983B，六科/题型模板/跨学科/星级内容齐全，fetch 0、外链 0
 - [x] 栏目页两卡片链接各命中 1（exam-weight-map / knowledge-tree）
 - [x] tsc -b exit 0；vite build exit 0
+
+## T-033 · 知识树补齐「性价比梯队」段落 + 两页互链（A 方案收尾）
+
+priority: P1
+area: 仓库内（D:/workspaces/bannianjihua_web）
+depends: T-032
+size: S
+executor: 我方自行执行，执行方请跳过（T-031/032 同源续作，执行方持续无动作，回退条件两条齐备）
+spec: 老板 2026-10-20 拍板 A 方案「知识树上站 + 性价比表改梯队措辞 + 和导图互链」。T-032 已上站原型本体；本卡补齐剩余两件：① zip 总览的「提分性价比排序」原用 S/A/B/C/D（与导图考点权重 S/A/B/C 语义撞车），改用「梯队一~五」措辞后落进知识树页底部新 section；② 两页头部互链（兄弟目录相对路径 `../`，天然子路径安全）。
+
+acceptance:
+- [x] 知识树页真跑（无头 Chrome）：「提分性价比梯队」标题、梯队一~五 5 行、「本表管『复习顺序』/导图 S/A/B/C 管『考查力度』」口径说明、一句话策略全渲染；互链 href=../exam-weight-map/index.html 命中
+- [x] 导图页真跑回归：初始 8 节点、scale(0.72) 托底不受影响；互链 href=../knowledge-tree/index.html 命中
+- [x] tsc -b exit 0；vite build exit 0 且产物含两目录
+- [x] 梯队配色沿用知识树星级色板（红/橙/黄/靛/灰），深色徽标白字对比可读（梯队三用 #D99000 加深）
