@@ -790,7 +790,7 @@ function buildTabs(){
     b.className='tab'+(s===cur?' active':'');
     b.innerHTML='<span class="dot" style="background:'+s.color+'"></span>'+s.name+
                 '<span class="sub">'+s.sub+'</span>';
-    b.onclick=()=>{ cur=s; selNode=null; collapsed.clear(); buildTabs(); buildMeta(); render(); fit(); };
+    b.onclick=()=>{ cur=s; selNode=null; collapseToModules(); buildTabs(); buildMeta(); render(); fit(); };
     t.appendChild(b);
   });
 }
@@ -808,7 +808,8 @@ function buildMeta(){
 function fit(){
   const r=stage.getBoundingClientRect();
   const cw=parseFloat(canvas.style.width), ch=parseFloat(canvas.style.height);
-  scale = Math.min(r.width/cw, r.height/ch, 1.05);
+  /* 下限 0.72：宁可溢出拖动也不缩成看不清的小字（2026-10-20 版式修复） */
+  scale = Math.max(0.72, Math.min(r.width/cw, r.height/ch, 1.05));
   tx = Math.max(20,(r.width - cw*scale)/2);
   ty = Math.max(10,(r.height - ch*scale)/2);
   applyTransform();
@@ -835,11 +836,11 @@ stage.addEventListener('wheel', e=>{
 
 /* 按钮 */
 $('btnExpand').onclick=()=>{ collapsed.clear(); render(); };
-$('btnCollapse').onclick=()=>{
+function collapseToModules(){
   collapsed.clear();
-  (cur.root.c||[]).forEach(m=>{ (m.c||[]).forEach(k=>{ if((k.c||[]).length) collapsed.add(k); }); });
-  render(); fit();
-};
+  (cur.root.c||[]).forEach(m=>{ if((m.c||[]).length) collapsed.add(m); });
+}
+$('btnCollapse').onclick=()=>{ collapseToModules(); render(); fit(); };
 $('btnFit').onclick=fit;
 $('zi').onclick=()=>{scale=Math.min(1.8,scale*1.15);applyTransform();};
 $('zo').onclick=()=>{scale=Math.max(.25,scale/1.15);applyTransform();};
@@ -857,7 +858,7 @@ $('q').addEventListener('input', e=>{
   render();
 });
 
-buildTabs(); buildMeta(); render(); fit();
+buildTabs(); buildMeta(); collapseToModules(); render(); fit();
 window.addEventListener('resize', ()=>{ /* 保持当前视图 */ });
 </script>
 </body>

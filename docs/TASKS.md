@@ -360,3 +360,25 @@ acceptance:
 - [x] `npx tsc -b` exit 0；`node scripts/check-tools.mjs` exit 0（频道4/集合5/ICAP4/工具19/路径3，本卡未动工具注册表）
 - [x] `vite build` exit 0 且产物含 gaokao/exam-weight-map/index.html
 - [x] 真跑（vite preview + 无头 Chrome）：栏目页 DOM 11589 字节，断言「考点图谱/六科考点权重思维导图/2027届/打开/entry 路径」5/5 命中；导图页 DOM 75084 字节，六科 tab 与「权重筛选/节点详情」全渲染、canvas 节点 39 个、控制台零报错
+
+## T-032 · 导图版式修复（默认打开看不清）+ 知识树原型上站
+
+priority: P1
+area: 仓库内（D:/workspaces/bannianjihua_web）
+depends: T-031
+size: M
+executor: 我方自行执行，执行方请跳过（源料为老板本机素材包，执行方不可达；执行方持续 5 天+ 无动作，回退条件两条齐备）
+spec: 老板 2026-10-20 两点反馈：① 参考「高考六科知识树-web素材包.zip」（99KB 自包含单页原型，零外链零 fetch）；② 「默认打开，脑图部分什么都看不清」。根因实测：exam-weight-map 初始态全展开（39 节点，树高约 2600px），fit() 以 min(视口宽/树宽, 视口高/树高, 1.05) 硬塞视口 → scale≈0.3，12.6px 节点字渲染后约 4px。
+
+实施：
+- exam-weight-map/index.html 四处修改：fit() 加 0.72 下限（宁可溢出拖动不出蚂蚁字）；抽 collapseToModules()；「折叠到模块」按钮改为真·折叠到模块层（原实现残留中间层，语义不符）；初始化与切 tab 均改为模块级折叠态
+- 素材包原型部署为 public/gaokao/knowledge-tree/index.html（去「Web 原型」字样），注册 entries.ts 新条目「六科知识树 · 星级考点清单」（★1-5 + 中文短语双标识，158 主题，含试卷结构/性价比梯队/跨学科/36 个五星题型模板）
+
+⚠️ 本卡探针自检抓出一个自造 bug：node -e 批量 replace 时「buildTabs(); buildMeta(); render(); fit();」子串在 tab onclick 与全局初始化两处出现，String.replace 只换第一个 → 初始化行漏改、onclick 行重复插入。靠「节点数仍 39」断言暴露后定点修复。
+
+acceptance:
+- [x] 初始态模块级折叠：真跑（--window-size=1440,900）初始可见 node 39 → 8，canvas 尺寸 554×606
+- [x] fit 下限生效：transform 实测 scale(0.72)（修复前同场景 ≈0.27）；真实浏览器模块折叠态树高 606px < stage 高 → 落在 1.05 满字号
+- [x] 知识树页真跑 exit 0、DOM 111983B，六科/题型模板/跨学科/星级内容齐全，fetch 0、外链 0
+- [x] 栏目页两卡片链接各命中 1（exam-weight-map / knowledge-tree）
+- [x] tsc -b exit 0；vite build exit 0

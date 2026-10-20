@@ -31,11 +31,21 @@ export const GAOKAO_ENTRIES: GaokaoEntry[] = [
     id: 'exam-weight-map',
     name: '六科考点权重思维导图',
     description:
-      '甘肃新高考（物化生）六科考点权重全景：S/A/B/C 四级权重、近三年分值、考查形式与备考提示；支持权重筛选、关键词定位与缩放。',
+      '甘肃新高考（物化生）六科考点权重全景：S/A/B/C 四级权重、近三年分值、考查形式与备考提示；默认按模块折叠展示（可逐层下钻），支持权重筛选、关键词定位与缩放。',
     tags: ['思维导图', '六科', '2027届', '权重分级'],
     entry: '/gaokao/exam-weight-map/index.html',
     externalUrl: 'https://workbuddy.link/p/GNy6OhxWRrFUvuG7RSFDdv',
     cover: '🧭',
+    addedAt: '2026-10-20',
+  },
+  {
+    id: 'exam-knowledge-tree',
+    name: '六科知识树 · 星级考点清单',
+    description:
+      '按教材册序梳理六科 158 个主题：★1–5 星级 + 中文短语双标识、每主题附真题痕迹；含试卷结构总览、提分性价比梯队、跨学科关联与 36 个五星题型模板。',
+    tags: ['知识树', '星级清单', '题型模板', '跨学科'],
+    entry: '/gaokao/knowledge-tree/index.html',
+    cover: '🌳',
     addedAt: '2026-10-20',
   },
 ];
